@@ -3,12 +3,12 @@ from . import views
 
 urlpatterns = [
     # Categories
-    path('categories/', views.CategoryListCreateView.as_view(), name='category-list-create'),
-    path('categories/<int:pk>/', views.CategoryDetailView.as_view(), name='category-detail'),
+    path('categories/', views.categories_list_create, name='category-list-create'),
+    path('categories/<int:pk>/', views.category_detail, name='category-detail'),
     
     # Items
-    path('items/', views.ItemListCreateView.as_view(), name='item-list-create'),
-    path('items/<int:pk>/', views.ItemDetailView.as_view(), name='item-detail'),
+    path('items/', views.items_list_create, name='item-list-create'),
+    path('items/<int:pk>/', views.item_detail, name='item-detail'),
     
     # Dashboard
     path('dashboard/', views.dashboard_stats, name='dashboard-stats'),

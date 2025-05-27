@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
@@ -10,34 +10,56 @@ from .serializers import CategorySerializer, ItemSerializer, ItemCreateUpdateSer
 # Create your views here.
 
 # Category Views
-class CategoryListCreateView(generics.ListCreateAPIView):
-    serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
-    
-    def get_queryset(self):
-        return Category.objects.all().order_by('name')
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def categories_list_create(request):
+    if request.method == 'POST':
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        categories = Category.objects.all().order_by('name')
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data)
 
-class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def category_detail(request, pk):
+    try:
+        category = Category.objects.get(pk=pk)
+    except Category.DoesNotExist:
+        return Response({'error': 'Kategorie nicht gefunden'}, status=status.HTTP_404_NOT_FOUND)
     
-    def get_queryset(self):
-        return Category.objects.all()
+    if request.method == 'GET':
+        serializer = CategorySerializer(category)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = CategorySerializer(category, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Item Views
-class ItemListCreateView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return ItemCreateUpdateSerializer
-        return ItemSerializer
-    
-    def get_queryset(self):
-        queryset = Item.objects.filter(owner=self.request.user).select_related('category', 'owner')
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def items_list_create(request):
+    if request.method == 'POST':
+        serializer = ItemCreateUpdateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        queryset = Item.objects.filter(owner=request.user).select_related('category', 'owner')
         
         # Suchfunktion
-        search = self.request.query_params.get('search', None)
+        search = request.query_params.get('search', None)
         if search:
             queryset = queryset.filter(
                 Q(name__icontains=search) |
@@ -47,30 +69,42 @@ class ItemListCreateView(generics.ListCreateAPIView):
             )
         
         # Kategorie-Filter
-        category = self.request.query_params.get('category', None)
+        category = request.query_params.get('category', None)
         if category:
             queryset = queryset.filter(category_id=category)
         
         # Zustand-Filter
-        condition = self.request.query_params.get('condition', None)
+        condition = request.query_params.get('condition', None)
         if condition:
             queryset = queryset.filter(condition=condition)
         
-        return queryset.order_by('-created_at')
+        serializer = ItemSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def item_detail(request, pk):
+    try:
+        item = Item.objects.get(pk=pk, owner=request.user)  # Nur eigene Items
+    except Item.DoesNotExist:
+        return Response({'error': 'Gegenstand nicht gefunden'}, status=status.HTTP_404_NOT_FOUND)
     
-    def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
-            return ItemCreateUpdateSerializer
-        return ItemSerializer
-    
-    def get_queryset(self):
-        return Item.objects.filter(owner=self.request.user).select_related('category', 'owner')
+    if request.method == 'GET':
+        serializer = ItemSerializer(item)
+        return Response(serializer.data)
+    elif request.method in ['PUT', 'PATCH']:
+        serializer = ItemCreateUpdateSerializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # Dashboard/Statistics View
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def dashboard_stats(request):
     user_items = Item.objects.filter(owner=request.user)
     

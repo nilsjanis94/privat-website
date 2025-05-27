@@ -63,16 +63,46 @@ export class RegisterComponent {
   onSubmit(): void {
     if (this.registerForm.valid) {
       this.isLoading = true;
+      
       this.authService.register(this.registerForm.value).subscribe({
-        next: () => {
+        next: (response) => {
+          this.isLoading = false;
           this.toastr.success('Erfolgreich registriert!');
           this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.isLoading = false;
-          this.toastr.error('Registrierung fehlgeschlagen. Versuchen Sie es erneut.');
+          
+          if (error.error && typeof error.error === 'object') {
+            // Spezifische Fehlermeldungen für jedes Feld
+            Object.keys(error.error).forEach(key => {
+              const messages = error.error[key];
+              const fieldName = this.getFieldDisplayName(key);
+              
+              if (Array.isArray(messages)) {
+                messages.forEach(message => {
+                  this.toastr.error(`${fieldName}: ${message}`);
+                });
+              } else {
+                this.toastr.error(`${fieldName}: ${messages}`);
+              }
+            });
+          } else {
+            this.toastr.error('Registrierung fehlgeschlagen. Versuchen Sie es erneut.');
+          }
         }
       });
     }
+  }
+
+  private getFieldDisplayName(fieldName: string): string {
+    const fieldNames: { [key: string]: string } = {
+      'email': 'E-Mail',
+      'username': 'Benutzername',
+      'password': 'Passwort',
+      'first_name': 'Vorname',
+      'last_name': 'Nachname'
+    };
+    return fieldNames[fieldName] || fieldName;
   }
 }

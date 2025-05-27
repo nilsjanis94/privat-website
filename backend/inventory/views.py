@@ -16,11 +16,11 @@ def categories_list_create(request):
     if request.method == 'POST':
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(owner=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        categories = Category.objects.all().order_by('name')
+        categories = Category.objects.filter(owner=request.user).order_by('name')
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
 
@@ -107,11 +107,12 @@ def item_detail(request, pk):
 @permission_classes([IsAuthenticated])
 def dashboard_stats(request):
     user_items = Item.objects.filter(owner=request.user)
+    user_categories = Category.objects.filter(owner=request.user)  # Nur User-Kategorien
     
     stats = {
         'total_items': user_items.count(),
         'total_value': sum(item.current_value or 0 for item in user_items),
-        'categories_count': Category.objects.count(),
+        'categories_count': user_categories.count(),  # User-Kategorien zählen
         'items_by_condition': {},
         'items_by_category': {},
         'recent_items': ItemSerializer(
@@ -129,9 +130,8 @@ def dashboard_stats(request):
             'count': count
         }
     
-    # Items nach Kategorie
-    categories = Category.objects.all()
-    for category in categories:
+    # Items nach Kategorie - nur User-Kategorien
+    for category in user_categories:  # Geändert von Category.objects.all()
         count = user_items.filter(category=category).count()
         if count > 0:
             stats['items_by_category'][category.name] = count

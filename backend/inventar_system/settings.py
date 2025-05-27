@@ -28,7 +28,12 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1', 
+    'www.aileenundnils.de',
+    'aileenundnils.de'
+]
 
 
 # Application definition
@@ -156,11 +161,16 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
-# CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",  # Angular development server
-    "http://127.0.0.1:4200",
-]
+# CORS Configuration - vereinfacht für Production
+if DEBUG:
+    # Development
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:4200",
+        "http://127.0.0.1:4200",
+    ]
+else:
+    # Production - erlaubt alle Origins (einfachste Lösung)
+    CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
 

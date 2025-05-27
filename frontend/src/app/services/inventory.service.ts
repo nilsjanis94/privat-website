@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Item, Category } from '../interfaces/inventory.interface';
@@ -32,15 +32,15 @@ export class InventoryService {
   }
 
   // Items
-  getItems(): Observable<any[]> {
-    return this.http.get<any>(`${environment.apiUrl}/inventory/items/`)
+  getItems(includeConsumed: boolean = false): Observable<Item[]> {
+    let params = new HttpParams();
+    if (!includeConsumed) {
+      params = params.set('consumed', 'false');
+    }
+    
+    return this.http.get<any>(`${environment.apiUrl}/inventory/items/`, { params })
       .pipe(
-        map(response => {
-          if (response && response.results) {
-            return response.results;
-          }
-          return Array.isArray(response) ? response : [];
-        })
+        map(response => response.results || response)
       );
   }
 
@@ -59,5 +59,14 @@ export class InventoryService {
   // Dashboard
   getDashboardStats(): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/inventory/dashboard/`);
+  }
+
+  // Neue Methoden hinzufügen
+  markItemConsumed(itemId: number): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/inventory/items/${itemId}/consume/`, {});
+  }
+
+  unmarkItemConsumed(itemId: number): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/inventory/items/${itemId}/unconsume/`, {});
   }
 }

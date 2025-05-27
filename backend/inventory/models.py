@@ -36,6 +36,8 @@ class Item(models.Model):
     serial_number = models.CharField(max_length=100, blank=True)
     warranty_until = models.DateField(null=True, blank=True)
     image = models.ImageField(upload_to='items/', null=True, blank=True)
+    consumed = models.BooleanField(default=False)
+    consumed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

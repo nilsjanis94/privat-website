@@ -54,3 +54,48 @@ def login(request):
 def profile(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_balance(request):
+    """
+    Aktualisiert den Kontostand des Benutzers.
+    Erwartet: { "amount": 100.50, "operation": "add" oder "subtract" oder "set" }
+    """
+    try:
+        amount = float(request.data.get('amount', 0))
+        operation = request.data.get('operation', 'add')
+        description = request.data.get('description', '')
+        
+        if amount < 0:
+            return Response({'error': 'Betrag muss positiv sein'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = request.user
+        old_balance = float(user.balance)
+        
+        if operation == 'add':
+            user.balance += amount
+        elif operation == 'subtract':
+            if user.balance < amount:
+                return Response({'error': 'Nicht genügend Guthaben'}, status=status.HTTP_400_BAD_REQUEST)
+            user.balance -= amount
+        elif operation == 'set':
+            user.balance = amount
+        else:
+            return Response({'error': 'Ungültige Operation. Verwende "add", "subtract" oder "set"'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.save()
+        
+        return Response({
+            'message': 'Kontostand erfolgreich aktualisiert',
+            'old_balance': old_balance,
+            'new_balance': float(user.balance),
+            'amount': amount,
+            'operation': operation,
+            'description': description
+        }, status=status.HTTP_200_OK)
+        
+    except (ValueError, TypeError):
+        return Response({'error': 'Ungültiger Betrag'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

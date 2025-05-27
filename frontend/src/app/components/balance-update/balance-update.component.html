@@ -1,0 +1,70 @@
+<div class="dialog-container">
+  <h2>Kontostand aktualisieren</h2>
+  
+  <div class="section">
+    <div class="form-group">
+      <label for="operation">Aktion</label>
+      <select 
+        id="operation"
+        [(ngModel)]="operation" 
+        class="form-input"
+        required>
+        <option value="add">Geld hinzufügen (z.B. Gehalt)</option>
+        <option value="subtract">Geld abziehen (z.B. Ausgabe)</option>
+        <option value="set">Kontostand setzen</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="amount">Betrag (€)</label>
+      <input 
+        id="amount"
+        type="number" 
+        [(ngModel)]="amount" 
+        step="0.01"
+        min="0"
+        placeholder="0.00"
+        class="form-input"
+        required>
+    </div>
+    
+    <div class="form-group">
+      <label for="description">Beschreibung (optional)</label>
+      <input 
+        id="description"
+        type="text" 
+        [(ngModel)]="description" 
+        placeholder="z.B. Gehalt Januar, Einkauf, etc."
+        class="form-input">
+    </div>
+    
+    <div class="info-box" *ngIf="operation === 'add'">
+      <p><strong>Hinzufügen:</strong> Der Betrag wird zu Ihrem aktuellen Kontostand hinzugefügt.</p>
+    </div>
+    
+    <div class="info-box warning" *ngIf="operation === 'subtract'">
+      <p><strong>Abziehen:</strong> Der Betrag wird von Ihrem aktuellen Kontostand abgezogen.</p>
+    </div>
+    
+    <div class="info-box warning" *ngIf="operation === 'set'">
+      <p><strong>Setzen:</strong> Ihr Kontostand wird auf den angegebenen Betrag gesetzt.</p>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button 
+      type="button" 
+      (click)="onCancel()" 
+      class="btn btn-cancel">
+      Abbrechen
+    </button>
+    
+    <button 
+      type="button"
+      [disabled]="!isFormValid() || isLoading"
+      (click)="onSubmit()"
+      class="btn btn-submit">
+      {{ isLoading ? 'Aktualisiere...' : 'Kontostand aktualisieren' }}
+    </button>
+  </div>
+</div>

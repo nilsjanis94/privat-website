@@ -10,7 +10,8 @@ class CategorySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']
     
     def get_items_count(self, obj):
-        return obj.items.count()
+        # Nur aktive (nicht verbrauchte) Items zählen
+        return obj.items.filter(consumed=False).count()
 
 class ItemSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
@@ -22,9 +23,10 @@ class ItemSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'category', 'category_name',
             'owner', 'owner_name', 'purchase_date', 'purchase_price',
             'current_value', 'condition', 'location', 'serial_number',
-            'warranty_until', 'image', 'created_at', 'updated_at'
+            'warranty_until', 'image', 'consumed', 'consumed_at',
+            'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'owner', 'consumed_at', 'created_at', 'updated_at']
     
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user

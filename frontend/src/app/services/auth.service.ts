@@ -71,4 +71,31 @@ export class AuthService {
   getToken(): string | null {
     return localStorage.getItem('access_token');
   }
+
+  updateBalance(amount: number, operation: 'add' | 'subtract' | 'set', description?: string): Observable<any> {
+    const payload = {
+      amount: amount,
+      operation: operation,
+      description: description || ''
+    };
+    
+    return this.http.post<any>(`${environment.apiUrl}/auth/update-balance/`, payload)
+      .pipe(
+        tap(response => {
+          // User-Daten aktualisieren nach Balance-Update
+          this.refreshUserData();
+        })
+      );
+  }
+
+  private refreshUserData(): void {
+    this.http.get<any>(`${environment.apiUrl}/auth/profile/`).subscribe({
+      next: (user) => {
+        this.currentUserSubject.next(user);
+      },
+      error: (error) => {
+        console.error('Fehler beim Aktualisieren der Benutzerdaten:', error);
+      }
+    });
+  }
 }

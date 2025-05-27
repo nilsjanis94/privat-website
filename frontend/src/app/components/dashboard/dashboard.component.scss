@@ -47,6 +47,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    position: relative;
   }
   
   .stat-icon {
@@ -57,6 +58,8 @@
   }
   
   .stat-info {
+    flex: 1;
+    
     h2 {
       margin: 0;
       font-size: 2rem;
@@ -68,6 +71,20 @@
       color: #666;
       font-size: 0.9rem;
     }
+  }
+}
+
+.balance-card {
+  .balance-edit-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover .balance-edit-btn {
+    opacity: 1;
   }
 }
 
@@ -233,6 +250,87 @@
   text-align: center;
 }
 
+.monthly-expenses {
+  display: grid;
+  gap: 1rem;
+}
+
+.month-expense {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .month-info {
+    h4 {
+      margin: 0 0 0.25rem 0;
+      color: #333;
+      font-size: 1rem;
+    }
+    
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 0.85rem;
+    }
+  }
+  
+  .month-amount {
+    .amount {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #f44336;  // Rot für Ausgaben
+    }
+  }
+}
+
+.warning-card {
+  background-color: #fff3e0;
+  border-left: 4px solid #ff9800;
+  margin-bottom: 1rem;
+  
+  .warning-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .warning-icon {
+    color: #ff9800;
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+    margin-top: 0.25rem;
+  }
+  
+  .warning-info {
+    flex: 1;
+    
+    h3 {
+      margin: 0 0 0.5rem 0;
+      color: #e65100;
+      font-size: 1.1rem;
+    }
+    
+    p {
+      margin: 0 0 1rem 0;
+      color: #bf360c;
+      line-height: 1.4;
+    }
+    
+    button {
+      color: #e65100;
+    }
+  }
+}
+
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
@@ -247,6 +345,22 @@
     
     button {
       width: 100%;
+    }
+  }
+  
+  .monthly-expenses {
+    gap: 0.5rem;
+  }
+  
+  .month-expense {
+    padding: 0.75rem;
+    
+    .month-info h4 {
+      font-size: 0.9rem;
+    }
+    
+    .month-amount .amount {
+      font-size: 1rem;
     }
   }
 }

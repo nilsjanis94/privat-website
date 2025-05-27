@@ -9,11 +9,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
 import { InventoryService } from '../../services/inventory.service';
 import { AuthService } from '../../services/auth.service';
 import { DashboardStats, Item } from '../../interfaces/inventory.interface';
 import { User } from '../../interfaces/user.interface';
 import { Observable } from 'rxjs';
+import { BalanceUpdateComponent } from '../balance-update/balance-update.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,7 +47,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private inventoryService: InventoryService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {
     this.currentUser$ = this.authService.currentUser$;
   }
@@ -58,6 +61,8 @@ export class DashboardComponent implements OnInit {
   loadDashboardStats(): void {
     this.inventoryService.getDashboardStats().subscribe({
       next: (stats) => {
+        console.log('Dashboard Stats:', stats);
+        console.log('Balance:', stats.balance);
         this.stats = stats;
         this.isLoading = false;
       },
@@ -78,6 +83,20 @@ export class DashboardComponent implements OnInit {
       error: (error: any) => {
         console.error('Fehler beim Laden der Items:', error);
         this.isLoadingItems = false;
+      }
+    });
+  }
+
+  openBalanceUpdateDialog(): void {
+    const dialogRef = this.dialog.open(BalanceUpdateComponent, {
+      width: '500px',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Dashboard-Statistiken neu laden nach Balance-Update
+        this.loadDashboardStats();
       }
     });
   }

@@ -14,6 +14,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ToastrService } from 'ngx-toastr';
 import { InventoryService } from '../../services/inventory.service';
 import { Category, Item } from '../../interfaces/inventory.interface';
@@ -38,7 +39,8 @@ import { CategoryFormComponent } from '../category-form/category-form.component'
     MatDialogModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatMenuModule
+    MatMenuModule,
+    MatSlideToggleModule
   ],
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.scss']
@@ -92,6 +94,8 @@ export class InventoryComponent implements OnInit {
     { value: 'schlecht', label: 'Schlecht' }
   ];
 
+  showConsumedItems = false;
+
   constructor(
     private inventoryService: InventoryService,
     private dialog: MatDialog,
@@ -120,10 +124,17 @@ export class InventoryComponent implements OnInit {
 
   loadItems(): void {
     this.isLoading = true;
-    this.inventoryService.getItems().subscribe({
+    this.inventoryService.getItems(this.showConsumedItems).subscribe({
       next: (response) => {
         this.items = Array.isArray(response) ? response : [];
-        this.filteredItems = [...this.items]; // Gefilterte Items initialisieren
+        
+        // Filter verbrauchte Items basierend auf showConsumedItems
+        if (!this.showConsumedItems) {
+          this.items = this.items.filter(item => !item.consumed);
+        }
+        
+        this.filteredItems = [...this.items];
+        this.applyFilters(); // Filter nach dem Laden anwenden
         this.isLoading = false;
       },
       error: (error: any) => {
@@ -266,5 +277,35 @@ export class InventoryComponent implements OnInit {
       case 'schlecht': return '#f44336';
       default: return '#9e9e9e';
     }
+  }
+
+  onShowConsumedToggle(): void {
+    this.loadItems();
+  }
+
+  markAsConsumed(item: Item): void {
+    this.inventoryService.markItemConsumed(item.id).subscribe({
+      next: (response) => {
+        this.toastr.success(`${item.name} wurde als verbraucht markiert`);
+        this.loadItems();
+      },
+      error: (error) => {
+        console.error('Fehler beim Markieren als verbraucht:', error);
+        this.toastr.error('Fehler beim Markieren als verbraucht');
+      }
+    });
+  }
+
+  unmarkAsConsumed(item: Item): void {
+    this.inventoryService.unmarkItemConsumed(item.id).subscribe({
+      next: (response) => {
+        this.toastr.success(`${item.name} ist wieder verfügbar`);
+        this.loadItems();
+      },
+      error: (error) => {
+        console.error('Fehler beim Rückgängigmachen:', error);
+        this.toastr.error('Fehler beim Rückgängigmachen');
+      }
+    });
   }
 }

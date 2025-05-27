@@ -9,6 +9,8 @@ urlpatterns = [
     # Items
     path('items/', views.items_list_create, name='item-list-create'),
     path('items/<int:pk>/', views.item_detail, name='item-detail'),
+    path('items/<int:pk>/consume/', views.mark_item_consumed, name='item-consume'),
+    path('items/<int:pk>/unconsume/', views.unmark_item_consumed, name='item-unconsume'),
     
     # Dashboard
     path('dashboard/', views.dashboard_stats, name='dashboard-stats'),

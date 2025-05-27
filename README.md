@@ -1,7 +1,6 @@
-```markdown:README.md
 # 🏠 Haushalts-Inventar-System
 
-Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich mit erweiterten Features wie Kontostand-Management, Ausgaben-Tracking und Verbrauchs-Verwaltung.
+Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich mit erweiterten Features wie Kontostand-Management, Ausgaben-Tracking, Verbrauchs-Verwaltung und automatisiertem Deployment.
 
 ## 🚀 Hauptfeatures
 
@@ -10,7 +9,7 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - JWT-Token basierte Authentifizierung
 - Email-basierte Benutzerkonten
 - Automatische Session-Verwaltung
-- Passwort-Reset-Funktionalität
+- Benutzerspezifische Datenisolation
 
 ### 📦 Inventar-Verwaltung
 - **Kategorien**: Vollständige CRUD-Operationen mit benutzerspezifischer Isolation
@@ -26,6 +25,7 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - **Monatliche Ausgaben**: Tracking der Ausgaben nach Kaufdatum
 - **Ausgaben-Historie**: 6-Monats-Übersicht der Ausgaben
 - **Balance-Update**: Dialog zum manuellen Anpassen des Kontostands
+- **Guthaben-Prüfung**: Verhindert Käufe bei unzureichendem Guthaben
 
 ### 🍽️ Verbrauchs-Management
 - **Verbraucht markieren**: Items als "verbraucht" markieren (z.B. Lebensmittel)
@@ -67,11 +67,19 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - **NgRx Toastr**: Elegante Benachrichtigungen
 - **CSS Grid & Flexbox**: Responsive Layout-System
 
+### Deployment & Infrastructure
+- **Apache2**: Webserver mit mod_rewrite für SPA-Routing
+- **Git**: Versionskontrolle und Deployment-Pipeline
+- **Bash**: Automatisierte Deployment-Scripts
+- **Virtual Environment**: Isolierte Python-Umgebung
+
 ## 📋 Systemanforderungen
 
 - **Python**: 3.11 oder höher
 - **Node.js**: 18 oder höher
 - **npm**: 8 oder höher
+- **Apache2**: Mit mod_rewrite, mod_headers, mod_expires, mod_deflate
+- **Git**: Für Deployment-Pipeline
 - **Speicher**: Mindestens 4GB RAM
 - **Browser**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 
@@ -122,6 +130,9 @@ cd frontend
 # Dependencies installieren
 npm install
 
+# Environment-Datei für Development erstellen
+cp src/environments/environment.prod.ts src/environments/environment.ts
+
 # Development Server starten
 ng serve
 
@@ -131,23 +142,84 @@ ng build --configuration production
 
 **Frontend läuft auf:** `http://localhost:4200`
 
+## 🚀 Production Deployment
+
+### Automatisiertes Deployment mit Script
+
+Das Projekt enthält ein vollautomatisches Deployment-Script für Apache2-Server:
+
+```bash
+# Auf dem Server: Repository klonen/aktualisieren
+git clone <repository-url>
+cd inventar-system
+git pull origin main
+
+# Virtual Environment aktivieren
+source venv/bin/activate
+
+# Automatisches Deployment ausführen
+./deploy.sh
+```
+
+### Was das Deployment-Script macht:
+
+1. **Frontend Build**: Angular Production-Build erstellen
+2. **Backend Setup**: Dependencies installieren, Migrationen ausführen
+3. **File Deployment**: Dateien nach `/var/www/html/` kopieren
+4. **Apache Konfiguration**: `.htaccess` für SPA-Routing konfigurieren
+5. **Module Aktivierung**: Benötigte Apache-Module aktivieren
+6. **Berechtigungen**: Korrekte Dateiberechtigungen setzen
+7. **Service Restart**: Apache bei Bedarf neu starten
+
+### Manuelle Deployment-Schritte
+
+Falls das automatische Script nicht verwendet werden kann:
+
+```bash
+# 1. Frontend Build
+cd frontend
+ng build --configuration production
+
+# 2. Backend Setup
+cd ../backend
+source ../venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py collectstatic --noinput
+
+# 3. Dateien kopieren
+sudo cp -r ../frontend/dist/frontend/* /var/www/html/
+sudo cp ../.htaccess /var/www/html/
+
+# 4. Apache Module aktivieren
+sudo a2enmod rewrite headers expires deflate
+sudo systemctl restart apache2
+
+# 5. Berechtigungen setzen
+sudo chown -R www-data:www-data /var/www/html/
+sudo chmod -R 644 /var/www/html/
+sudo chmod 755 /var/www/html/
+```
+
 ## 📁 Detaillierte Projektstruktur
 
 ```
 inventar-system/
-├── backend/                           # Django Backend
+├── .htaccess                         # Apache SPA-Routing-Konfiguration
+├── deploy.sh                         # Automatisches Deployment-Script
+├── backend/                          # Django Backend
 │   ├── inventar_system/              # Hauptprojekt-Konfiguration
 │   │   ├── settings.py               # Django-Einstellungen
 │   │   ├── urls.py                   # URL-Routing
 │   │   └── wsgi.py                   # WSGI-Konfiguration
 │   ├── authentication/               # Authentifizierungs-App
-│   │   ├── models.py                 # CustomUser Model
+│   │   ├── models.py                 # CustomUser Model mit Balance
 │   │   ├── views.py                  # Auth-Views & Balance-Update
 │   │   ├── serializers.py            # User-Serializers
 │   │   └── urls.py                   # Auth-URLs
 │   ├── inventory/                    # Inventar-App
-│   │   ├── models.py                 # Category & Item Models
-│   │   ├── views.py                  # CRUD-Views & Dashboard
+│   │   ├── models.py                 # Category & Item Models mit Consumed
+│   │   ├── views.py                  # CRUD-Views, Dashboard & Consumed-API
 │   │   ├── serializers.py            # API-Serializers
 │   │   └── urls.py                   # Inventar-URLs
 │   ├── manage.py                     # Django-Management
@@ -157,8 +229,8 @@ inventar-system/
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── components/           # UI-Komponenten
-│   │   │   │   ├── dashboard/        # Dashboard-Komponente
-│   │   │   │   ├── inventory/        # Inventar-Verwaltung
+│   │   │   │   ├── dashboard/        # Dashboard mit Finanz-Übersicht
+│   │   │   │   ├── inventory/        # Inventar mit Edit/Delete/Consumed
 │   │   │   │   ├── item-form/        # Item-Formular (Create/Edit)
 │   │   │   │   ├── category-form/    # Kategorie-Formular
 │   │   │   │   ├── balance-update/   # Kontostand-Update-Dialog
@@ -166,19 +238,23 @@ inventar-system/
 │   │   │   │   ├── register/         # Registrierungs-Komponente
 │   │   │   │   └── navbar/           # Navigation
 │   │   │   ├── services/             # Angular Services
-│   │   │   │   ├── auth.service.ts   # Authentifizierung
-│   │   │   │   └── inventory.service.ts # Inventar-API
+│   │   │   │   ├── auth.service.ts   # Authentifizierung & Balance
+│   │   │   │   └── inventory.service.ts # Inventar-API & Consumed
 │   │   │   ├── guards/               # Route Guards
 │   │   │   │   └── auth.guard.ts     # Authentifizierungs-Guard
 │   │   │   ├── interceptors/         # HTTP-Interceptors
 │   │   │   │   └── auth.interceptor.ts # JWT-Token-Interceptor
 │   │   │   ├── interfaces/           # TypeScript-Interfaces
-│   │   │   │   └── inventory.interface.ts # Datenmodelle
+│   │   │   │   ├── inventory.interface.ts # Erweiterte Datenmodelle
+│   │   │   │   └── user.interface.ts # User-Interface
 │   │   │   └── environments/         # Umgebungskonfiguration
+│   │   │       ├── environment.prod.ts # Production (relative URLs)
+│   │   │       └── environment.ts    # Development (lokale URLs)
 │   │   └── assets/                   # Statische Assets
 │   ├── angular.json                  # Angular-Konfiguration
 │   ├── package.json                  # Node.js-Dependencies
 │   └── proxy.conf.json               # Development-Proxy
+├── venv/                             # Python Virtual Environment
 ├── .gitignore                        # Git-Ignore-Regeln
 └── README.md                         # Diese Datei
 ```
@@ -226,6 +302,34 @@ export const environment = {
   production: true,
   apiUrl: '/api'  // Relative URL für Production
 };
+```
+
+### Apache-Konfiguration (`.htaccess`)
+
+```apache
+# Angular SPA Routing für Apache2
+RewriteEngine On
+
+# Handle Angular Router
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule ^.*$ /index.html [L]
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Cache-Control & Compression
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access plus 0 seconds"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/css "access plus 1 year"
+</IfModule>
 ```
 
 ## 📊 API-Dokumentation
@@ -301,28 +405,38 @@ class Item(Model):
 - **SQL-Injection-Schutz**: Django ORM verhindert SQL-Injection
 - **XSS-Schutz**: Angular's eingebauter XSS-Schutz
 - **CSRF-Schutz**: Django's CSRF-Middleware
+- **Security Headers**: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection
 
-## 🚀 Deployment
+## 🚀 Deployment-Workflow
 
-### Production-Build erstellen
+### Entwicklung → Production
+
 ```bash
-# Frontend Build
-cd frontend
-ng build --configuration production
+# 1. Lokale Entwicklung
+git add .
+git commit -m "Feature: Neue Funktionalität"
+git push origin main
 
-# Backend für Production konfigurieren
-cd backend
-python manage.py collectstatic
-python manage.py migrate
+# 2. Server-Deployment
+ssh user@server
+cd /var/www/project
+git pull origin main
+source venv/bin/activate
+./deploy.sh
+
+# 3. Testen
+curl https://yourdomain.com/
+curl https://yourdomain.com/api/inventory/dashboard/
 ```
 
-### Umgebungsvariablen (Production)
-```bash
-export DEBUG=False
-export SECRET_KEY="your-secret-key"
-export ALLOWED_HOSTS="yourdomain.com,www.yourdomain.com"
-export DATABASE_URL="your-database-url"
-```
+### Deployment-Features
+
+- ✅ **Automatisiert**: Ein Befehl für komplettes Deployment
+- ✅ **Backup**: Automatische Backups vor Deployment
+- ✅ **Rollback**: Git-basierte Rollback-Möglichkeit
+- ✅ **Validierung**: Überprüfung der Systemvoraussetzungen
+- ✅ **Logging**: Detaillierte Deployment-Logs
+- ✅ **Zero-Downtime**: Minimale Ausfallzeiten
 
 ## 🧪 Testing
 
@@ -339,14 +453,63 @@ ng test
 ng e2e
 ```
 
+### API Tests
+```bash
+# Dashboard-API testen
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+     https://yourdomain.com/api/inventory/dashboard/
+
+# Items-API testen
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+     https://yourdomain.com/api/inventory/items/
+```
+
 ## 📈 Performance-Optimierungen
 
 - **Lazy Loading**: Angular-Module werden bei Bedarf geladen
 - **OnPush Change Detection**: Optimierte Change Detection
 - **Database Indexing**: Optimierte Datenbankabfragen
-- **Caching**: Browser-Caching für statische Assets
+- **Caching**: Browser-Caching für statische Assets (1 Jahr)
+- **Compression**: Gzip-Kompression für alle Text-Assets
 - **Minification**: Komprimierte Production-Builds
 - **Tree Shaking**: Entfernung ungenutzten Codes
+- **Bundle Splitting**: Optimierte JavaScript-Bundles
+
+## 🔧 Troubleshooting
+
+### Häufige Probleme
+
+**1. 404-Fehler bei Angular-Routen**
+```bash
+# Lösung: .htaccess prüfen
+cat /var/www/html/.htaccess
+# Apache mod_rewrite aktivieren
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+```
+
+**2. API-Calls funktionieren nicht**
+```bash
+# CORS-Einstellungen prüfen
+grep CORS backend/inventar_system/settings.py
+# Django-Server läuft prüfen
+ps aux | grep python
+```
+
+**3. Environment-Datei fehlt**
+```bash
+# Environment-Datei erstellen
+cp frontend/src/environments/environment.prod.ts \
+   frontend/src/environments/environment.ts
+```
+
+**4. Berechtigungsprobleme**
+```bash
+# Git-Berechtigungen korrigieren
+sudo chown -R $USER:$USER /var/www/project
+# Web-Berechtigungen setzen
+sudo chown -R www-data:www-data /var/www/html/
+```
 
 ## 🤝 Beitragen
 
@@ -356,19 +519,42 @@ ng e2e
 4. Push zum Branch (`git push origin feature/AmazingFeature`)
 5. Öffne einen Pull Request
 
+## 📝 Changelog
+
+### Version 2.1.0 (Aktuell)
+- ✅ Automatisiertes Deployment-System
+- ✅ Apache2-Integration mit .htaccess
+- ✅ Production-ready Konfiguration
+- ✅ Erweiterte Sicherheitsfeatures
+- ✅ Performance-Optimierungen
+
+### Version 2.0.0
+- ✅ Kontostand-Management
+- ✅ Ausgaben-Tracking
+- ✅ Verbrauchs-Management
+- ✅ Erweiterte Dashboard-Funktionen
+- ✅ Vollständige CRUD-Operationen
+
+### Version 1.0.0
+- ✅ Basis-Inventar-System
+- ✅ Authentifizierung
+- ✅ Angular Material UI
+- ✅ Django REST API
+
 ## 📝 Lizenz
 
 Dieses Projekt steht unter der MIT-Lizenz. Siehe `LICENSE` Datei für Details.
 
 ## 👥 Autoren
 
-- **Nils Wolters** - *Initial work* - [GitHub](https://github.com/nilswolters)
+- **Nils Wolters** - *Initial work & Full-Stack Development* - [GitHub](https://github.com/nilsjanis94)
 
 ## 🙏 Danksagungen
 
 - Angular Team für das großartige Framework
 - Django Team für das robuste Backend-Framework
 - Material Design Team für die UI-Komponenten
+- Apache Foundation für den zuverlässigen Webserver
 - Alle Open-Source-Contributors
 
 ## 📞 Support
@@ -376,11 +562,19 @@ Dieses Projekt steht unter der MIT-Lizenz. Siehe `LICENSE` Datei für Details.
 Bei Fragen oder Problemen:
 - Erstelle ein Issue auf GitHub
 - Kontaktiere den Entwickler direkt
+- Prüfe die Troubleshooting-Sektion
+
+## 🌐 Live Demo
+
+**URL**: https://aileenundnils.de  
+**Test-Account**: Registrierung erforderlich  
+**Features**: Alle Funktionen verfügbar
 
 ---
 
-**Version**: 2.0.0  
+**Version**: 2.1.0  
 **Letztes Update**: Dezember 2024  
-**Status**: ✅ Production Ready
+**Status**: ✅ Production Ready & Live Deployed  
+**Deployment**: Automatisiert mit Apache2
 ```
 

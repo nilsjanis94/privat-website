@@ -1,0 +1,59 @@
+<div class="category-dialog">
+  <!-- Dialog Header -->
+  <div mat-dialog-title class="dialog-header">
+    <h2>{{ isEditMode ? 'Kategorie bearbeiten' : 'Neue Kategorie hinzufügen' }}</h2>
+  </div>
+
+  <!-- Dialog Content -->
+  <div mat-dialog-content class="dialog-content">
+    <form [formGroup]="categoryForm" class="category-form" (ngSubmit)="onSubmit()">
+      
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Kategorie-Name</mat-label>
+        <input matInput 
+               formControlName="name" 
+               placeholder="z.B. Elektronik, Möbel, Kleidung"
+               required>
+        <mat-icon matSuffix>category</mat-icon>
+        <mat-error *ngIf="categoryForm.get('name')?.hasError('required')">
+          Name ist erforderlich
+        </mat-error>
+        <mat-error *ngIf="categoryForm.get('name')?.hasError('maxlength')">
+          Maximal 100 Zeichen erlaubt
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Beschreibung (optional)</mat-label>
+        <textarea matInput 
+                  formControlName="description" 
+                  rows="3"
+                  placeholder="Beschreibung der Kategorie..."></textarea>
+        <mat-icon matSuffix>description</mat-icon>
+      </mat-form-field>
+
+    </form>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button 
+            type="button"
+            (click)="onCancel()" 
+            [disabled]="isLoading"
+            class="cancel-button">
+      Abbrechen
+    </button>
+    
+    <button mat-raised-button 
+            color="primary"
+            type="button"
+            (click)="onSubmit()" 
+            [disabled]="!categoryForm.valid || isLoading"
+            class="submit-button">
+      <mat-spinner diameter="18" *ngIf="isLoading"></mat-spinner>
+      <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode ? 'Aktualisieren' : 'Hinzufügen' }}</span>
+    </button>
+  </div>
+</div>

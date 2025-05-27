@@ -1,0 +1,117 @@
+<div class="item-form-container">
+  <h2 mat-dialog-title>
+    {{ isEditMode ? 'Gegenstand bearbeiten' : 'Neuen Gegenstand hinzufügen' }}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="itemForm" class="item-form">
+      <!-- Grundinformationen -->
+      <div class="form-section">
+        <h3>Grundinformationen</h3>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name *</mat-label>
+          <input matInput formControlName="name" required>
+          <mat-error>{{ getErrorMessage('name') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Beschreibung</mat-label>
+          <textarea matInput formControlName="description" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Kategorie *</mat-label>
+            <mat-select formControlName="category" required>
+              <mat-option *ngFor="let category of data.categories" [value]="category.id">
+                {{ category.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error>{{ getErrorMessage('category') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Zustand *</mat-label>
+            <mat-select formControlName="condition" required>
+              <mat-option *ngFor="let condition of conditionOptions" [value]="condition.value">
+                {{ condition.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error>{{ getErrorMessage('condition') }}</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Kaufinformationen -->
+      <div class="form-section">
+        <h3>Kaufinformationen</h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Kaufdatum</mat-label>
+            <input matInput [matDatepicker]="purchasePicker" formControlName="purchase_date">
+            <mat-datepicker-toggle matIconSuffix [for]="purchasePicker"></mat-datepicker-toggle>
+            <mat-datepicker #purchasePicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Kaufpreis</mat-label>
+            <input matInput type="number" formControlName="purchase_price" min="0" step="0.01">
+            <span matTextSuffix>€</span>
+            <mat-error>{{ getErrorMessage('purchase_price') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Aktueller Wert</mat-label>
+          <input matInput type="number" formControlName="current_value" min="0" step="0.01">
+          <span matTextSuffix>€</span>
+          <mat-error>{{ getErrorMessage('current_value') }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Details -->
+      <div class="form-section">
+        <h3>Details</h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Ort/Standort</mat-label>
+            <input matInput formControlName="location">
+            <mat-icon matSuffix>location_on</mat-icon>
+            <mat-error>{{ getErrorMessage('location') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Seriennummer</mat-label>
+            <input matInput formControlName="serial_number">
+            <mat-icon matSuffix>tag</mat-icon>
+            <mat-error>{{ getErrorMessage('serial_number') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Garantie bis</mat-label>
+          <input matInput [matDatepicker]="warrantyPicker" formControlName="warranty_until">
+          <mat-datepicker-toggle matIconSuffix [for]="warrantyPicker"></mat-datepicker-toggle>
+          <mat-datepicker #warrantyPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">
+      Abbrechen
+    </button>
+    <button mat-raised-button color="primary" 
+            (click)="onSubmit()" 
+            [disabled]="itemForm.invalid || isLoading">
+      <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+      <span *ngIf="!isLoading">
+        {{ isEditMode ? 'Aktualisieren' : 'Hinzufügen' }}
+      </span>
+    </button>
+  </mat-dialog-actions>
+</div>

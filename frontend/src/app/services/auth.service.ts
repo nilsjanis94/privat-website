@@ -14,7 +14,26 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router
-  ) {}
+  ) {
+    // Auto-Login beim App-Start wenn Token vorhanden
+    this.initializeAuth();
+  }
+
+  private initializeAuth(): void {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      // User-Daten vom Server holen
+      this.http.get<any>(`${environment.apiUrl}/auth/profile/`).subscribe({
+        next: (user) => {
+          this.currentUserSubject.next(user);
+        },
+        error: () => {
+          // Token ungültig - ausloggen
+          this.logout();
+        }
+      });
+    }
+  }
 
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/auth/login/`, credentials)

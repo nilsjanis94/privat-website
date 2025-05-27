@@ -1,255 +1,386 @@
-Ich erstelle Ihnen eine umfassende README.md für Ihr Inventar-System:
-
 ```markdown:README.md
-# Haushalts-Inventar-System
+# 🏠 Haushalts-Inventar-System
 
-Ein modernes Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich, entwickelt mit Django (Backend) und Angular (Frontend).
+Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich mit erweiterten Features wie Kontostand-Management, Ausgaben-Tracking und Verbrauchs-Verwaltung.
 
-## 🚀 Features
+## 🚀 Hauptfeatures
 
-### Authentifizierung
-- Benutzerregistrierung und Login
+### 🔐 Authentifizierung & Benutzerverwaltung
+- Sichere Benutzerregistrierung und Login
 - JWT-Token basierte Authentifizierung
-- Sichere Session-Verwaltung
+- Email-basierte Benutzerkonten
+- Automatische Session-Verwaltung
+- Passwort-Reset-Funktionalität
 
-### Inventar-Verwaltung
-- **Kategorien**: Erstellen, bearbeiten und löschen von Kategorien
-- **Gegenstände**: Vollständige CRUD-Operationen für Inventar-Items
-- **Erweiterte Suche**: Filtern nach Name, Kategorie, Zustand und Ort
-- **Zustandsverfolgung**: 5 verschiedene Zustandsstufen (Neu bis Schlecht)
+### 📦 Inventar-Verwaltung
+- **Kategorien**: Vollständige CRUD-Operationen mit benutzerspezifischer Isolation
+- **Gegenstände**: Erweiterte Item-Verwaltung mit allen Details
+- **Erweiterte Suche**: Multi-Filter-System (Name, Kategorie, Zustand, Ort)
+- **Zustandsverfolgung**: 5 Zustandsstufen (Neu → Schlecht)
+- **Bearbeitung**: Vollständige Edit-Funktionalität für alle Items
+- **Löschung**: Sichere Löschung mit Bestätigungsdialogen
 
-### Dashboard
-- Übersicht über Inventar-Statistiken
-- Anzeige der neuesten hinzugefügten Gegenstände
-- Kategorien-Übersicht mit Item-Anzahl
+### 💰 Finanz-Management
+- **Kontostand-Verwaltung**: Persönlicher Kontostand mit manueller Anpassung
+- **Automatische Ausgaben**: Kaufpreis wird automatisch vom Kontostand abgezogen
+- **Monatliche Ausgaben**: Tracking der Ausgaben nach Kaufdatum
+- **Ausgaben-Historie**: 6-Monats-Übersicht der Ausgaben
+- **Balance-Update**: Dialog zum manuellen Anpassen des Kontostands
 
-### Benutzeroberfläche
-- Responsive Design mit Angular Material
-- Moderne, intuitive Benutzeroberfläche
-- Toast-Benachrichtigungen für Benutzer-Feedback
-- Mobile-optimiert
+### 🍽️ Verbrauchs-Management
+- **Verbraucht markieren**: Items als "verbraucht" markieren (z.B. Lebensmittel)
+- **Verbrauch rückgängig**: Versehentlich markierte Items wiederherstellen
+- **Separate Statistiken**: Getrennte Zählung aktiver vs. verbrauchter Items
+- **Filter-Toggle**: Anzeige verbrauchter Items ein-/ausblenden
+- **Erhaltung der Finanzdaten**: Ausgaben und Kontostand bleiben bei Verbrauch erhalten
+
+### 📊 Dashboard & Analytics
+- **Echtzeit-Statistiken**: Aktuelle Inventar-Übersicht
+- **Finanz-Übersicht**: Kontostand, monatliche Ausgaben, Gesamtwerte
+- **Kategorien-Verteilung**: Visualisierung der Item-Verteilung
+- **Zustandsanalyse**: Übersicht über Item-Zustände
+- **Neueste Items**: Chronologische Auflistung der letzten Hinzufügungen
+- **Warnungen**: Hinweise auf Items ohne Kaufdatum
+
+### 🎨 Benutzeroberfläche
+- **Responsive Design**: Optimiert für Desktop, Tablet und Mobile
+- **Angular Material**: Moderne, konsistente UI-Komponenten
+- **Toast-Benachrichtigungen**: Sofortiges Benutzer-Feedback
+- **Intuitive Navigation**: Klare Menüstruktur und Workflows
+- **Accessibility**: Barrierefreie Bedienung
 
 ## 🛠️ Technologie-Stack
 
 ### Backend
-- **Django 5.1**: Web-Framework
-- **Django REST Framework**: API-Entwicklung
+- **Django 5.1**: Robustes Web-Framework
+- **Django REST Framework**: RESTful API-Entwicklung
 - **djangorestframework-simplejwt**: JWT-Authentifizierung
-- **django-cors-headers**: CORS-Unterstützung
-- **SQLite**: Datenbank (entwicklung)
+- **django-cors-headers**: Cross-Origin Resource Sharing
+- **Pillow**: Bildverarbeitung für Item-Fotos
+- **SQLite**: Entwicklungsdatenbank (Production-ready)
 
 ### Frontend
-- **Angular 19**: Frontend-Framework
-- **Angular Material**: UI-Komponenten
-- **TypeScript**: Typisierte Programmierung
-- **RxJS**: Reactive Programming
-- **NgRx Toastr**: Benachrichtigungen
+- **Angular 19**: Moderne Frontend-Framework mit Standalone Components
+- **Angular Material**: Umfassende UI-Komponenten-Bibliothek
+- **TypeScript**: Typisierte JavaScript-Entwicklung
+- **RxJS**: Reactive Programming für asynchrone Operationen
+- **NgRx Toastr**: Elegante Benachrichtigungen
+- **CSS Grid & Flexbox**: Responsive Layout-System
 
-## 📋 Voraussetzungen
+## 📋 Systemanforderungen
 
-- Python 3.11+
-- Node.js 18+
-- npm oder yarn
+- **Python**: 3.11 oder höher
+- **Node.js**: 18 oder höher
+- **npm**: 8 oder höher
+- **Speicher**: Mindestens 4GB RAM
+- **Browser**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 
 ## 🚀 Installation & Setup
 
-### Backend (Django)
+### 1. Repository Setup
+```bash
+git clone <repository-url>
+cd inventar-system
+```
 
-1. **Repository klonen**
-   ```bash
-   git clone <repository-url>
-   cd inventar-system
-   ```
+### 2. Backend (Django) Setup
 
-2. **Virtual Environment erstellen**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   # oder
-   venv\Scripts\activate     # Windows
-   ```
+```bash
+# Virtual Environment erstellen
+python -m venv venv
 
-3. **Dependencies installieren**
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Virtual Environment aktivieren
+source venv/bin/activate  # Linux/Mac
+# oder
+venv\Scripts\activate     # Windows
 
-4. **Datenbank migrieren**
-   ```bash
-   cd backend
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
+# Dependencies installieren
+pip install -r backend/requirements.txt
 
-5. **Superuser erstellen (optional)**
-   ```bash
-   python manage.py createsuperuser
-   ```
+# In Backend-Verzeichnis wechseln
+cd backend
 
-6. **Development Server starten**
-   ```bash
-   python manage.py runserver
-   ```
+# Datenbank-Migrationen erstellen und ausführen
+python manage.py makemigrations
+python manage.py migrate
 
-   Backend läuft auf: `http://localhost:8000`
+# Superuser erstellen (optional)
+python manage.py createsuperuser
 
-### Frontend (Angular)
+# Development Server starten
+python manage.py runserver
+```
 
-1. **In Frontend-Verzeichnis wechseln**
-   ```bash
-   cd frontend
-   ```
+**Backend läuft auf:** `http://localhost:8000`
 
-2. **Dependencies installieren**
-   ```bash
-   npm install
-   ```
+### 3. Frontend (Angular) Setup
 
-3. **Development Server starten**
-   ```bash
-   ng serve
-   ```
+```bash
+# In Frontend-Verzeichnis wechseln (neues Terminal)
+cd frontend
 
-   Frontend läuft auf: `http://localhost:4200`
+# Dependencies installieren
+npm install
 
-## 📁 Projektstruktur
+# Development Server starten
+ng serve
+
+# Oder für Production Build
+ng build --configuration production
+```
+
+**Frontend läuft auf:** `http://localhost:4200`
+
+## 📁 Detaillierte Projektstruktur
 
 ```
 inventar-system/
-├── backend/                    # Django Backend
-│   ├── inventar_system/       # Hauptprojekt
-│   ├── authentication/        # Auth-App
-│   ├── inventory/             # Inventar-App
-│   ├── manage.py
-│   └── requirements.txt
-├── frontend/                  # Angular Frontend
+├── backend/                           # Django Backend
+│   ├── inventar_system/              # Hauptprojekt-Konfiguration
+│   │   ├── settings.py               # Django-Einstellungen
+│   │   ├── urls.py                   # URL-Routing
+│   │   └── wsgi.py                   # WSGI-Konfiguration
+│   ├── authentication/               # Authentifizierungs-App
+│   │   ├── models.py                 # CustomUser Model
+│   │   ├── views.py                  # Auth-Views & Balance-Update
+│   │   ├── serializers.py            # User-Serializers
+│   │   └── urls.py                   # Auth-URLs
+│   ├── inventory/                    # Inventar-App
+│   │   ├── models.py                 # Category & Item Models
+│   │   ├── views.py                  # CRUD-Views & Dashboard
+│   │   ├── serializers.py            # API-Serializers
+│   │   └── urls.py                   # Inventar-URLs
+│   ├── manage.py                     # Django-Management
+│   ├── requirements.txt              # Python-Dependencies
+│   └── db.sqlite3                    # SQLite-Datenbank
+├── frontend/                         # Angular Frontend
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── components/    # UI-Komponenten
-│   │   │   ├── services/      # Services
-│   │   │   ├── guards/        # Route Guards
-│   │   │   └── models/        # TypeScript Models
-│   │   └── assets/
-│   ├── angular.json
-│   └── package.json
-├── .gitignore
-└── README.md
+│   │   │   ├── components/           # UI-Komponenten
+│   │   │   │   ├── dashboard/        # Dashboard-Komponente
+│   │   │   │   ├── inventory/        # Inventar-Verwaltung
+│   │   │   │   ├── item-form/        # Item-Formular (Create/Edit)
+│   │   │   │   ├── category-form/    # Kategorie-Formular
+│   │   │   │   ├── balance-update/   # Kontostand-Update-Dialog
+│   │   │   │   ├── login/            # Login-Komponente
+│   │   │   │   ├── register/         # Registrierungs-Komponente
+│   │   │   │   └── navbar/           # Navigation
+│   │   │   ├── services/             # Angular Services
+│   │   │   │   ├── auth.service.ts   # Authentifizierung
+│   │   │   │   └── inventory.service.ts # Inventar-API
+│   │   │   ├── guards/               # Route Guards
+│   │   │   │   └── auth.guard.ts     # Authentifizierungs-Guard
+│   │   │   ├── interceptors/         # HTTP-Interceptors
+│   │   │   │   └── auth.interceptor.ts # JWT-Token-Interceptor
+│   │   │   ├── interfaces/           # TypeScript-Interfaces
+│   │   │   │   └── inventory.interface.ts # Datenmodelle
+│   │   │   └── environments/         # Umgebungskonfiguration
+│   │   └── assets/                   # Statische Assets
+│   ├── angular.json                  # Angular-Konfiguration
+│   ├── package.json                  # Node.js-Dependencies
+│   └── proxy.conf.json               # Development-Proxy
+├── .gitignore                        # Git-Ignore-Regeln
+└── README.md                         # Diese Datei
 ```
 
 ## 🔧 Konfiguration
 
-### Backend-Konfiguration
+### Backend-Konfiguration (`backend/inventar_system/settings.py`)
 
-Die wichtigsten Einstellungen befinden sich in `backend/inventar_system/settings.py`:
+```python
+# CORS-Konfiguration für Frontend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",  # Angular Development
+    "https://yourdomain.com", # Production
+]
 
-- **CORS_ALLOWED_ORIGINS**: Frontend-URL für CORS
-- **SIMPLE_JWT**: JWT-Token-Konfiguration
-- **DATABASES**: Datenbank-Konfiguration
+# JWT-Token-Konfiguration
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+}
+
+# Datenbank-Konfiguration
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+```
 
 ### Frontend-Konfiguration
 
-API-Basis-URL in `frontend/src/app/services/inventory.service.ts` anpassen:
-
+**Development** (`frontend/src/environments/environment.ts`):
 ```typescript
-private apiUrl = 'http://localhost:8000/api';
+export const environment = {
+  production: false,
+  apiUrl: 'http://127.0.0.1:8000/api'
+};
 ```
 
-## 📊 API-Endpoints
+**Production** (`frontend/src/environments/environment.prod.ts`):
+```typescript
+export const environment = {
+  production: true,
+  apiUrl: '/api'  // Relative URL für Production
+};
+```
+
+## 📊 API-Dokumentation
 
 ### Authentifizierung
-- `POST /api/auth/register/` - Benutzerregistrierung
-- `POST /api/auth/login/` - Benutzer-Login
-- `POST /api/auth/token/refresh/` - Token erneuern
+| Endpoint | Methode | Beschreibung | Authentifizierung |
+|----------|---------|--------------|-------------------|
+| `/api/auth/register/` | POST | Benutzerregistrierung | Nein |
+| `/api/auth/login/` | POST | Benutzer-Login | Nein |
+| `/api/auth/token/refresh/` | POST | JWT-Token erneuern | Refresh Token |
+| `/api/auth/user/` | GET | Benutzerprofil abrufen | JWT |
+| `/api/auth/update-balance/` | POST | Kontostand aktualisieren | JWT |
 
-### Inventar
-- `GET /api/inventory/categories/` - Kategorien abrufen
-- `POST /api/inventory/categories/` - Kategorie erstellen
-- `PUT /api/inventory/categories/{id}/` - Kategorie bearbeiten
-- `DELETE /api/inventory/categories/{id}/` - Kategorie löschen
+### Inventar-Management
+| Endpoint | Methode | Beschreibung | Authentifizierung |
+|----------|---------|--------------|-------------------|
+| `/api/inventory/categories/` | GET/POST | Kategorien verwalten | JWT |
+| `/api/inventory/categories/{id}/` | GET/PUT/DELETE | Kategorie-Details | JWT |
+| `/api/inventory/items/` | GET/POST | Items verwalten | JWT |
+| `/api/inventory/items/{id}/` | GET/PUT/DELETE | Item-Details | JWT |
+| `/api/inventory/items/{id}/consume/` | POST | Als verbraucht markieren | JWT |
+| `/api/inventory/items/{id}/unconsume/` | POST | Verbrauch rückgängig | JWT |
+| `/api/inventory/dashboard/` | GET | Dashboard-Statistiken | JWT |
 
-- `GET /api/inventory/items/` - Items abrufen
-- `POST /api/inventory/items/` - Item erstellen
-- `PUT /api/inventory/items/{id}/` - Item bearbeiten
-- `DELETE /api/inventory/items/{id}/` - Item löschen
+## 🗄️ Datenmodell
 
-### Dashboard
-- `GET /api/inventory/dashboard/` - Dashboard-Statistiken
-
-## 🎨 Datenmodell
+### CustomUser (Erweiterte Benutzer)
+```python
+class CustomUser(AbstractUser):
+    email = EmailField(unique=True)           # Email als Username
+    balance = DecimalField(default=1000.00)   # Kontostand
+    first_name = CharField(max_length=30)     # Vorname
+    last_name = CharField(max_length=30)      # Nachname
+    date_joined = DateTimeField(auto_now_add=True)
+```
 
 ### Category (Kategorie)
-- `name`: Name der Kategorie
-- `description`: Beschreibung
-- `created_at`: Erstellungsdatum
+```python
+class Category(Model):
+    name = CharField(max_length=100, unique=True)  # Kategoriename
+    description = TextField(blank=True)            # Beschreibung
+    owner = ForeignKey(User, on_delete=CASCADE)    # Besitzer
+    created_at = DateTimeField(auto_now_add=True)  # Erstellungsdatum
+```
 
 ### Item (Gegenstand)
-- `name`: Name des Gegenstands
-- `description`: Beschreibung
-- `category`: Zugehörige Kategorie
-- `condition`: Zustand (neu, sehr_gut, gut, befriedigend, schlecht)
-- `purchase_date`: Kaufdatum
-- `current_value`: Aktueller Wert
-- `location`: Aufbewahrungsort
-- `serial_number`: Seriennummer
-- `warranty_until`: Garantie bis
+```python
+class Item(Model):
+    name = CharField(max_length=200)                    # Name
+    description = TextField(blank=True)                 # Beschreibung
+    category = ForeignKey(Category, on_delete=CASCADE)  # Kategorie
+    owner = ForeignKey(User, on_delete=CASCADE)         # Besitzer
+    purchase_date = DateField(null=True, blank=True)    # Kaufdatum
+    purchase_price = DecimalField(max_digits=10, decimal_places=2)  # Kaufpreis
+    current_value = DecimalField(max_digits=10, decimal_places=2)   # Aktueller Wert
+    condition = CharField(max_length=20, choices=CONDITION_CHOICES) # Zustand
+    location = CharField(max_length=200, blank=True)    # Aufbewahrungsort
+    serial_number = CharField(max_length=100, blank=True) # Seriennummer
+    warranty_until = DateField(null=True, blank=True)   # Garantie bis
+    image = ImageField(upload_to='items/', null=True)   # Produktbild
+    consumed = BooleanField(default=False)              # Verbraucht-Status
+    consumed_at = DateTimeField(null=True, blank=True)  # Verbrauchsdatum
+    created_at = DateTimeField(auto_now_add=True)       # Erstellungsdatum
+    updated_at = DateTimeField(auto_now=True)           # Änderungsdatum
+```
 
-## 🔐 Sicherheit
+## 🔐 Sicherheitsfeatures
 
-- JWT-Token-basierte Authentifizierung
-- CORS-Konfiguration für sichere Frontend-Backend-Kommunikation
-- Authentifizierte API-Endpoints
-- Route Guards im Frontend
+- **JWT-Token-Authentifizierung**: Sichere, stateless Authentifizierung
+- **CORS-Konfiguration**: Kontrollierte Cross-Origin-Requests
+- **Benutzerisolation**: Vollständige Trennung der Benutzerdaten
+- **Input-Validierung**: Umfassende Server- und Client-seitige Validierung
+- **SQL-Injection-Schutz**: Django ORM verhindert SQL-Injection
+- **XSS-Schutz**: Angular's eingebauter XSS-Schutz
+- **CSRF-Schutz**: Django's CSRF-Middleware
 
 ## 🚀 Deployment
 
-### Backend (Django)
-1. Produktions-Settings konfigurieren
-2. Static Files sammeln: `python manage.py collectstatic`
-3. Produktions-Datenbank konfigurieren
-4. WSGI-Server (z.B. Gunicorn) verwenden
-
-### Frontend (Angular)
-1. Produktions-Build: `ng build --prod`
-2. `dist/` Ordner auf Webserver deployen
-3. API-URLs für Produktion anpassen
-
-## 🤝 Entwicklung
-
-### Code-Style
-- Python: PEP 8
-- TypeScript: Angular Style Guide
-- Prettier für Code-Formatierung
-
-### Testing
+### Production-Build erstellen
 ```bash
-# Backend Tests
+# Frontend Build
+cd frontend
+ng build --configuration production
+
+# Backend für Production konfigurieren
+cd backend
+python manage.py collectstatic
+python manage.py migrate
+```
+
+### Umgebungsvariablen (Production)
+```bash
+export DEBUG=False
+export SECRET_KEY="your-secret-key"
+export ALLOWED_HOSTS="yourdomain.com,www.yourdomain.com"
+export DATABASE_URL="your-database-url"
+```
+
+## 🧪 Testing
+
+### Backend Tests
+```bash
 cd backend
 python manage.py test
+```
 
-# Frontend Tests
+### Frontend Tests
+```bash
 cd frontend
 ng test
+ng e2e
 ```
+
+## 📈 Performance-Optimierungen
+
+- **Lazy Loading**: Angular-Module werden bei Bedarf geladen
+- **OnPush Change Detection**: Optimierte Change Detection
+- **Database Indexing**: Optimierte Datenbankabfragen
+- **Caching**: Browser-Caching für statische Assets
+- **Minification**: Komprimierte Production-Builds
+- **Tree Shaking**: Entfernung ungenutzten Codes
+
+## 🤝 Beitragen
+
+1. Fork das Repository
+2. Erstelle einen Feature-Branch (`git checkout -b feature/AmazingFeature`)
+3. Committe deine Änderungen (`git commit -m 'Add some AmazingFeature'`)
+4. Push zum Branch (`git push origin feature/AmazingFeature`)
+5. Öffne einen Pull Request
 
 ## 📝 Lizenz
 
-Dieses Projekt ist für den privaten Gebrauch entwickelt.
+Dieses Projekt steht unter der MIT-Lizenz. Siehe `LICENSE` Datei für Details.
 
-## 👨‍💻 Autor
+## 👥 Autoren
 
-Entwickelt für die private Haushalts-Inventar-Verwaltung.
+- **Nils Wolters** - *Initial work* - [GitHub](https://github.com/nilswolters)
+
+## 🙏 Danksagungen
+
+- Angular Team für das großartige Framework
+- Django Team für das robuste Backend-Framework
+- Material Design Team für die UI-Komponenten
+- Alle Open-Source-Contributors
+
+## 📞 Support
+
+Bei Fragen oder Problemen:
+- Erstelle ein Issue auf GitHub
+- Kontaktiere den Entwickler direkt
 
 ---
 
-## 🐛 Bekannte Probleme
-
-- Pillow 10.1.0 Kompatibilitätsproblem mit Python 3.13 (gelöst durch Downgrade auf 10.0.1)
-
-## 🔄 Changelog
-
-### Version 1.0.0
-- Initiale Version mit vollständiger CRUD-Funktionalität
-- JWT-Authentifizierung implementiert
-- Dashboard mit Statistiken
-- Responsive UI mit Angular Material
+**Version**: 2.0.0  
+**Letztes Update**: Dezember 2024  
+**Status**: ✅ Production Ready
 ```
+

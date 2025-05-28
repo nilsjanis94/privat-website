@@ -90,6 +90,18 @@ python manage.py collectstatic --noinput
 
 print_success "Backend setup completed!"
 
+# Django Backend Service neustarten
+print_status "Restarting Django backend service..."
+sudo systemctl restart django-backend
+
+# Prüfe ob Service erfolgreich gestartet wurde
+if systemctl is-active --quiet django-backend; then
+    print_success "Django backend service restarted successfully!"
+else
+    print_warning "Django backend service restart may have failed. Checking status..."
+    sudo systemctl status django-backend --no-pager -l
+fi
+
 # Deployment zum Webserver
 print_status "Deploying to web directory..."
 cd "$PROJECT_DIR"
@@ -139,7 +151,7 @@ print_success "Deployment completed successfully!"
 echo ""
 echo "📊 Deployment Summary:"
 echo "  • Frontend: Built and deployed"
-echo "  • Backend: Migrations and static files updated"
+echo "  • Backend: Migrations, static files updated and service restarted"
 echo "  • Web directory: $WEB_DIR"
 echo "  • .htaccess: Configured for Angular routing"
 echo ""
@@ -149,3 +161,4 @@ echo "🔍 Test these URLs:"
 echo "  • https://yourdomain.com/ (should show dashboard)"
 echo "  • https://yourdomain.com/login (should show login page)"
 echo "  • https://yourdomain.com/api/inventory/dashboard/ (should return JSON)"
+echo "  • https://yourdomain.com/api/inventory/expenses-chart/?period=1M (should return chart data)"

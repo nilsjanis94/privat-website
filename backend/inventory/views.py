@@ -54,11 +54,6 @@ def category_detail(request, pk):
 @permission_classes([IsAuthenticated])
 def items_list_create(request):
     if request.method == 'POST':
-        print(f"DEBUG: Received data: {request.data}")
-        print(f"DEBUG: User: {request.user}")
-        print(f"DEBUG: Content-Type: {request.content_type}")
-        print(f"DEBUG: Headers: {dict(request.headers)}")
-        
         # Daten vor Serializer-Validierung bereinigen
         data = request.data.copy()
         
@@ -68,7 +63,7 @@ def items_list_create(request):
         if data.get('purchase_price') == '':
             data['purchase_price'] = None
             
-        # ISO-Datum zu YYYY-MM-DD konvertieren (ohne Debug-Ausgaben)
+        # ISO-Datum zu YYYY-MM-DD konvertieren
         if data.get('purchase_date') and isinstance(data['purchase_date'], str):
             try:
                 # Parse ISO format und extrahiere nur das Datum
@@ -78,14 +73,10 @@ def items_list_create(request):
             except ValueError:
                 pass  # Bei Fehler das Original-Datum beibehalten
         
-        print(f"DEBUG: Cleaned data: {data}")
-        
         # Context für Serializer hinzufügen
         serializer = ItemCreateUpdateSerializer(data=data, context={'request': request})
 
         if serializer.is_valid():
-            print(f"DEBUG: Validated data: {serializer.validated_data}")
-            
             purchase_price = serializer.validated_data.get('purchase_price', 0) or 0
             
             if purchase_price > 0:
@@ -99,13 +90,10 @@ def items_list_create(request):
             
             try:
                 item = serializer.save(owner=request.user)
-                print(f"DEBUG: Item created successfully: {item}")
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             except Exception as e:
-                print(f"DEBUG: Error saving item: {e}")
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            print(f"DEBUG: Serializer errors: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         queryset = Item.objects.filter(owner=request.user).select_related('category', 'owner')
@@ -139,12 +127,35 @@ def item_detail(request, pk):
         serializer = ItemSerializer(item)
         return Response(serializer.data)
     elif request.method in ['PUT', 'PATCH']:
+        # Daten vor Serializer-Validierung bereinigen (wie bei CREATE)
+        data = request.data.copy()
+        
+        # Leere Strings zu None
+        if data.get('purchase_date') == '':
+            data['purchase_date'] = None
+        if data.get('purchase_price') == '':
+            data['purchase_price'] = None
+            
+        # ISO-Datum zu YYYY-MM-DD konvertieren
+        if data.get('purchase_date') and isinstance(data['purchase_date'], str):
+            try:
+                # Parse ISO format und extrahiere nur das Datum
+                if 'T' in data['purchase_date']:
+                    date_obj = datetime.fromisoformat(data['purchase_date'].replace('Z', '+00:00'))
+                    data['purchase_date'] = date_obj.date().isoformat()
+            except ValueError:
+                pass  # Bei Fehler das Original-Datum beibehalten
+        
         # Bei Updates den Kontostand NICHT ändern (nur bei Erstellung)
-        serializer = ItemCreateUpdateSerializer(item, data=request.data)
+        serializer = ItemCreateUpdateSerializer(item, data=data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                serializer.save()
+                return Response(serializer.data)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'DELETE':
         # Optional: Kaufpreis zurück zum Kontostand hinzufügen bei Löschung
         if item.purchase_price:
@@ -282,3 +293,138 @@ def dashboard_stats(request):
             stats['items_by_category'][category.name] = count
     
     return Response(stats)
+
+# Neue API für Ausgaben-Chart mit verschiedenen Zeiträumen
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def expenses_chart_data(request):
+    user_items = Item.objects.filter(owner=request.user)
+    period = request.query_params.get('period', '1W')  # Standard: 1W
+    
+    now = timezone.now()
+    data_points = []
+    
+    if period == '1W':
+        # Letzte 7 Tage (täglich)
+        for i in range(7):
+            day = now.date() - timedelta(days=i)
+            
+            day_items = user_items.filter(
+                purchase_date=day,
+                purchase_date__isnull=False
+            )
+            
+            total = sum(item.purchase_price or 0 for item in day_items)
+            
+            data_points.append({
+                'date': day.isoformat(),
+                'label': day.strftime('%d.%m'),
+                'amount': float(total),
+                'items_count': day_items.count()
+            })
+    
+    elif period == '1M':
+        # Letzten 30 Tage (täglich)
+        for i in range(30):
+            day = now.date() - timedelta(days=i)
+            
+            day_items = user_items.filter(
+                purchase_date=day,
+                purchase_date__isnull=False
+            )
+            
+            total = sum(item.purchase_price or 0 for item in day_items)
+            
+            data_points.append({
+                'date': day.isoformat(),
+                'label': day.strftime('%d.%m'),
+                'amount': float(total),
+                'items_count': day_items.count()
+            })
+    
+    elif period == '1Y':
+        # Letzten 12 Monate (monatlich)
+        for i in range(12):
+            month_date = now - timedelta(days=30 * i)
+            month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+            
+            month_items = user_items.filter(
+                purchase_date__gte=month_start.date(),
+                purchase_date__lte=month_end.date(),
+                purchase_date__isnull=False
+            )
+            
+            total = sum(item.purchase_price or 0 for item in month_items)
+            
+            data_points.append({
+                'date': month_start.date().isoformat(),
+                'label': month_start.strftime('%b %y'),
+                'amount': float(total),
+                'items_count': month_items.count()
+            })
+    
+    elif period == 'MAX':
+        # Alle Daten seit dem ersten Kauf (monatlich gruppiert)
+        first_item = user_items.filter(purchase_date__isnull=False).order_by('purchase_date').first()
+        
+        if first_item:
+            start_date = first_item.purchase_date
+            current_date = now.date()
+            
+            # Berechne Monate zwischen erstem Kauf und heute
+            current_month = current_date.replace(day=1)
+            start_month = start_date.replace(day=1)
+            
+            while start_month <= current_month:
+                month_end = (start_month + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+                
+                month_items = user_items.filter(
+                    purchase_date__gte=start_month,
+                    purchase_date__lte=month_end,
+                    purchase_date__isnull=False
+                )
+                
+                total = sum(item.purchase_price or 0 for item in month_items)
+                
+                data_points.append({
+                    'date': start_month.isoformat(),
+                    'label': start_month.strftime('%b %y'),
+                    'amount': float(total),
+                    'items_count': month_items.count()
+                })
+                
+                # Nächster Monat
+                if start_month.month == 12:
+                    start_month = start_month.replace(year=start_month.year + 1, month=1)
+                else:
+                    start_month = start_month.replace(month=start_month.month + 1)
+    
+    else:
+        # Fallback auf 1W
+        for i in range(7):
+            day = now.date() - timedelta(days=i)
+            
+            day_items = user_items.filter(
+                purchase_date=day,
+                purchase_date__isnull=False
+            )
+            
+            total = sum(item.purchase_price or 0 for item in day_items)
+            
+            data_points.append({
+                'date': day.isoformat(),
+                'label': day.strftime('%d.%m'),
+                'amount': float(total),
+                'items_count': day_items.count()
+            })
+    
+    # Daten umkehren (älteste zuerst für Liniendiagramm)
+    data_points.reverse()
+    
+    return Response({
+        'period': period,
+        'data_points': data_points,
+        'total_amount': sum(point['amount'] for point in data_points),
+        'total_items': sum(point['items_count'] for point in data_points)
+    })

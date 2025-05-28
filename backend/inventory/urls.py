@@ -14,4 +14,5 @@ urlpatterns = [
     
     # Dashboard
     path('dashboard/', views.dashboard_stats, name='dashboard-stats'),
+    path('expenses-chart/', views.expenses_chart_data, name='expenses_chart_data'),
 ]

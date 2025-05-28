@@ -63,119 +63,154 @@ body {
   right: 20px !important;
   z-index: 999999 !important;
   width: 350px !important;
-  padding: 16px !important;
+  padding: 16px 20px !important; /* Normales Padding ohne extra Icon-Platz */
   margin-bottom: 10px !important;
   border-radius: 8px !important;
   font-size: 14px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
   opacity: 1 !important;
   color: white !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
+  display: block !important;
+  min-height: auto !important;
+  pointer-events: auto !important;
+  position: relative !important;
 }
 
+/* Entferne alle selbst erstellten Icons */
+.ngx-toastr:before {
+  display: none !important;
+}
+
+/* Toast-Inhalt Container */
+.ngx-toastr .toast-message {
+  display: block !important;
+  margin: 0 !important;
+  padding-right: 30px !important; /* Platz für Close-Button */
+  word-wrap: break-word !important;
+  line-height: 1.4 !important;
+}
+
+/* Toast-Titel */
+.ngx-toastr .toast-title {
+  display: block !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  margin-bottom: 6px !important;
+  line-height: 1.3 !important;
+  padding-right: 30px !important; /* Platz für Close-Button */
+}
+
+/* Toast-Typen Hintergründe */
 .toast-success {
   background-color: #28a745 !important;
+  border-left: 4px solid #1e7e34 !important;
 }
 
 .toast-error {
   background-color: #dc3545 !important;
+  border-left: 4px solid #c82333 !important;
 }
 
-.toast-title {
-  font-weight: 600 !important;
-  font-size: 16px !important;
-  margin-bottom: 5px !important;
-  line-height: 1.2 !important;
+.toast-info {
+  background-color: #17a2b8 !important;
+  border-left: 4px solid #138496 !important;
 }
 
-.toast-message {
-  font-size: 14px !important;
-  line-height: 1.4 !important;
-  margin: 0 !important;
-}
-
-.toast-progress {
-  height: 4px !important;
-  background-color: rgba(255, 255, 255, 0.7) !important;
-}
-
-/* Icon-spezifische Ausrichtung */
-.ngx-toastr .toast-icon {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  vertical-align: middle !important;
-  line-height: 1 !important;
-}
-
-/* Text-Container */
-.ngx-toastr .toast-content {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
+.toast-warning {
+  background-color: #ffc107 !important;
+  color: #212529 !important;
+  border-left: 4px solid #e0a800 !important;
 }
 
 /* Close Button */
-#toast-container .toast-close-button {
+.ngx-toastr .toast-close-button {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
   color: white !important;
-  font-size: 18px !important;
+  font-size: 16px !important;
   opacity: 0.8 !important;
-  right: 10px !important;
-  top: 10px !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 2px !important;
+  line-height: 1 !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-// Mobile-spezifische Verbesserungen
+.ngx-toastr .toast-close-button:hover {
+  opacity: 1 !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 2px !important;
+}
+
+/* Progress Bar */
+.toast-progress {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 3px !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 0 0 8px 8px !important;
+}
+
+/* Container */
+#toast-container {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+  max-width: 350px !important;
+}
+
+#toast-container .ngx-toastr {
+  pointer-events: auto !important;
+  margin-bottom: 8px !important;
+}
+
+/* Mobile Optimierungen */
 @media (max-width: 768px) {
-  // Bessere Touch-Targets
-  button, .mat-mdc-button {
-    min-height: 44px !important;
-  }
-  
-  .mat-mdc-icon-button {
-    width: 44px !important;
-    height: 44px !important;
-  }
-  
-  // Verhindere Zoom bei Eingabefeldern auf iOS
-  input, textarea, select {
-    font-size: 16px !important;
-  }
-  
-  // Toastr für Mobile anpassen
   .ngx-toastr {
     width: calc(100vw - 40px) !important;
-    max-width: 350px !important;
+    max-width: 320px !important;
+    padding: 14px 18px !important;
+  }
+  
+  #toast-container {
     top: 10px !important;
     right: 20px !important;
     left: 20px !important;
+    max-width: calc(100vw - 40px) !important;
     margin: 0 auto !important;
-  }
-  
-  // Bessere Scrollbar für Mobile
-  ::-webkit-scrollbar {
-    width: 4px;
   }
 }
 
 @media (max-width: 480px) {
-  // Noch kleinere Toastr für sehr kleine Bildschirme
   .ngx-toastr {
     width: calc(100vw - 20px) !important;
+    max-width: 300px !important;
+    padding: 12px 16px !important;
+  }
+  
+  #toast-container {
     top: 10px !important;
     right: 10px !important;
     left: 10px !important;
-    font-size: 13px !important;
-    padding: 12px !important;
+    max-width: calc(100vw - 20px) !important;
   }
   
-  .toast-title {
+  .ngx-toastr .toast-title {
     font-size: 14px !important;
   }
   
-  .toast-message {
-    font-size: 12px !important;
+  .ngx-toastr .toast-message {
+    font-size: 13px !important;
   }
 }
 

@@ -69,4 +69,9 @@ export class InventoryService {
   unmarkItemConsumed(itemId: number): Observable<any> {
     return this.http.post(`${environment.apiUrl}/inventory/items/${itemId}/unconsume/`, {});
   }
+
+  // Neue Methode hinzufügen
+  getExpensesChartData(period: string = '1M'): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/inventory/expenses-chart/?period=${period}`);
+  }
 }

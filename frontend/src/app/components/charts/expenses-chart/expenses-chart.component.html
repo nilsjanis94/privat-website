@@ -1,0 +1,58 @@
+<mat-card class="expenses-chart-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>trending_up</mat-icon>
+      Ausgaben-Trend
+    </mat-card-title>
+    <mat-card-subtitle *ngIf="chartResponse">
+      {{ getPeriodDescription() }} • 
+      {{ chartResponse.total_amount | currency:'EUR':'symbol':'1.0-0' }} gesamt
+    </mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <!-- Zeitraum-Buttons mit expliziter Click-Behandlung -->
+    <div class="period-selector">
+      <mat-button-toggle-group [value]="selectedPeriod">
+        <mat-button-toggle value="1W" (click)="onPeriodChange('1W')">1W</mat-button-toggle>
+        <mat-button-toggle value="1M" (click)="onPeriodChange('1M')">1M</mat-button-toggle>
+        <mat-button-toggle value="1Y" (click)="onPeriodChange('1Y')">1J</mat-button-toggle>
+        <mat-button-toggle value="MAX" (click)="onPeriodChange('MAX')">Max</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+    
+    <!-- Chart Container mit fester Größe -->
+    <div class="chart-container" *ngIf="!isLoading && hasData()" style="position: relative; height: 400px; width: 100%;">
+      <canvas #chartCanvas></canvas>
+    </div>
+    
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Lade Chart-Daten...</span>
+    </div>
+    
+    <!-- No Data -->
+    <div *ngIf="!isLoading && !hasData()" class="no-data-container">
+      <mat-icon>timeline</mat-icon>
+      <h3>Keine Ausgaben-Daten</h3>
+      <p>Für diesen Zeitraum sind keine Ausgaben vorhanden.</p>
+    </div>
+    
+    <!-- Statistiken -->
+    <div class="chart-stats" *ngIf="chartResponse && hasData()">
+      <div class="stat-item">
+        <span class="label">Durchschnitt:</span>
+        <span class="value">{{ getAverage() | currency:'EUR':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Höchstwert:</span>
+        <span class="value">{{ getMaxValue() | currency:'EUR':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Items:</span>
+        <span class="value">{{ chartResponse.total_items }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -5,6 +5,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { Chart, ChartConfiguration, ChartData, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DashboardStats } from '../../../interfaces/inventory.interface';
+import { ExpensesChartComponent } from '../expenses-chart/expenses-chart.component';
 
 // Chart.js registrieren
 Chart.register(...registerables, ChartDataLabels);
@@ -14,7 +15,8 @@ Chart.register(...registerables, ChartDataLabels);
   imports: [
     CommonModule,
     MatCardModule,
-    BaseChartDirective
+    BaseChartDirective,
+    ExpensesChartComponent
   ],
   templateUrl: './dashboard-charts.component.html',
   styleUrl: './dashboard-charts.component.scss'

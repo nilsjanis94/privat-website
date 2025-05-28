@@ -2,9 +2,9 @@ import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { HttpErrorResponse } from '@angular/common/http';
 import { InventoryService } from '../../services/inventory.service';
 import { ToastrService } from 'ngx-toastr';
+import { ItemCondition, ItemLocation } from '../../interfaces/inventory.interface';
 
 @Component({
   selector: 'app-item-form',
@@ -24,19 +24,21 @@ import { ToastrService } from 'ngx-toastr';
             id="name"
             type="text" 
             [(ngModel)]="item.name" 
-            placeholder="z.B. Laptop"
+            placeholder="z.B. Laptop, Kaffeemaschine"
             class="form-input"
             required>
         </div>
         
         <div class="form-group">
           <label for="description">Beschreibung</label>
-          <textarea 
+          <input 
             id="description"
+            type="text"
             [(ngModel)]="item.description" 
-            rows="3"
-            placeholder="Beschreibung des Gegenstands..."
-            class="form-input"></textarea>
+            placeholder="Kurze Beschreibung (max. 200 Zeichen)"
+            maxlength="200"
+            class="form-input">
+          <small class="char-counter">{{ item.description?.length || 0 }}/200</small>
         </div>
         
         <div class="form-row">
@@ -55,17 +57,22 @@ import { ToastrService } from 'ngx-toastr';
           </div>
           
           <div class="form-group">
-            <label for="condition">Zustand *</label>
+            <label for="location">Standort</label>
             <select 
-              id="condition"
-              [(ngModel)]="item.condition" 
-              class="form-input"
-              required>
-              <option value="neu">Neu</option>
-              <option value="sehr_gut">Sehr gut</option>
-              <option value="gut">Gut</option>
-              <option value="befriedigend">Befriedigend</option>
-              <option value="schlecht">Schlecht</option>
+              id="location"
+              [(ngModel)]="item.location" 
+              class="form-input">
+              <option value="">Standort wählen...</option>
+              <option value="wohnzimmer">Wohnzimmer</option>
+              <option value="schlafzimmer">Schlafzimmer</option>
+              <option value="kueche">Küche</option>
+              <option value="bad">Bad</option>
+              <option value="buero">Büro</option>
+              <option value="keller">Keller</option>
+              <option value="dachboden">Dachboden</option>
+              <option value="garage">Garage</option>
+              <option value="balkon">Balkon</option>
+              <option value="sonstiges">Sonstiges</option>
             </select>
           </div>
         </div>
@@ -97,57 +104,9 @@ import { ToastrService } from 'ngx-toastr';
               class="form-input">
           </div>
         </div>
-        
-        <div class="form-group">
-          <label for="current_value">Aktueller Wert (€)</label>
-          <input 
-            id="current_value"
-            type="number" 
-            [(ngModel)]="item.current_value" 
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            class="form-input">
-        </div>
       </div>
 
-      <!-- Details -->
-      <div class="section">
-        <h3>Details</h3>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="location">Ort/Standort</label>
-            <input 
-              id="location"
-              type="text" 
-              [(ngModel)]="item.location" 
-              placeholder="z.B. Büro, Wohnzimmer"
-              class="form-input">
-          </div>
-          
-          <div class="form-group">
-            <label for="serial_number">Seriennummer</label>
-            <input 
-              id="serial_number"
-              type="text" 
-              [(ngModel)]="item.serial_number" 
-              placeholder="z.B. ABC123456"
-              class="form-input">
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="warranty_until">Garantie bis</label>
-          <input 
-            id="warranty_until"
-            type="date" 
-            [(ngModel)]="item.warranty_until" 
-            class="form-input">
-        </div>
-      </div>
-
-      <!-- Buttons mit korrekten Styles -->
+      <!-- Buttons -->
       <div class="dialog-actions">
         <button 
           type="button" 
@@ -185,14 +144,13 @@ import { ToastrService } from 'ngx-toastr';
     }
     
     .section {
-      margin-bottom: 32px;
-      padding-bottom: 24px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
       border-bottom: 1px solid #e0e0e0;
     }
     
     .section:last-of-type {
       border-bottom: none;
-      margin-bottom: 24px;
     }
     
     h3 {
@@ -332,6 +290,21 @@ import { ToastrService } from 'ngx-toastr';
         font-size: 16px;
       }
     }
+    
+    .char-counter {
+      color: #666;
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
+    }
+    
+    .help-text {
+      color: #666;
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
+      font-style: italic;
+    }
   `]
 })
 export class ItemFormComponent {
@@ -339,13 +312,9 @@ export class ItemFormComponent {
     name: '',
     description: '',
     category: '',
-    condition: 'gut',
-    purchase_date: '',
-    purchase_price: null,
-    current_value: null,
     location: '',
-    serial_number: '',
-    warranty_until: ''
+    purchase_date: '',
+    purchase_price: null
   };
   
   isLoading = false;
@@ -364,18 +333,15 @@ export class ItemFormComponent {
       if (this.item.purchase_date) {
         this.item.purchase_date = this.item.purchase_date.split('T')[0];
       }
-      if (this.item.warranty_until) {
-        this.item.warranty_until = this.item.warranty_until.split('T')[0];
-      }
     }
   }
 
-  getCategories(): any[] {
-    return Array.isArray(this.data?.categories) ? this.data.categories : [];
+  getCategories() {
+    return this.data?.categories || [];
   }
 
   isFormValid(): boolean {
-    return !!(this.item.name && this.item.name.trim() && this.item.category);
+    return !!(this.item.name?.trim() && this.item.category);
   }
 
   onSubmit(): void {
@@ -384,10 +350,8 @@ export class ItemFormComponent {
       
       const itemData = {
         ...this.item,
-        purchase_price: this.item.purchase_price || null,
-        current_value: this.item.current_value || null,
-        purchase_date: this.item.purchase_date || null,
-        warranty_until: this.item.warranty_until || null
+        purchase_price: this.item.purchase_price ? parseFloat(this.item.purchase_price.toString().replace(',', '.')) : null,
+        purchase_date: this.item.purchase_date || null
       };
 
       const operation = this.isEditMode
@@ -400,27 +364,12 @@ export class ItemFormComponent {
             ? `"${this.item.name}" wurde erfolgreich aktualisiert!`
             : `"${this.item.name}" wurde erfolgreich erstellt!`;
           
-          this.toastr.success(successMessage, '[ERFOLG]', {
-            timeOut: 3000,
-            progressBar: true,
-            closeButton: true
-          });
-          
+          this.toastr.success(successMessage, 'Erfolg!');
           this.dialogRef.close(result);
         },
         error: (error: any) => {
           console.error('Fehler beim Speichern:', error);
-          
-          const errorMessage = this.isEditMode
-            ? `Fehler beim Aktualisieren von "${this.item.name}"`
-            : `Fehler beim Erstellen von "${this.item.name}"`;
-          
-          this.toastr.error(errorMessage, 'Fehler!', {
-            timeOut: 5000,
-            progressBar: true,
-            closeButton: true
-          });
-          
+          this.toastr.error('Fehler beim Speichern', 'Fehler!');
           this.isLoading = false;
         }
       });

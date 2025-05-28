@@ -16,6 +16,7 @@ import { DashboardStats, Item } from '../../interfaces/inventory.interface';
 import { User } from '../../interfaces/user.interface';
 import { Observable } from 'rxjs';
 import { BalanceUpdateComponent } from '../balance-update/balance-update.component';
+import { ItemFormComponent } from '../item-form/item-form.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,9 +42,10 @@ export class DashboardComponent implements OnInit {
   currentUser$: Observable<User | null>;
   isLoading = true;
   isLoadingItems = true;
+  error: string | null = null;
   
   // Tabellen-Konfiguration
-  displayedColumns: string[] = ['name', 'category', 'condition', 'current_value', 'created_at'];
+  displayedColumns: string[] = ['name', 'category', 'location', 'purchase_price', 'created_at'];
 
   constructor(
     private inventoryService: InventoryService,
@@ -59,23 +61,42 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardStats(): void {
+    console.log('Loading dashboard stats...');
     this.inventoryService.getDashboardStats().subscribe({
       next: (stats) => {
-        console.log('Dashboard Stats:', stats);
-        console.log('Balance:', stats.balance);
+        console.log('Dashboard Stats received:', stats);
         this.stats = stats;
         this.isLoading = false;
+        this.error = null;
       },
       error: (error: any) => {
         console.error('Fehler beim Laden der Dashboard-Statistiken:', error);
+        this.error = 'Fehler beim Laden der Dashboard-Daten';
         this.isLoading = false;
+        
+        // Fallback-Daten für Demo-Zwecke
+        this.stats = {
+          total_items: 0,
+          consumed_items: 0,
+          total_value: 0,
+          total_purchase_price: 0,
+          current_month_expenses: 0,
+          monthly_expenses: [],
+          items_without_purchase_date: 0,
+          categories_count: 0,
+          balance: 0,
+          items_by_category: {},
+          recent_items: []
+        };
       }
     });
   }
 
   loadRecentItems(): void {
+    console.log('Loading recent items...');
     this.inventoryService.getItems().subscribe({
       next: (items) => {
+        console.log('Items received:', items);
         // Nur die letzten 5 Items anzeigen
         this.items = items.slice(0, 5);
         this.isLoadingItems = false;
@@ -83,6 +104,7 @@ export class DashboardComponent implements OnInit {
       error: (error: any) => {
         console.error('Fehler beim Laden der Items:', error);
         this.isLoadingItems = false;
+        this.items = [];
       }
     });
   }
@@ -101,33 +123,84 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  getConditionKeys(): string[] {
-    return this.stats ? Object.keys(this.stats.items_by_condition) : [];
+  openAddItemDialog(): void {
+    // Kategorien laden für das Formular
+    this.inventoryService.getCategories().subscribe({
+      next: (categories) => {
+        const dialogRef = this.dialog.open(ItemFormComponent, {
+          width: '90vw',
+          maxWidth: '700px',
+          maxHeight: '90vh',
+          data: { 
+            item: null, // Neues Item
+            categories: Array.isArray(categories) ? categories : []
+          }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            // Dashboard-Daten neu laden nach erfolgreichem Hinzufügen
+            this.loadDashboardStats();
+            this.loadRecentItems();
+          }
+        });
+      },
+      error: (error: any) => {
+        console.error('Fehler beim Laden der Kategorien für Dialog:', error);
+        // Dialog trotzdem öffnen, aber ohne Kategorien
+        const dialogRef = this.dialog.open(ItemFormComponent, {
+          width: '90vw',
+          maxWidth: '700px',
+          maxHeight: '90vh',
+          data: { 
+            item: null,
+            categories: []
+          }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            this.loadDashboardStats();
+            this.loadRecentItems();
+          }
+        });
+      }
+    });
   }
 
   getCategoryKeys(): string[] {
     return this.stats ? Object.keys(this.stats.items_by_category) : [];
   }
 
-  getConditionLabel(condition: string): string {
-    const conditionMap: { [key: string]: string } = {
-      'neu': 'Neu',
-      'sehr_gut': 'Sehr gut',
-      'gut': 'Gut',
-      'befriedigend': 'Befriedigend',
-      'schlecht': 'Schlecht'
-    };
-    return conditionMap[condition] || condition;
+  // Hilfsmethoden für bessere UX
+  hasData(): boolean {
+    return !!(this.stats && this.stats.total_items > 0);
   }
 
-  getConditionColor(condition: string): string {
-    switch (condition) {
-      case 'neu': return '#4caf50';
-      case 'sehr_gut': return '#8bc34a';
-      case 'gut': return '#ffeb3b';
-      case 'befriedigend': return '#ff9800';
-      case 'schlecht': return '#f44336';
-      default: return '#9e9e9e';
-    }
+  hasCategories(): boolean {
+    return !!(this.stats && this.stats.categories_count > 0);
+  }
+
+  hasRecentItems(): boolean {
+    return !!(this.stats && this.stats.recent_items && this.stats.recent_items.length > 0);
+  }
+
+  getCategoryIcon(categoryName: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Elektronik': 'devices',
+      'Möbel': 'chair',
+      'Kleidung': 'checkroom',
+      'Bücher': 'book',
+      'Küche': 'kitchen',
+      'Sport': 'fitness_center',
+      'Werkzeug': 'build',
+      'Garten': 'yard',
+      'Spielzeug': 'toys',
+      'Schmuck': 'diamond',
+      'Fahrzeug': 'directions_car',
+      'Haushalt': 'home'
+    };
+    
+    return iconMap[categoryName] || 'category';
   }
 }

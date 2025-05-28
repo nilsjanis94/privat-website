@@ -46,6 +46,10 @@ import { Observable } from 'rxjs';
             <mat-icon>inventory</mat-icon>
             <span class="nav-text">Inventar</span>
           </a>
+          <a mat-button routerLink="/statistics" routerLinkActive="active">
+            <mat-icon>analytics</mat-icon>
+            <span class="nav-text">Statistiken</span>
+          </a>
         </div>
       </div>
 
@@ -83,6 +87,10 @@ import { Observable } from 'rxjs';
         <a class="nav-item" routerLink="/inventory" (click)="closeMobileMenu()">
           <mat-icon>inventory</mat-icon>
           <span>Inventar</span>
+        </a>
+        <a class="nav-item" routerLink="/statistics" (click)="closeMobileMenu()">
+          <mat-icon>analytics</mat-icon>
+          <span>Statistiken</span>
         </a>
         <div class="nav-divider"></div>
         <a class="nav-item" (click)="logout()">

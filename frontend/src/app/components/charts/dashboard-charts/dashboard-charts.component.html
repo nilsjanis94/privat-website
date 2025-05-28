@@ -1,0 +1,36 @@
+<div class="charts-container">
+  <!-- Kategorien Donut Chart -->
+  <mat-card class="chart-card" *ngIf="hasCategoryData()">
+    <mat-card-header>
+      <mat-card-title>Gegenstände nach Kategorien</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-wrapper">
+        <canvas 
+          baseChart
+          [data]="categoryChartData"
+          [options]="categoryChartOptions"
+          [type]="'doughnut'">
+        </canvas>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Monatliche Ausgaben Bar Chart -->
+  <mat-card class="chart-card" *ngIf="hasExpensesData()">
+    <mat-card-header>
+      <mat-card-title>Monatliche Ausgaben</mat-card-title>
+      <mat-card-subtitle>Letzte 6 Monate</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-wrapper">
+        <canvas 
+          baseChart
+          [data]="expensesChartData"
+          [options]="expensesChartOptions"
+          [type]="'bar'">
+        </canvas>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -56,10 +56,8 @@ def items_list_create(request):
     if request.method == 'POST':
         serializer = ItemCreateUpdateSerializer(data=request.data)
         if serializer.is_valid():
-            # Kontostand prüfen und abziehen - KORRIGIERT: purchase_price statt current_value
             purchase_price = serializer.validated_data.get('purchase_price', 0) or 0
             
-            # Nur abziehen wenn ein Kaufpreis angegeben wurde
             if purchase_price > 0:
                 if request.user.balance >= purchase_price:
                     request.user.balance -= purchase_price
@@ -69,7 +67,6 @@ def items_list_create(request):
                         'error': f'Nicht genügend Guthaben. Verfügbar: {request.user.balance}€, Benötigt: {purchase_price}€'
                     }, status=status.HTTP_400_BAD_REQUEST)
             
-            # Item erstellen
             serializer.save(owner=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -82,19 +79,13 @@ def items_list_create(request):
             queryset = queryset.filter(
                 Q(name__icontains=search) |
                 Q(description__icontains=search) |
-                Q(location__icontains=search) |
-                Q(serial_number__icontains=search)
+                Q(location__icontains=search)
             )
         
         # Kategorie-Filter
         category = request.query_params.get('category', None)
         if category:
             queryset = queryset.filter(category_id=category)
-        
-        # Zustand-Filter
-        condition = request.query_params.get('condition', None)
-        if condition:
-            queryset = queryset.filter(condition=condition)
         
         serializer = ItemSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -218,36 +209,27 @@ def dashboard_stats(request):
     monthly_expenses.reverse()
     
     # Berechne Statistiken (nur aktive Items für Inventar)
-    total_current_value = sum(item.current_value or 0 for item in active_items)
+    total_current_value = sum(item.purchase_price or 0 for item in active_items)
     total_purchase_price = sum(item.purchase_price or 0 for item in user_items)  # Alle Items
     items_without_purchase_date = user_items.filter(purchase_date__isnull=True).count()
     
     stats = {
-        'total_items': active_items.count(),  # Nur aktive Items
-        'consumed_items': consumed_items.count(),  # Verbrauchte Items
-        'total_value': total_current_value,  # Nur aktive Items
-        'total_purchase_price': total_purchase_price,  # Alle Items
-        'current_month_expenses': float(current_month_expenses),  # Alle Items
-        'monthly_expenses': monthly_expenses,  # Alle Items
+        'total_items': active_items.count(),
+        'consumed_items': consumed_items.count(),
+        'total_value': total_current_value,
+        'total_purchase_price': total_purchase_price,
+        'current_month_expenses': float(current_month_expenses),
+        'monthly_expenses': monthly_expenses,
         'items_without_purchase_date': items_without_purchase_date,
         'categories_count': user_categories.count(),
         'balance': float(request.user.balance),
-        'items_by_condition': {},
         'items_by_category': {},
         'recent_items': ItemSerializer(
-            active_items.order_by('-created_at')[:5],  # Nur aktive Items
+            active_items.order_by('-created_at')[:5],
             many=True, 
             context={'request': request}
         ).data
     }
-    
-    # Items nach Zustand (nur aktive)
-    for condition_key, condition_label in Item.CONDITION_CHOICES:
-        count = active_items.filter(condition=condition_key).count()
-        stats['items_by_condition'][condition_key] = {
-            'label': condition_label,
-            'count': count
-        }
     
     # Items nach Kategorie (nur aktive)
     for category in user_categories:

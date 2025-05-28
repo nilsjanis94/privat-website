@@ -5,19 +5,17 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { InventoryService } from '../../services/inventory.service';
-import { Category, Item } from '../../interfaces/inventory.interface';
+import { Item, Category } from '../../interfaces/inventory.interface';
 import { ItemFormComponent } from '../item-form/item-form.component';
 import { CategoryFormComponent } from '../category-form/category-form.component';
 
@@ -31,15 +29,12 @@ import { CategoryFormComponent } from '../category-form/category-form.component'
     MatButtonModule,
     MatIconModule,
     MatInputModule,
-    MatFormFieldModule,
     MatSelectModule,
+    MatFormFieldModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule,
-    MatDialogModule,
-    MatChipsModule,
     MatProgressSpinnerModule,
-    MatMenuModule,
+    MatChipsModule,
     MatSlideToggleModule
   ],
   templateUrl: './inventory.component.html',
@@ -49,8 +44,8 @@ export class InventoryComponent implements OnInit {
   items: Item[] = [];
   categories: Category[] = [];
   filteredItems: Item[] = [];
-  
-  // Filter-Eigenschaften mit automatischer Anwendung
+
+  // Filter-Properties
   private _searchTerm = '';
   get searchTerm(): string {
     return this._searchTerm;
@@ -69,31 +64,14 @@ export class InventoryComponent implements OnInit {
     this.applyFilters();
   }
 
-  private _selectedCondition = '';
-  get selectedCondition(): string {
-    return this._selectedCondition;
-  }
-  set selectedCondition(value: string) {
-    this._selectedCondition = value;
-    this.applyFilters();
-  }
-  
-  // Tabellen-Eigenschaften
-  displayedColumns: string[] = ['name', 'category', 'condition', 'location', 'current_value', 'created_at', 'actions'];
-  
-  // Loading-States
+  // Tabellen-Konfiguration (condition und current_value entfernt)
+  displayedColumns: string[] = ['name', 'category', 'location', 'purchase_price', 'created_at', 'actions'];
+
+  // Loading States
   isLoading = true;
   isLoadingCategories = true;
-  
-  // Condition-Optionen
-  conditionOptions = [
-    { value: 'neu', label: 'Neu' },
-    { value: 'sehr_gut', label: 'Sehr gut' },
-    { value: 'gut', label: 'Gut' },
-    { value: 'befriedigend', label: 'Befriedigend' },
-    { value: 'schlecht', label: 'Schlecht' }
-  ];
 
+  // Toggle für verbrauchte Items
   showConsumedItems = false;
 
   constructor(
@@ -156,17 +134,13 @@ export class InventoryComponent implements OnInit {
       const matchesCategory = !this.selectedCategory || 
         item.category === this.selectedCategory;
       
-      const matchesCondition = !this.selectedCondition || 
-        item.condition === this.selectedCondition;
-      
-      return matchesSearch && matchesCategory && matchesCondition;
+      return matchesSearch && matchesCategory;
     });
   }
 
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedCategory = null;
-    this.selectedCondition = '';
     this.filteredItems = [...this.items];
   }
 
@@ -260,22 +234,6 @@ export class InventoryComponent implements OnInit {
           this.toastr.error('Fehler beim Löschen der Kategorie');
         }
       });
-    }
-  }
-
-  getConditionLabel(condition: string): string {
-    const option = this.conditionOptions.find(opt => opt.value === condition);
-    return option ? option.label : condition;
-  }
-
-  getConditionColor(condition: string): string {
-    switch (condition) {
-      case 'neu': return '#4caf50';
-      case 'sehr_gut': return '#8bc34a';
-      case 'gut': return '#ffeb3b';
-      case 'befriedigend': return '#ff9800';
-      case 'schlecht': return '#f44336';
-      default: return '#9e9e9e';
     }
   }
 

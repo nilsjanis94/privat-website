@@ -21,5 +21,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/inventory/inventory.component').then(m => m.InventoryComponent),
     canActivate: [authGuard]
   },
+  { 
+    path: 'statistics', 
+    loadComponent: () => import('./components/statistics/statistics.component').then(m => m.StatisticsComponent),
+    canActivate: [authGuard]
+  },
   { path: '**', redirectTo: '/dashboard' }
 ];

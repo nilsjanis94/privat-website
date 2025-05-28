@@ -9,9 +9,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'owner', 'condition', 'current_value', 'created_at')
-    list_filter = ('category', 'condition', 'created_at', 'owner')
-    search_fields = ('name', 'description', 'serial_number', 'location')
+    list_display = ('name', 'category', 'owner', 'purchase_price', 'created_at')
+    list_filter = ('category', 'created_at', 'owner')
+    search_fields = ('name', 'description', 'location')
     ordering = ('-created_at',)
     
     fieldsets = (
@@ -19,10 +19,10 @@ class ItemAdmin(admin.ModelAdmin):
             'fields': ('name', 'description', 'category', 'owner')
         }),
         ('Kaufinformationen', {
-            'fields': ('purchase_date', 'purchase_price', 'current_value')
+            'fields': ('purchase_date', 'purchase_price')
         }),
         ('Details', {
-            'fields': ('condition', 'location', 'serial_number', 'warranty_until', 'image')
+            'fields': ('location',)
         }),
         ('Zeitstempel', {
             'fields': ('created_at', 'updated_at'),

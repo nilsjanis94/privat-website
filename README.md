@@ -1,6 +1,6 @@
 # 🏠 Haushalts-Inventar-System
 
-Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich mit erweiterten Features wie Kontostand-Management, Ausgaben-Tracking, Verbrauchs-Verwaltung und automatisiertem Deployment.
+Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich mit erweiterten Features wie Kontostand-Management, Ausgaben-Tracking, Verbrauchs-Verwaltung, interaktiven Charts und automatisiertem Deployment.
 
 ## 🚀 Hauptfeatures
 
@@ -11,13 +11,15 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - Automatische Session-Verwaltung
 - Benutzerspezifische Datenisolation
 
-### 📦 Inventar-Verwaltung
+### 📦 Inventar-Verwaltung (Vereinfacht & Benutzerfreundlich)
 - **Kategorien**: Vollständige CRUD-Operationen mit benutzerspezifischer Isolation
-- **Gegenstände**: Erweiterte Item-Verwaltung mit allen Details
-- **Erweiterte Suche**: Multi-Filter-System (Name, Kategorie, Zustand, Ort)
-- **Zustandsverfolgung**: 5 Zustandsstufen (Neu → Schlecht)
+- **Gegenstände**: Stark vereinfachte Item-Verwaltung mit Fokus auf Kern-Features
+- **Erweiterte Suche**: Multi-Filter-System (Name, Kategorie, Ort)
+- **Benutzerfreundlichkeit**: Reduzierte Formular-Komplexität für bessere UX
+- **Optionale Felder**: Kaufdatum ist optional für mehr Flexibilität
 - **Bearbeitung**: Vollständige Edit-Funktionalität für alle Items
 - **Löschung**: Sichere Löschung mit Bestätigungsdialogen
+- **Direkte Formular-Navigation**: "Gegenstand hinzufügen" öffnet direkt das Formular
 
 ### 💰 Finanz-Management
 - **Kontostand-Verwaltung**: Persönlicher Kontostand mit manueller Anpassung
@@ -35,19 +37,23 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - **Erhaltung der Finanzdaten**: Ausgaben und Kontostand bleiben bei Verbrauch erhalten
 
 ### 📊 Dashboard & Analytics
+- **Vereinfachtes Dashboard**: Fokus auf wichtigste Kennzahlen und neueste Items
+- **Separate Statistiken-Seite**: Detaillierte Charts und Analysen
+- **Interaktive Charts**: Chart.js-basierte Visualisierungen
+  - Kategorien-Donut-Chart mit Prozentangaben
+  - Monatliche Ausgaben Bar-Chart (6 Monate)
 - **Echtzeit-Statistiken**: Aktuelle Inventar-Übersicht
 - **Finanz-Übersicht**: Kontostand, monatliche Ausgaben, Gesamtwerte
-- **Kategorien-Verteilung**: Visualisierung der Item-Verteilung
-- **Zustandsanalyse**: Übersicht über Item-Zustände
-- **Neueste Items**: Chronologische Auflistung der letzten Hinzufügungen
-- **Warnungen**: Hinweise auf Items ohne Kaufdatum
+- **Intelligente Durchschnitte**: Monate ohne Ausgaben werden nicht in Durchschnittsberechnung einbezogen
+- **Responsive Charts**: Optimiert für alle Bildschirmgrößen
 
 ### 🎨 Benutzeroberfläche
 - **Responsive Design**: Optimiert für Desktop, Tablet und Mobile
 - **Angular Material**: Moderne, konsistente UI-Komponenten
 - **Toast-Benachrichtigungen**: Sofortiges Benutzer-Feedback
-- **Intuitive Navigation**: Klare Menüstruktur und Workflows
+- **Intuitive Navigation**: Klare Menüstruktur mit separaten Bereichen für Dashboard und Statistiken
 - **Accessibility**: Barrierefreie Bedienung
+- **Optimierte Layouts**: Bessere Reihenfolge und Strukturierung der Inhalte
 
 ### 📱 Mobile-First Design
 - **Responsive Navigation**: Hamburger-Menü mit mat-sidenav für mobile Geräte
@@ -57,6 +63,7 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - **Adaptive Layouts**: CSS Grid/Flexbox für alle Bildschirmgrößen
 - **Responsive Breakpoints**: 320px, 480px, 768px, 1024px, 1200px+
 - **Touch-freundliche Dialogs**: Optimierte Formulare für mobile Eingabe
+- **Responsive Charts**: Mobile-optimierte Chart-Höhen und -Layouts
 
 ## 🛠️ Technologie-Stack
 
@@ -71,6 +78,7 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 ### Frontend
 - **Angular 19**: Moderne Frontend-Framework mit Standalone Components
 - **Angular Material**: Umfassende UI-Komponenten-Bibliothek
+- **Chart.js & ng2-charts**: Interaktive Datenvisualisierung
 - **TypeScript**: Typisierte JavaScript-Entwicklung
 - **RxJS**: Reactive Programming für asynchrone Operationen
 - **NgRx Toastr**: Elegante Benachrichtigungen
@@ -392,11 +400,7 @@ class Item(Model):
     owner = ForeignKey(User, on_delete=CASCADE)         # Besitzer
     purchase_date = DateField(null=True, blank=True)    # Kaufdatum
     purchase_price = DecimalField(max_digits=10, decimal_places=2)  # Kaufpreis
-    current_value = DecimalField(max_digits=10, decimal_places=2)   # Aktueller Wert
-    condition = CharField(max_length=20, choices=CONDITION_CHOICES) # Zustand
     location = CharField(max_length=200, blank=True)    # Aufbewahrungsort
-    serial_number = CharField(max_length=100, blank=True) # Seriennummer
-    warranty_until = DateField(null=True, blank=True)   # Garantie bis
     image = ImageField(upload_to='items/', null=True)   # Produktbild
     consumed = BooleanField(default=False)              # Verbraucht-Status
     consumed_at = DateTimeField(null=True, blank=True)  # Verbrauchsdatum
@@ -550,7 +554,28 @@ sudo chown -R www-data:www-data /var/www/html/
 
 ## 📝 Changelog
 
-### Version 2.2.0 (Aktuell - Dezember 2024)
+### Version 2.4.0 (Aktuell - Mai 2025)
+- ✅ **Separate Statistiken-Route**: Neue `/statistics` Route für detaillierte Analysen
+- ✅ **Interaktive Charts**: Chart.js-Integration mit Donut- und Bar-Charts
+- ✅ **Dashboard-Vereinfachung**: Fokus auf wichtigste Kennzahlen und neueste Items
+- ✅ **Optimierte Navigation**: Direkte Formular-Navigation für "Gegenstand hinzufügen"
+- ✅ **Intelligente Durchschnitte**: Monate ohne Ausgaben werden nicht in Berechnung einbezogen
+- ✅ **Responsive Charts**: Mobile-optimierte Chart-Layouts und -Höhen
+- ✅ **UI-Verbesserungen**: Bessere Abstände, Lesbarkeit und Strukturierung
+- ✅ **Redundanz-Entfernung**: Eliminierung überflüssiger Schnellaktionen und Details
+
+### Version 2.3.0 (Mai 2025)
+- ✅ **Model-Vereinfachung**: Entfernung unnötiger Felder für bessere UX
+  - Entfernt: `serial_number`, `warranty_until`, `condition`, `current_value`
+  - Grund: Reduzierung der Formular-Komplexität
+- ✅ **UX-Verbesserung**: Vereinfachte Formulare für intuitivere Bedienung
+- ✅ **Flexibles Kaufdatum**: `purchase_date` ist jetzt optional
+- ✅ **Fokus auf Kern-Features**: Konzentration auf Name, Kategorie, Wert, Standort
+- ✅ **Database Migration**: Automatische Migration für vereinfachtes Schema
+- ✅ **Bessere Validierung**: Klarere Pflicht- und optionale Felder
+- ✅ **Currency-Pipe Fix**: Korrekte Dezimalstellen-Anzeige (1.2-2)
+
+### Version 2.2.0 (Mai 2025)
 - ✅ **Mobile Responsivität**: Vollständig responsive Navigation mit mat-sidenav
 - ✅ **SPA-Routing Fix**: Refresh-Bug auf Live-Server durch Apache-Konfiguration behoben
 - ✅ **UI-Verbesserungen**: Card-Titel Lesbarkeit (#333) und Touch-Optimierung (44px+)
@@ -589,11 +614,11 @@ Dieses Projekt steht unter der MIT-Lizenz. Siehe `LICENSE` Datei für Details.
 
 ## 🙏 Danksagungen
 
-- Angular Team für das großartige Framework
+- Angular Team für das exzellente Framework
 - Django Team für das robuste Backend-Framework
-- Material Design Team für die UI-Komponenten
-- Apache Foundation für den zuverlässigen Webserver
-- Alle Open-Source-Contributors
+- Chart.js Team für die großartigen Visualisierungs-Tools
+- Material Design Team für die konsistente UI-Bibliothek
+- Open Source Community für die unzähligen hilfreichen Bibliotheken
 
 ## 📞 Support
 
@@ -630,7 +655,7 @@ Bei Fragen oder Problemen:
 
 ---
 
-**Version**: 2.2.0  
+**Version**: 2.4.0  
 **Letztes Update**: Mai 2025  
 **Status**: ✅ Production Ready & Live Deployed  
 **Mobile**: ✅ Vollständig responsive & touch-optimiert  

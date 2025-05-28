@@ -4,19 +4,38 @@
     <p>Hier ist eine Übersicht über Ihr Inventar</p>
   </div>
 
+  <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-container">
     <mat-spinner></mat-spinner>
     <p>Lade Dashboard...</p>
   </div>
 
-  <div *ngIf="!isLoading && stats" class="dashboard-content">
-    <!-- Statistik-Karten -->
-    <div class="stats-grid">
-      <mat-card class="stat-card">
+  <!-- Error State -->
+  <div *ngIf="!isLoading && error" class="error-container">
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon class="error-icon">error</mat-icon>
+        <h2>Fehler beim Laden</h2>
+        <p>{{ error }}</p>
+        <button mat-raised-button color="primary" (click)="loadDashboardStats()">
+          Erneut versuchen
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!isLoading && !error && stats" class="dashboard-content">
+    
+    <!-- Wichtigste Kennzahlen -->
+    <div class="key-metrics">
+      <mat-card class="metric-card primary">
         <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon">inventory</mat-icon>
-            <div class="stat-info">
+          <div class="metric-content">
+            <div class="metric-icon">
+              <mat-icon>inventory</mat-icon>
+            </div>
+            <div class="metric-info">
               <h2>{{ stats.total_items }}</h2>
               <p>Gegenstände</p>
             </div>
@@ -24,68 +43,45 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card">
+      <mat-card class="metric-card">
         <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon">euro</mat-icon>
-            <div class="stat-info">
+          <div class="metric-content">
+            <div class="metric-icon">
+              <mat-icon>euro</mat-icon>
+            </div>
+            <div class="metric-info">
               <h2>{{ stats.total_value | currency:'EUR':'symbol':'1.0-0' }}</h2>
-              <p>Aktueller Wert</p>
+              <p>Gesamtwert</p>
             </div>
           </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card">
+      <mat-card class="metric-card expense">
         <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon">shopping_cart</mat-icon>
-            <div class="stat-info">
+          <div class="metric-content">
+            <div class="metric-icon">
+              <mat-icon>shopping_cart</mat-icon>
+            </div>
+            <div class="metric-info">
               <h2>{{ stats.current_month_expenses | currency:'EUR':'symbol':'1.0-0' }}</h2>
-              <p>Ausgaben diesen Monat</p>
+              <p>Diesen Monat</p>
             </div>
           </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card">
+      <mat-card class="metric-card balance" (click)="openBalanceUpdateDialog()">
         <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon">category</mat-icon>
-            <div class="stat-info">
-              <h2>{{ stats.categories_count }}</h2>
-              <p>Kategorien</p>
+          <div class="metric-content">
+            <div class="metric-icon">
+              <mat-icon>account_balance_wallet</mat-icon>
             </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon">delete_outline</mat-icon>
-            <div class="stat-info">
-              <h2>{{ stats.consumed_items }}</h2>
-              <p>Verbrauchte Items</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card balance-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon">account_balance_wallet</mat-icon>
-            <div class="stat-info">
-              <h2>{{ stats.balance | currency:'EUR':'symbol':'1.2-2' }}</h2>
+            <div class="metric-info">
+              <h2>{{ stats.balance | currency:'EUR':'symbol':'1.0-0' }}</h2>
               <p>Kontostand</p>
             </div>
-            <button 
-              mat-icon-button 
-              color="primary" 
-              (click)="openBalanceUpdateDialog()"
-              class="balance-edit-btn"
-              title="Kontostand bearbeiten">
+            <button mat-icon-button class="edit-btn">
               <mat-icon>edit</mat-icon>
             </button>
           </div>
@@ -93,11 +89,41 @@
       </mat-card>
     </div>
 
-    <!-- Aktuelle Items-Liste -->
-    <mat-card class="items-list-card" *ngIf="items.length > 0">
+    <!-- Schnelle Aktionen -->
+    <div class="quick-actions">
+      <h2>Schnelle Aktionen</h2>
+      <div class="actions-grid">
+        <mat-card class="action-card add-item" (click)="openAddItemDialog()">
+          <mat-card-content>
+            <mat-icon class="action-icon">add_circle</mat-icon>
+            <h3>Gegenstand hinzufügen</h3>
+            <p>Neues Item zum Inventar hinzufügen</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card view-inventory" routerLink="/inventory">
+          <mat-card-content>
+            <mat-icon class="action-icon">list</mat-icon>
+            <h3>Inventar verwalten</h3>
+            <p>Alle Gegenstände anzeigen und bearbeiten</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card view-stats" routerLink="/statistics">
+          <mat-card-content>
+            <mat-icon class="action-icon">analytics</mat-icon>
+            <h3>Detaillierte Statistiken</h3>
+            <p>Charts und Analysen anzeigen</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Letzte Aktivitäten -->
+    <mat-card class="recent-activity" *ngIf="items.length > 0">
       <mat-card-header>
-        <mat-card-title>Aktuelle Gegenstände</mat-card-title>
-        <mat-card-subtitle>Die letzten 5 hinzugefügten Items</mat-card-subtitle>
+        <mat-card-title>Letzte Aktivitäten</mat-card-title>
+        <mat-card-subtitle>Zuletzt hinzugefügte Gegenstände</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div *ngIf="isLoadingItems" class="loading-items">
@@ -105,171 +131,57 @@
           <span>Lade Items...</span>
         </div>
         
-        <div *ngIf="!isLoadingItems" class="items-table-container">
-          <table mat-table [dataSource]="items" class="items-table">
-            <!-- Name Column -->
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Name</th>
-              <td mat-cell *matCellDef="let item">
-                <strong>{{ item.name }}</strong>
-                <div class="item-description" *ngIf="item.description">
-                  {{ item.description }}
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Category Column -->
-            <ng-container matColumnDef="category">
-              <th mat-header-cell *matHeaderCellDef>Kategorie</th>
-              <td mat-cell *matCellDef="let item">{{ item.category_name || 'Unbekannt' }}</td>
-            </ng-container>
-
-            <!-- Condition Column -->
-            <ng-container matColumnDef="condition">
-              <th mat-header-cell *matHeaderCellDef>Zustand</th>
-              <td mat-cell *matCellDef="let item">
-                <mat-chip [style.background-color]="getConditionColor(item.condition)" 
-                          [style.color]="item.condition === 'gut' ? '#000' : '#fff'">
-                  {{ getConditionLabel(item.condition) }}
-                </mat-chip>
-              </td>
-            </ng-container>
-
-            <!-- Value Column -->
-            <ng-container matColumnDef="current_value">
-              <th mat-header-cell *matHeaderCellDef>Wert</th>
-              <td mat-cell *matCellDef="let item">
-                <span *ngIf="item.current_value">{{ item.current_value | currency:'EUR':'symbol':'1.0-0' }}</span>
-                <span *ngIf="!item.current_value" class="no-value">-</span>
-              </td>
-            </ng-container>
-
-            <!-- Created Date Column -->
-            <ng-container matColumnDef="created_at">
-              <th mat-header-cell *matHeaderCellDef>Hinzugefügt</th>
-              <td mat-cell *matCellDef="let item">{{ item.created_at | date:'short' }}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
+        <div *ngIf="!isLoadingItems" class="activity-list">
+          <div *ngFor="let item of items.slice(0, 3)" class="activity-item">
+            <div class="item-avatar">
+              <mat-icon>{{ getCategoryIcon(item.category_name) }}</mat-icon>
+            </div>
+            <div class="item-details">
+              <h4>{{ item.name }}</h4>
+              <p class="item-meta">
+                {{ item.category_name || 'Unbekannt' }} • 
+                {{ item.created_at | date:'short' }}
+                <span *ngIf="item.purchase_price" class="price">
+                  • {{ item.purchase_price | currency:'EUR':'symbol':'1.0-0' }}
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
         
-        <div class="table-actions">
+        <div class="card-footer">
           <button mat-button color="primary" routerLink="/inventory">
-            Alle Items anzeigen
+            Alle anzeigen
+            <mat-icon>arrow_forward</mat-icon>
           </button>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <!-- Zustand-Übersicht -->
-    <mat-card class="overview-card">
+    <!-- Kategorien-Schnellübersicht -->
+    <mat-card class="categories-preview" *ngIf="hasCategories()">
       <mat-card-header>
-        <mat-card-title>Zustand der Gegenstände</mat-card-title>
+        <mat-card-title>Top Kategorien</mat-card-title>
+        <mat-card-subtitle>{{ stats.categories_count }} Kategorien insgesamt</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <div class="condition-chips">
-          <mat-chip-set>
-            <mat-chip *ngFor="let condition of getConditionKeys()">
-              {{ stats.items_by_condition[condition].label }}: 
-              {{ stats.items_by_condition[condition].count }}
-            </mat-chip>
-          </mat-chip-set>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Kategorien-Übersicht -->
-    <mat-card class="overview-card" *ngIf="getCategoryKeys().length > 0">
-      <mat-card-header>
-        <mat-card-title>Gegenstände nach Kategorien</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="category-list">
-          <div *ngFor="let category of getCategoryKeys()" class="category-item">
-            <span class="category-name">{{ category }}</span>
+        <div class="categories-list">
+          <div *ngFor="let category of getCategoryKeys().slice(0, 4)" class="category-item">
+            <div class="category-info">
+              <mat-icon>{{ getCategoryIcon(category) }}</mat-icon>
+              <span class="category-name">{{ category }}</span>
+            </div>
             <span class="category-count">{{ stats.items_by_category[category] }}</span>
           </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Neueste Gegenstände -->
-    <mat-card class="overview-card" *ngIf="stats.recent_items.length > 0">
-      <mat-card-header>
-        <mat-card-title>Zuletzt hinzugefügt</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="recent-items">
-          <div *ngFor="let item of stats.recent_items" class="recent-item">
-            <div class="item-info">
-              <h4>{{ item.name }}</h4>
-              <p>{{ item.category_name }}</p>
-              <small>{{ item.created_at | date:'short' }}</small>
-            </div>
-            <div class="item-value" *ngIf="item.current_value">
-              {{ item.current_value | currency:'EUR':'symbol':'1.0-0' }}
-            </div>
+          <div *ngIf="getCategoryKeys().length > 4" class="more-categories">
+            <span>und {{ getCategoryKeys().length - 4 }} weitere...</span>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Monatliche Ausgaben-Übersicht -->
-    <mat-card class="overview-card">
-      <mat-card-header>
-        <mat-card-title>Monatliche Ausgaben</mat-card-title>
-        <mat-card-subtitle>Ausgaben der letzten 6 Monate</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="monthly-expenses">
-          <div *ngFor="let month of stats.monthly_expenses" class="month-expense">
-            <div class="month-info">
-              <h4>{{ month.month_name }}</h4>
-              <p>{{ month.items_count }} Gegenstände</p>
-            </div>
-            <div class="month-amount">
-              <span class="amount">{{ month.total_expenses | currency:'EUR':'symbol':'1.0-0' }}</span>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Warnung für Items ohne Kaufdatum -->
-    <mat-card class="warning-card" *ngIf="stats.items_without_purchase_date > 0">
-      <mat-card-content>
-        <div class="warning-content">
-          <mat-icon class="warning-icon">warning</mat-icon>
-          <div class="warning-info">
-            <h3>Achtung: Fehlende Kaufdaten</h3>
-            <p>
-              {{ stats.items_without_purchase_date }} Gegenstände haben kein Kaufdatum und werden 
-              daher nicht in den monatlichen Ausgaben berücksichtigt.
-            </p>
-            <button mat-button color="primary" routerLink="/inventory">
-              Items überprüfen
-            </button>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Quick Actions -->
-    <mat-card class="actions-card">
-      <mat-card-header>
-        <mat-card-title>Schnellaktionen</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="action-buttons">
-          <button mat-raised-button color="primary" routerLink="/inventory">
-            <mat-icon>add</mat-icon>
-            Neuen Gegenstand hinzufügen
-          </button>
-          <button mat-raised-button color="accent" routerLink="/inventory">
-            <mat-icon>list</mat-icon>
-            Inventar verwalten
+        
+        <div class="card-footer">
+          <button mat-button color="primary" routerLink="/statistics">
+            Detaillierte Analyse
+            <mat-icon>analytics</mat-icon>
           </button>
         </div>
       </mat-card-content>
@@ -277,16 +189,18 @@
   </div>
 
   <!-- Leerer Zustand -->
-  <div *ngIf="!isLoading && stats && stats.total_items === 0" class="empty-state">
+  <div *ngIf="!isLoading && !error && stats && stats.total_items === 0" class="empty-state">
     <mat-card>
       <mat-card-content>
-        <mat-icon class="empty-icon">inventory</mat-icon>
-        <h2>Ihr Inventar ist leer</h2>
-        <p>Beginnen Sie damit, Ihre ersten Gegenstände hinzuzufügen!</p>
-        <button mat-raised-button color="primary" routerLink="/inventory">
-          <mat-icon>add</mat-icon>
-          Ersten Gegenstand hinzufügen
-        </button>
+        <div class="empty-content">
+          <mat-icon class="empty-icon">inventory_2</mat-icon>
+          <h2>Willkommen bei Ihrem Inventar-System!</h2>
+          <p>Sie haben noch keine Gegenstände hinzugefügt. Beginnen Sie jetzt mit der Verwaltung Ihres Inventars.</p>
+          <button mat-raised-button color="primary" (click)="openAddItemDialog()" class="cta-button">
+            <mat-icon>add</mat-icon>
+            Ersten Gegenstand hinzufügen
+          </button>
+        </div>
       </mat-card-content>
     </mat-card>
   </div>

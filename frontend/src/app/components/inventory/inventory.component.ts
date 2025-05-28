@@ -333,6 +333,16 @@ export class InventoryComponent implements OnInit {
     return !!(this.selectedCategory || this.searchTerm || this.showConsumedItems);
   }
 
+  hasSearchOrCategoryFilters(): boolean {
+    return !!(this.selectedCategory || this.searchTerm);
+  }
+
+  clearSearchAndCategoryFilters(): void {
+    this.selectedCategory = null;
+    this.searchTerm = '';
+    this.applyFilters();
+  }
+
   getCategoryName(categoryId: number): string {
     const category = this.categories.find(c => c.id === categoryId);
     return category ? category.name : '';

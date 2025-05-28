@@ -10,11 +10,17 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - Email-basierte Benutzerkonten
 - Automatische Session-Verwaltung
 - Benutzerspezifische Datenisolation
+- **NEU**: Automatische Standard-Kategorien bei Registrierung/Login
 
 ### 📦 Inventar-Verwaltung (Vereinfacht & Benutzerfreundlich)
 - **Kategorien**: Vollständige CRUD-Operationen mit benutzerspezifischer Isolation
+- **Intelligente Kategorie-Verwaltung**: 
+  - Automatische Erstellung von 7 Standard-Kategorien
+  - Plus-Button im Item-Formular für direkte Kategorie-Erstellung
+  - "Mehr anzeigen" Button bei vielen Kategorien (>6)
 - **Gegenstände**: Stark vereinfachte Item-Verwaltung mit Fokus auf Kern-Features
 - **Erweiterte Suche**: Multi-Filter-System (Name, Kategorie, Ort)
+- **Paginierung**: Automatische Seiteneinteilung bei vielen Items (25 pro Seite)
 - **Benutzerfreundlichkeit**: Reduzierte Formular-Komplexität für bessere UX
 - **Optionale Felder**: Kaufdatum ist optional für mehr Flexibilität
 - **Bearbeitung**: Vollständige Edit-Funktionalität für alle Items
@@ -33,15 +39,15 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - **Verbraucht markieren**: Items als "verbraucht" markieren (z.B. Lebensmittel)
 - **Verbrauch rückgängig**: Versehentlich markierte Items wiederherstellen
 - **Separate Statistiken**: Getrennte Zählung aktiver vs. verbrauchter Items
-- **Filter-Toggle**: Anzeige verbrauchter Items ein-/ausblenden
+- **Filter-Toggle**: Anzeige verbrauchter Items ein-/ausblenden mit Icon
 - **Erhaltung der Finanzdaten**: Ausgaben und Kontostand bleiben bei Verbrauch erhalten
 
 ### 📊 Dashboard & Analytics
 - **Vereinfachtes Dashboard**: Fokus auf wichtigste Kennzahlen und neueste Items
 - **Separate Statistiken-Seite**: Detaillierte Charts und Analysen
 - **Interaktive Charts**: Chart.js-basierte Visualisierungen
-  - Kategorien-Donut-Chart mit Prozentangaben
-  - Monatliche Ausgaben Bar-Chart (6 Monate)
+  - **Kategorien-Donut-Chart**: Mit Prozentangaben direkt im Chart
+  - **Monatliche Ausgaben Bar-Chart**: Mit Werten über den Balken (6 Monate)
 - **Echtzeit-Statistiken**: Aktuelle Inventar-Übersicht
 - **Finanz-Übersicht**: Kontostand, monatliche Ausgaben, Gesamtwerte
 - **Intelligente Durchschnitte**: Monate ohne Ausgaben werden nicht in Durchschnittsberechnung einbezogen
@@ -52,8 +58,12 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - **Angular Material**: Moderne, konsistente UI-Komponenten
 - **Toast-Benachrichtigungen**: Sofortiges Benutzer-Feedback
 - **Intuitive Navigation**: Klare Menüstruktur mit separaten Bereichen für Dashboard und Statistiken
+- **Optimierte Layouts**: 
+  - Kategorien → Filter → Items Reihenfolge
+  - Kompakte Cards für bessere Übersicht
+  - Material Design Accent-Farben für ausgewählte Kategorien
 - **Accessibility**: Barrierefreie Bedienung
-- **Optimierte Layouts**: Bessere Reihenfolge und Strukturierung der Inhalte
+- **Paginierung**: Automatische Seiteneinteilung für große Datenmengen
 
 ### 📱 Mobile-First Design
 - **Responsive Navigation**: Hamburger-Menü mit mat-sidenav für mobile Geräte
@@ -554,7 +564,27 @@ sudo chown -R www-data:www-data /var/www/html/
 
 ## 📝 Changelog
 
-### Version 2.4.0 (Aktuell - Mai 2025)
+### Version 2.5.0 (Aktuell - Mai 2025)
+- ✅ **Intelligente Kategorie-Verwaltung**: 
+  - Automatische Standard-Kategorien bei Login/Registrierung
+  - Plus-Button im Item-Formular für direkte Kategorie-Erstellung
+  - "Mehr anzeigen" Button bei vielen Kategorien (>6)
+- ✅ **Paginierung**: Automatische Seiteneinteilung bei vielen Items (25 pro Seite)
+- ✅ **UI-Optimierungen**:
+  - Kategorien → Filter → Items Layout-Reihenfolge
+  - Material Design Accent-Farben für ausgewählte Kategorien
+  - Kompakte Cards für bessere Raumnutzung
+  - Icon statt Text für Verbraucht-Toggle
+- ✅ **Chart-Verbesserungen**:
+  - Prozentangaben direkt im Donut-Chart
+  - Werte über Balken im Bar-Chart
+  - Bessere Padding-Einstellungen
+- ✅ **Formular-Verbesserungen**:
+  - ReactiveFormsModule statt FormsModule
+  - Separate HTML/SCSS-Dateien statt Inline-Templates
+  - Bessere Validierung und Fehlerbehandlung
+
+### Version 2.4.0 (Mai 2025)
 - ✅ **Separate Statistiken-Route**: Neue `/statistics` Route für detaillierte Analysen
 - ✅ **Interaktive Charts**: Chart.js-Integration mit Donut- und Bar-Charts
 - ✅ **Dashboard-Vereinfachung**: Fokus auf wichtigste Kennzahlen und neueste Items
@@ -655,7 +685,7 @@ Bei Fragen oder Problemen:
 
 ---
 
-**Version**: 2.4.0  
+**Version**: 2.5.0  
 **Letztes Update**: Mai 2025  
 **Status**: ✅ Production Ready & Live Deployed  
 **Mobile**: ✅ Vollständig responsive & touch-optimiert  

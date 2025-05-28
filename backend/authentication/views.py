@@ -8,17 +8,48 @@ from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSe
 
 # Create your views here.
 
+def create_default_categories(user):
+    """Erstellt Standard-Kategorien für neue Benutzer"""
+    from inventory.models import Category
+    
+    default_categories = [
+        {'name': 'Elektronik', 'description': 'Elektronische Geräte und Zubehör'},
+        {'name': 'Möbel', 'description': 'Möbel und Einrichtungsgegenstände'},
+        {'name': 'Kleidung', 'description': 'Kleidung und Accessoires'},
+        {'name': 'Küche', 'description': 'Küchengeräte und -utensilien'},
+        {'name': 'Bücher & Medien', 'description': 'Bücher, DVDs, Spiele'},
+        {'name': 'Sport & Freizeit', 'description': 'Sportgeräte und Freizeitartikel'},
+        {'name': 'Sonstiges', 'description': 'Andere Gegenstände'},
+    ]
+    
+    created_categories = []
+    for cat_data in default_categories:
+        category, created = Category.objects.get_or_create(
+            name=cat_data['name'],
+            owner=user,
+            defaults={'description': cat_data['description']}
+        )
+        if created:
+            created_categories.append(category.name)
+    
+    return created_categories
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
     serializer = UserRegistrationSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+        
+        # Standard-Kategorien für neuen Benutzer erstellen
+        created_categories = create_default_categories(user)
+        
         refresh = RefreshToken.for_user(user)
         return Response({
             'user': UserSerializer(user).data,
             'refresh': str(refresh),
             'access': str(refresh.access_token),
+            'created_categories': created_categories,
         }, status=status.HTTP_201_CREATED)
     
     # Bessere Fehlermeldungen für häufige Probleme
@@ -41,11 +72,20 @@ def login(request):
     serializer = UserLoginSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.validated_data['user']
+        
+        # Prüfen ob Benutzer Standard-Kategorien hat, falls nicht erstellen
+        from inventory.models import Category
+        if not Category.objects.filter(owner=user).exists():
+            created_categories = create_default_categories(user)
+        else:
+            created_categories = []
+        
         refresh = RefreshToken.for_user(user)
         return Response({
             'user': UserSerializer(user).data,
             'refresh': str(refresh),
             'access': str(refresh.access_token),
+            'created_categories': created_categories,
         })
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

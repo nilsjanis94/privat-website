@@ -54,8 +54,40 @@ def category_detail(request, pk):
 @permission_classes([IsAuthenticated])
 def items_list_create(request):
     if request.method == 'POST':
-        serializer = ItemCreateUpdateSerializer(data=request.data)
+        print(f"DEBUG: Received data: {request.data}")
+        print(f"DEBUG: User: {request.user}")
+        print(f"DEBUG: Content-Type: {request.content_type}")
+        print(f"DEBUG: Headers: {dict(request.headers)}")
+        
+        # Daten vor Serializer-Validierung bereinigen
+        data = request.data.copy()
+        
+        # Leere Strings zu None
+        if data.get('purchase_date') == '':
+            data['purchase_date'] = None
+        if data.get('purchase_price') == '':
+            data['purchase_price'] = None
+            
+        # ISO-Datum zu YYYY-MM-DD konvertieren
+        if data.get('purchase_date') and isinstance(data['purchase_date'], str):
+            try:
+                # Parse ISO format und extrahiere nur das Datum
+                if 'T' in data['purchase_date']:
+                    date_obj = datetime.fromisoformat(data['purchase_date'].replace('Z', '+00:00'))
+                    data['purchase_date'] = date_obj.date().isoformat()
+                    print(f"DEBUG: Converted date to: {data['purchase_date']}")
+            except ValueError as e:
+                print(f"DEBUG: Date parsing error: {e}")
+        
+        print(f"DEBUG: Cleaned data: {data}")
+        
+        # Context für Serializer hinzufügen
+        serializer = ItemCreateUpdateSerializer(data=data, context={'request': request})
+        print(f"DEBUG: Serializer valid: {serializer.is_valid()}")
+        
         if serializer.is_valid():
+            print(f"DEBUG: Validated data: {serializer.validated_data}")
+            
             purchase_price = serializer.validated_data.get('purchase_price', 0) or 0
             
             if purchase_price > 0:
@@ -67,9 +99,16 @@ def items_list_create(request):
                         'error': f'Nicht genügend Guthaben. Verfügbar: {request.user.balance}€, Benötigt: {purchase_price}€'
                     }, status=status.HTTP_400_BAD_REQUEST)
             
-            serializer.save(owner=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                item = serializer.save(owner=request.user)
+                print(f"DEBUG: Item created successfully: {item}")
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                print(f"DEBUG: Error saving item: {e}")
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print(f"DEBUG: Serializer errors: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         queryset = Item.objects.filter(owner=request.user).select_related('category', 'owner')
         

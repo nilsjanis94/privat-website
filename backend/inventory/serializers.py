@@ -33,6 +33,12 @@ class ItemSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 class ItemCreateUpdateSerializer(serializers.ModelSerializer):
+    # Explizit allow_null und allow_blank für optionale Felder entsprechend dem Model
+    purchase_date = serializers.DateField(allow_null=True, required=False)
+    purchase_price = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True, required=False)
+    location = serializers.CharField(max_length=50, allow_blank=True, required=False)
+    description = serializers.CharField(max_length=200, allow_blank=True, required=False)
+    
     class Meta:
         model = Item
         fields = [
@@ -40,5 +46,19 @@ class ItemCreateUpdateSerializer(serializers.ModelSerializer):
             'purchase_price', 'location'
         ]
     
+    def validate_category(self, value):
+        """Prüfe ob die Kategorie dem aktuellen Benutzer gehört"""
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            if not Category.objects.filter(id=value.id, owner=request.user).exists():
+                raise serializers.ValidationError("Kategorie nicht gefunden oder gehört nicht dem Benutzer.")
+        return value
+    
     def create(self, validated_data):
-        return Item.objects.create(**validated_data)
+        # Owner wird von der View über save(owner=...) gesetzt
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        # Owner nicht ändern bei Updates
+        validated_data.pop('owner', None)
+        return super().update(instance, validated_data)

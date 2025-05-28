@@ -74,6 +74,16 @@ pip install -r requirements.txt
 print_status "Running database migrations..."
 python manage.py migrate
 
+# Prüfe ob es unangewendete Migrationen gibt
+print_status "Checking for pending migrations..."
+PENDING_MIGRATIONS=$(python manage.py showmigrations --plan | grep "\[ \]" | wc -l)
+if [ $PENDING_MIGRATIONS -gt 0 ]; then
+    print_warning "Found $PENDING_MIGRATIONS pending migrations!"
+    python manage.py showmigrations --plan | grep "\[ \]"
+    print_status "Applying pending migrations..."
+    python manage.py migrate
+fi
+
 # Static files sammeln
 print_status "Collecting static files..."
 python manage.py collectstatic --noinput

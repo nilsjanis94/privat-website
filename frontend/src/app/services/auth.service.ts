@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -13,7 +14,8 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {
     // Auto-Login beim App-Start wenn Token vorhanden
     this.initializeAuth();
@@ -42,6 +44,15 @@ export class AuthService {
           localStorage.setItem('access_token', response.access);
           localStorage.setItem('refresh_token', response.refresh);
           this.currentUserSubject.next(response.user);
+          
+          // Benachrichtigung über erstellte Standard-Kategorien
+          if (response.created_categories && response.created_categories.length > 0) {
+            this.toastr.success(
+              `${response.created_categories.length} Standard-Kategorien wurden für dich erstellt: ${response.created_categories.join(', ')}`,
+              'Willkommen zurück!',
+              { timeOut: 5000 }
+            );
+          }
         })
       );
   }
@@ -53,6 +64,15 @@ export class AuthService {
           localStorage.setItem('access_token', response.access);
           localStorage.setItem('refresh_token', response.refresh);
           this.currentUserSubject.next(response.user);
+          
+          // Benachrichtigung über erstellte Standard-Kategorien
+          if (response.created_categories && response.created_categories.length > 0) {
+            this.toastr.success(
+              `Willkommen! ${response.created_categories.length} Standard-Kategorien wurden für dich erstellt: ${response.created_categories.join(', ')}`,
+              'Registrierung erfolgreich!',
+              { timeOut: 7000 }
+            );
+          }
         })
       );
   }

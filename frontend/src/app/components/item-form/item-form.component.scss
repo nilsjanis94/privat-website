@@ -46,6 +46,59 @@
   }
 }
 
+// Plus-Button für Kategorie-Erstellung
+.input-with-button {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  
+  mat-form-field {
+    flex: 1;
+    margin-bottom: 0;
+  }
+  
+  .add-category-btn {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    flex-shrink: 0;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    transition: all 0.2s ease !important;
+    margin-top: 4px; // Ausrichtung mit mat-form-field
+    
+    &:hover {
+      background-color: #45a049 !important;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    mat-icon {
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+    }
+  }
+}
+
+.help-text {
+  color: #666;
+  font-size: 12px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
 mat-dialog-actions {
   padding: 1rem 0;
   gap: 1rem;
@@ -76,6 +129,20 @@ mat-spinner {
     
     .half-width {
       width: 100%;
+    }
+  }
+  
+  .input-with-button {
+    .add-category-btn {
+      width: 48px !important;
+      height: 48px !important;
+      min-width: 48px !important;
+      
+      mat-icon {
+        font-size: 24px !important;
+        width: 24px !important;
+        height: 24px !important;
+      }
     }
   }
   

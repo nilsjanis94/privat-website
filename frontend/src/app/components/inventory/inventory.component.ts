@@ -74,6 +74,14 @@ export class InventoryComponent implements OnInit {
   // Toggle für verbrauchte Items
   showConsumedItems = false;
 
+  // Toggle für Kategorie-Anzeige
+  showAllCategories = false;
+
+  // Paginierung
+  pageSize = 25;
+  currentPage = 0;
+  paginatedItems: Item[] = [];
+
   constructor(
     private inventoryService: InventoryService,
     private dialog: MatDialog,
@@ -112,13 +120,14 @@ export class InventoryComponent implements OnInit {
         }
         
         this.filteredItems = [...this.items];
-        this.applyFilters(); // Filter nach dem Laden anwenden
+        this.applyFilters(); // Filter nach dem Laden anwenden (inkl. Paginierung)
         this.isLoading = false;
       },
       error: (error: any) => {
         console.error('Fehler beim Laden der Items:', error);
         this.items = [];
         this.filteredItems = [];
+        this.paginatedItems = [];
         this.isLoading = false;
       }
     });
@@ -136,6 +145,22 @@ export class InventoryComponent implements OnInit {
       
       return matchesSearch && matchesCategory;
     });
+    
+    // Reset auf erste Seite bei neuen Filtern
+    this.currentPage = 0;
+    this.updatePaginatedItems();
+  }
+
+  updatePaginatedItems(): void {
+    const startIndex = this.currentPage * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedItems = this.filteredItems.slice(startIndex, endIndex);
+  }
+
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.updatePaginatedItems();
   }
 
   clearFilters(): void {
@@ -265,5 +290,46 @@ export class InventoryComponent implements OnInit {
         this.toastr.error('Fehler beim Rückgängigmachen');
       }
     });
+  }
+
+  filterByCategory(categoryId: number): void {
+    this.selectedCategory = categoryId;
+    this.applyFilters();
+  }
+
+  clearCategoryFilter(): void {
+    this.selectedCategory = null;
+    this.applyFilters();
+  }
+
+  clearSearchFilter(): void {
+    this.searchTerm = '';
+    this.applyFilters();
+  }
+
+  toggleConsumedFilter(): void {
+    this.showConsumedItems = !this.showConsumedItems;
+    this.onShowConsumedToggle();
+  }
+
+  clearAllFilters(): void {
+    this.selectedCategory = null;
+    this.searchTerm = '';
+    this.showConsumedItems = false;
+    this.applyFilters();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.selectedCategory || this.searchTerm || this.showConsumedItems);
+  }
+
+  getCategoryName(categoryId: number): string {
+    const category = this.categories.find(c => c.id === categoryId);
+    return category ? category.name : '';
+  }
+
+  onSearchInput(): void {
+    // Debounced search - optional für bessere Performance
+    this.applyFilters();
   }
 }

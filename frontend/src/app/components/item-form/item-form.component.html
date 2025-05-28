@@ -21,26 +21,36 @@
         </mat-form-field>
 
         <div class="form-row">
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Kategorie *</mat-label>
-            <mat-select formControlName="category" required>
-              <mat-option *ngFor="let category of data.categories" [value]="category.id">
-                {{ category.name }}
-              </mat-option>
-            </mat-select>
-            <mat-error>{{ getErrorMessage('category') }}</mat-error>
-          </mat-form-field>
+          <div class="input-with-button half-width">
+            <mat-form-field appearance="outline">
+              <mat-label>Kategorie *</mat-label>
+              <mat-select formControlName="category" required>
+                <mat-option *ngFor="let category of categories" [value]="category.id">
+                  {{ category.name }}
+                </mat-option>
+              </mat-select>
+              <mat-error>{{ getErrorMessage('category') }}</mat-error>
+            </mat-form-field>
+            <button 
+              type="button"
+              mat-icon-button
+              (click)="openCategoryDialog()"
+              class="add-category-btn"
+              matTooltip="Neue Kategorie erstellen">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
 
           <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Zustand *</mat-label>
-            <mat-select formControlName="condition" required>
-              <mat-option *ngFor="let condition of conditionOptions" [value]="condition.value">
-                {{ condition.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error>{{ getErrorMessage('condition') }}</mat-error>
+            <mat-label>Ort/Standort</mat-label>
+            <input matInput formControlName="location">
+            <mat-icon matSuffix>location_on</mat-icon>
           </mat-form-field>
         </div>
+
+        <small class="help-text" *ngIf="categories?.length === 0">
+          Keine Kategorien vorhanden. Klicke auf + um eine zu erstellen.
+        </small>
       </div>
 
       <!-- Kaufinformationen -->
@@ -59,44 +69,8 @@
             <mat-label>Kaufpreis</mat-label>
             <input matInput type="number" formControlName="purchase_price" min="0" step="0.01">
             <span matTextSuffix>€</span>
-            <mat-error>{{ getErrorMessage('purchase_price') }}</mat-error>
           </mat-form-field>
         </div>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Aktueller Wert</mat-label>
-          <input matInput type="number" formControlName="current_value" min="0" step="0.01">
-          <span matTextSuffix>€</span>
-          <mat-error>{{ getErrorMessage('current_value') }}</mat-error>
-        </mat-form-field>
-      </div>
-
-      <!-- Details -->
-      <div class="form-section">
-        <h3>Details</h3>
-        
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Ort/Standort</mat-label>
-            <input matInput formControlName="location">
-            <mat-icon matSuffix>location_on</mat-icon>
-            <mat-error>{{ getErrorMessage('location') }}</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Seriennummer</mat-label>
-            <input matInput formControlName="serial_number">
-            <mat-icon matSuffix>tag</mat-icon>
-            <mat-error>{{ getErrorMessage('serial_number') }}</mat-error>
-          </mat-form-field>
-        </div>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Garantie bis</mat-label>
-          <input matInput [matDatepicker]="warrantyPicker" formControlName="warranty_until">
-          <mat-datepicker-toggle matIconSuffix [for]="warrantyPicker"></mat-datepicker-toggle>
-          <mat-datepicker #warrantyPicker></mat-datepicker>
-        </mat-form-field>
       </div>
     </form>
   </mat-dialog-content>

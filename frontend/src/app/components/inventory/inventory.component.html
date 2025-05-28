@@ -13,76 +13,87 @@
     </div>
   </div>
 
-  <!-- Filter-Bereich -->
-  <mat-card class="filter-card">
-    <mat-card-header>
-      <mat-card-title>Filter</mat-card-title>
-    </mat-card-header>
+  <!-- 1. KOMPAKTE KATEGORIEN-ÜBERSICHT -->
+  <mat-card class="categories-card compact">
     <mat-card-content>
-      <div class="filter-row">
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Suchen</mat-label>
-          <input matInput [(ngModel)]="searchTerm" placeholder="Name, Beschreibung, Ort..." 
-                 (keyup.enter)="applyFilters()">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Kategorie</mat-label>
-          <mat-select [(ngModel)]="selectedCategory">
-            <mat-option [value]="null">Alle Kategorien</mat-option>
-            <mat-option *ngFor="let category of categories" [value]="category.id">
-              {{ category.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <div class="filter-actions">
-          <button mat-raised-button color="primary" (click)="applyFilters()">
-            <mat-icon>filter_list</mat-icon>
-            Filtern
-          </button>
-          <button mat-button (click)="clearFilters()">
-            <mat-icon>clear</mat-icon>
-            Zurücksetzen
-          </button>
-        </div>
+      <div class="categories-header">
+        <h3><mat-icon>category</mat-icon> Kategorien</h3>
       </div>
-
-      <!-- Filter-Toggle für verbrauchte Items -->
-      <mat-slide-toggle 
-        [(ngModel)]="showConsumedItems" 
-        name="showConsumedItems"
-        (change)="onShowConsumedToggle()">
-        Verbrauchte Items anzeigen
-      </mat-slide-toggle>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Kategorien-Übersicht -->
-  <mat-card class="categories-card" *ngIf="!isLoadingCategories">
-    <mat-card-header>
-      <mat-card-title>Kategorien</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="categories-list">
+      <div class="categories-chips">
         <mat-chip-set>
-          <mat-chip *ngFor="let category of categories" 
-                    [removable]="true" 
-                    (removed)="deleteCategory(category)"
-                    (click)="openCategoryDialog(category)">
+          <mat-chip class="category-chip"
+                    [class.selected]="selectedCategory === null"
+                    (click)="clearCategoryFilter()">
+            Alle ({{ items.length }})
+          </mat-chip>
+          
+          <!-- Zeige nur erste 6 Kategorien oder alle wenn expanded -->
+          <mat-chip *ngFor="let category of (showAllCategories ? categories : categories.slice(0, 6))" 
+                    class="category-chip"
+                    [class.selected]="selectedCategory === category.id"
+                    (click)="filterByCategory(category.id)">
             {{ category.name }} ({{ category.items_count }})
-            <mat-icon matChipRemove *ngIf="category.items_count === 0">cancel</mat-icon>
+            <button mat-icon-button 
+                    class="edit-btn"
+                    (click)="openCategoryDialog(category); $event.stopPropagation()">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </mat-chip>
+          
+          <!-- "Mehr anzeigen" Button -->
+          <mat-chip *ngIf="categories.length > 6 && !showAllCategories"
+                    class="category-chip more-chip"
+                    (click)="showAllCategories = true">
+            +{{ categories.length - 6 }} mehr
+          </mat-chip>
+          
+          <!-- "Weniger anzeigen" Button -->
+          <mat-chip *ngIf="showAllCategories && categories.length > 6"
+                    class="category-chip less-chip"
+                    (click)="showAllCategories = false">
+            <mat-icon>expand_less</mat-icon>
           </mat-chip>
         </mat-chip-set>
       </div>
     </mat-card-content>
   </mat-card>
 
-  <!-- Gegenstände-Tabelle -->
+  <!-- 2. KOMPAKTER FILTER-BEREICH -->
+  <mat-card class="filter-card compact">
+    <mat-card-content>
+      <div class="filter-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Gegenstände durchsuchen</mat-label>
+          <input matInput [(ngModel)]="searchTerm" placeholder="Name, Beschreibung oder Standort eingeben..." 
+                 (input)="onSearchInput()">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-slide-toggle 
+          [(ngModel)]="showConsumedItems" 
+          (change)="onShowConsumedToggle()"
+          title="Verbrauchte Gegenstände anzeigen">
+          <mat-icon style="font-size: 16px;">restaurant</mat-icon>
+        </mat-slide-toggle>
+
+        <button mat-button (click)="clearAllFilters()" *ngIf="hasActiveFilters()">
+          <mat-icon>clear</mat-icon>
+          Zurücksetzen
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- 3. GEGENSTÄNDE-TABELLE - MEHR PLATZ -->
   <mat-card class="items-card">
     <mat-card-header>
-      <mat-card-title>Gegenstände ({{ filteredItems.length }} von {{ items.length }})</mat-card-title>
+      <mat-card-title>
+        <mat-icon>inventory</mat-icon>
+        Gegenstände ({{ filteredItems.length }} von {{ items.length }})
+      </mat-card-title>
+      <mat-card-subtitle *ngIf="selectedCategory">
+        Gefiltert nach: {{ getCategoryName(selectedCategory) }}
+      </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <div *ngIf="isLoading" class="loading-container">
@@ -104,14 +115,14 @@
         <mat-icon class="empty-icon">filter_list</mat-icon>
         <h3>Keine Gegenstände entsprechen den Filtern</h3>
         <p>Versuchen Sie, die Filter zu ändern oder zurückzusetzen.</p>
-        <button mat-raised-button color="primary" (click)="clearFilters()">
+        <button mat-raised-button color="primary" (click)="clearAllFilters()">
           <mat-icon>clear</mat-icon>
-          Filter zurücksetzen
+          Alle Filter zurücksetzen
         </button>
       </div>
 
       <div *ngIf="!isLoading && filteredItems.length > 0" class="table-container">
-        <table mat-table [dataSource]="filteredItems" class="items-table">
+        <table mat-table [dataSource]="paginatedItems" class="items-table">
           <!-- Name Column -->
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -196,6 +207,17 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
               [class.consumed-row]="row.consumed"></tr>
         </table>
+
+        <mat-paginator 
+          *ngIf="filteredItems.length > pageSize"
+          [length]="filteredItems.length"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[10, 25, 50, 100]"
+          [pageIndex]="currentPage"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+          class="paginator">
+        </mat-paginator>
       </div>
     </mat-card-content>
   </mat-card>

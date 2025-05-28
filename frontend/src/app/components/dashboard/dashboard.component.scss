@@ -228,10 +228,12 @@
 
 .items-table-container {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .items-table {
   width: 100%;
+  min-width: 600px;
   
   .item-description {
     font-size: 12px;
@@ -420,7 +422,35 @@
     }
   }
   
-  // Bessere Touch-Targets
+  .items-table-container {
+    overflow: visible;
+  }
+  
+  .items-table {
+    min-width: auto;
+    
+    .mat-column-category,
+    .mat-column-condition,
+    .mat-column-created_at {
+      display: none;
+    }
+    
+    .mat-mdc-cell,
+    .mat-mdc-header-cell {
+      padding: 8px 4px;
+      font-size: 0.9rem;
+    }
+    
+    .mat-column-name {
+      width: 60%;
+    }
+    
+    .mat-column-current_value {
+      width: 40%;
+      text-align: right;
+    }
+  }
+  
   button {
     min-height: 44px;
   }
@@ -506,7 +536,14 @@
     }
   }
   
-  // Noch bessere Touch-Targets für sehr kleine Bildschirme
+  .items-table {
+    .mat-mdc-cell,
+    .mat-mdc-header-cell {
+      padding: 6px 2px;
+      font-size: 0.8rem;
+    }
+  }
+  
   button {
     min-height: 48px;
     font-size: 14px;
@@ -515,6 +552,16 @@
   .balance-edit-btn {
     width: 40px;
     height: 40px;
+  }
+  
+  mat-card {
+    mat-card-content {
+      padding: 12px;
+    }
+    
+    mat-card-header {
+      padding: 12px 12px 0;
+    }
   }
 }
 
@@ -547,5 +594,15 @@
   .month-expense {
     padding: 0.5rem;
     font-size: 0.85rem;
+  }
+  
+  .items-table {
+    .mat-column-current_value {
+      display: none;
+    }
+    
+    .mat-column-name {
+      width: 100%;
+    }
   }
 }

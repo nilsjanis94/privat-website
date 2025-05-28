@@ -1,12 +1,24 @@
 # Angular SPA Routing für Apache2
 RewriteEngine On
 
+# Basis-URL setzen (falls die App in einem Unterverzeichnis liegt)
+# RewriteBase /
+
 # Handle Angular Router - alle Requests die keine echten Dateien sind
 # werden an index.html weitergeleitet, außer API-Calls
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
-RewriteRule ^.*$ /index.html [L]
+RewriteCond %{REQUEST_URI} !^/backend/
+RewriteCond %{REQUEST_URI} !^/static/
+RewriteCond %{REQUEST_URI} !^/media/
+RewriteCond %{REQUEST_URI} !\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|map)$
+RewriteRule ^(.*)$ /index.html [L,QSA]
+
+# Fallback für den Fall, dass mod_rewrite nicht verfügbar ist
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 /index.html
+</IfModule>
 
 # Security Headers
 <IfModule mod_headers.c>

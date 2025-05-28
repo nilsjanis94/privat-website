@@ -57,7 +57,6 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDashboardStats();
-    this.loadRecentItems();
   }
 
   loadDashboardStats(): void {
@@ -74,13 +73,14 @@ export class DashboardComponent implements OnInit {
         this.error = 'Fehler beim Laden der Dashboard-Daten';
         this.isLoading = false;
         
-        // Fallback-Daten für Demo-Zwecke
+        // Fallback-Daten für Demo-Zwecke - MIT today_expenses
         this.stats = {
           total_items: 0,
           consumed_items: 0,
           total_value: 0,
           total_purchase_price: 0,
           current_month_expenses: 0,
+          today_expenses: 0,
           monthly_expenses: [],
           items_without_purchase_date: 0,
           categories_count: 0,
@@ -88,23 +88,6 @@ export class DashboardComponent implements OnInit {
           items_by_category: {},
           recent_items: []
         };
-      }
-    });
-  }
-
-  loadRecentItems(): void {
-    console.log('Loading recent items...');
-    this.inventoryService.getItems().subscribe({
-      next: (items) => {
-        console.log('Items received:', items);
-        // Nur die letzten 5 Items anzeigen
-        this.items = items.slice(0, 5);
-        this.isLoadingItems = false;
-      },
-      error: (error: any) => {
-        console.error('Fehler beim Laden der Items:', error);
-        this.isLoadingItems = false;
-        this.items = [];
       }
     });
   }
@@ -141,7 +124,6 @@ export class DashboardComponent implements OnInit {
           if (result) {
             // Dashboard-Daten neu laden nach erfolgreichem Hinzufügen
             this.loadDashboardStats();
-            this.loadRecentItems();
           }
         });
       },
@@ -161,7 +143,6 @@ export class DashboardComponent implements OnInit {
         dialogRef.afterClosed().subscribe(result => {
           if (result) {
             this.loadDashboardStats();
-            this.loadRecentItems();
           }
         });
       }
@@ -169,7 +150,12 @@ export class DashboardComponent implements OnInit {
   }
 
   getCategoryKeys(): string[] {
-    return this.stats ? Object.keys(this.stats.items_by_category) : [];
+    if (!this.stats?.items_by_category) return [];
+    
+    // KORRIGIERT: Sortiere Kategorien nach Anzahl der Items (absteigend)
+    return Object.entries(this.stats.items_by_category)
+      .sort(([,a], [,b]) => b - a) // Sortiere nach Werten absteigend
+      .map(([key,]) => key); // Nur die Kategorienamen zurückgeben
   }
 
   // Hilfsmethoden für bessere UX
@@ -202,5 +188,9 @@ export class DashboardComponent implements OnInit {
     };
     
     return iconMap[categoryName] || 'category';
+  }
+
+  getRecentItems(): Item[] {
+    return this.stats?.recent_items || [];
   }
 }

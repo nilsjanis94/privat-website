@@ -1,49 +1,53 @@
-<div class="item-form-container">
-  <h2 mat-dialog-title>
-    {{ isEditMode ? 'Gegenstand bearbeiten' : 'Neuen Gegenstand hinzufügen' }}
-  </h2>
+<div class="item-dialog">
+  <!-- Dialog Header -->
+  <div mat-dialog-title class="dialog-header">
+    <h2>{{ isEditMode ? 'Gegenstand bearbeiten' : 'Neuen Gegenstand hinzufügen' }}</h2>
+  </div>
 
-  <mat-dialog-content>
+  <!-- Dialog Content -->
+  <div mat-dialog-content class="dialog-content">
     <form [formGroup]="itemForm" class="item-form">
       <!-- Grundinformationen -->
       <div class="form-section">
         <h3>Grundinformationen</h3>
         
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Name *</mat-label>
-          <input matInput formControlName="name" required>
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required placeholder="z.B. iPhone, Sofa, Laptop">
+          <mat-icon matSuffix>inventory_2</mat-icon>
           <mat-error>{{ getErrorMessage('name') }}</mat-error>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Beschreibung</mat-label>
-          <textarea matInput formControlName="description" rows="3"></textarea>
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Beschreibung (optional)</mat-label>
+          <textarea matInput formControlName="description" rows="3" placeholder="Beschreibung des Gegenstands..."></textarea>
+          <mat-icon matSuffix>description</mat-icon>
         </mat-form-field>
 
         <div class="form-row">
-          <div class="input-with-button half-width">
-            <mat-form-field appearance="outline">
-              <mat-label>Kategorie *</mat-label>
+          <div class="input-with-button">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Kategorie</mat-label>
               <mat-select formControlName="category" required>
                 <mat-option *ngFor="let category of categories" [value]="category.id">
                   {{ category.name }}
                 </mat-option>
               </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
               <mat-error>{{ getErrorMessage('category') }}</mat-error>
             </mat-form-field>
             <button 
               type="button"
-              mat-icon-button
-              (click)="openCategoryDialog()"
               class="add-category-btn"
+              (click)="openCategoryDialog()"
               matTooltip="Neue Kategorie erstellen">
               <mat-icon>add</mat-icon>
             </button>
           </div>
 
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Ort/Standort</mat-label>
-            <input matInput formControlName="location">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Ort/Standort (optional)</mat-label>
+            <input matInput formControlName="location" placeholder="z.B. Wohnzimmer, Küche">
             <mat-icon matSuffix>location_on</mat-icon>
           </mat-form-field>
         </div>
@@ -58,34 +62,39 @@
         <h3>Kaufinformationen</h3>
         
         <div class="form-row">
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Kaufdatum</mat-label>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Kaufdatum (optional)</mat-label>
             <input matInput [matDatepicker]="purchasePicker" formControlName="purchase_date">
             <mat-datepicker-toggle matIconSuffix [for]="purchasePicker"></mat-datepicker-toggle>
             <mat-datepicker #purchasePicker></mat-datepicker>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="half-width">
-            <mat-label>Kaufpreis</mat-label>
-            <input matInput type="number" formControlName="purchase_price" min="0" step="0.01">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Kaufpreis (optional)</mat-label>
+            <input matInput type="number" formControlName="purchase_price" min="0" step="0.01" placeholder="0.00">
             <span matTextSuffix>€</span>
           </mat-form-field>
         </div>
       </div>
-    </form>
-  </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" [disabled]="isLoading">
-      Abbrechen
-    </button>
-    <button mat-raised-button color="primary" 
-            (click)="onSubmit()" 
-            [disabled]="itemForm.invalid || isLoading">
-      <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
-      <span *ngIf="!isLoading">
-        {{ isEditMode ? 'Aktualisieren' : 'Hinzufügen' }}
-      </span>
-    </button>
-  </mat-dialog-actions>
+      <!-- Buttons direkt im Formular -->
+      <div class="form-actions">
+        <button type="button"
+                class="cancel-button"
+                (click)="onCancel()" 
+                [disabled]="isLoading">
+          Abbrechen
+        </button>
+        
+        <button type="button"
+                class="submit-button"
+                (click)="onSubmit()" 
+                [disabled]="itemForm.invalid || isLoading">
+          <mat-spinner diameter="18" *ngIf="isLoading"></mat-spinner>
+          <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+          <span>{{ isEditMode ? 'Aktualisieren' : 'Hinzufügen' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

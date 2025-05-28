@@ -36,11 +36,9 @@ export class StatisticsComponent implements OnInit {
   }
 
   loadStatistics(): void {
-    console.log('Loading statistics...');
     this.isLoading = true;
     this.inventoryService.getDashboardStats().subscribe({
       next: (stats) => {
-        console.log('Statistics received:', stats);
         this.stats = stats;
         this.isLoading = false;
         this.error = null;

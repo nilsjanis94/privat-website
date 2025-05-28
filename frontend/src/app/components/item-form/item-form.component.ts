@@ -131,7 +131,31 @@ export class ItemFormComponent {
   onSubmit(): void {
     if (this.itemForm.valid) {
       this.isLoading = true;
-      const formData = this.itemForm.value;
+      const formData = { ...this.itemForm.value };
+      
+      // Datum korrekt formatieren falls vorhanden - VERBESSERTES HANDLING
+      if (formData.purchase_date) {
+        const date = new Date(formData.purchase_date);
+        if (!isNaN(date.getTime())) {
+          // Lokales Datum verwenden (KEINE UTC-Konvertierung!)
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          formData.purchase_date = `${year}-${month}-${day}`;
+        } else {
+          formData.purchase_date = null;
+        }
+      }
+      
+      // Leere Strings zu null konvertieren
+      if (formData.purchase_price === '') {
+        formData.purchase_price = null;
+      }
+      if (formData.purchase_date === '') {
+        formData.purchase_date = null;
+      }
+      
+      console.log('Sending data:', formData); // Debug-Ausgabe
       
       const operation = this.isEditMode
         ? this.inventoryService.updateItem(this.data.item.id, formData)
@@ -139,10 +163,12 @@ export class ItemFormComponent {
 
       operation.subscribe({
         next: (result) => {
+          console.log('Item saved successfully:', result);
           this.toastr.success('Erfolgreich gespeichert!', 'Erfolg!');
           this.dialogRef.close(result);
         },
         error: (error) => {
+          console.error('Error saving item:', error);
           this.toastr.error('Fehler beim Speichern', 'Fehler!');
           this.isLoading = false;
         }

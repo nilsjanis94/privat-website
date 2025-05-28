@@ -120,19 +120,19 @@
     </div>
 
     <!-- Letzte Aktivitäten -->
-    <mat-card class="recent-activity" *ngIf="items.length > 0">
+    <mat-card class="recent-activity" *ngIf="getRecentItems().length > 0">
       <mat-card-header>
         <mat-card-title>Letzte Aktivitäten</mat-card-title>
         <mat-card-subtitle>Zuletzt hinzugefügte Gegenstände</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <div *ngIf="isLoadingItems" class="loading-items">
+        <div *ngIf="isLoading" class="loading-items">
           <mat-spinner diameter="30"></mat-spinner>
           <span>Lade Items...</span>
         </div>
         
-        <div *ngIf="!isLoadingItems" class="activity-list">
-          <div *ngFor="let item of items.slice(0, 3)" class="activity-item">
+        <div *ngIf="!isLoading" class="activity-list">
+          <div *ngFor="let item of getRecentItems()" class="activity-item">
             <div class="item-avatar">
               <mat-icon>{{ getCategoryIcon(item.category_name) }}</mat-icon>
             </div>

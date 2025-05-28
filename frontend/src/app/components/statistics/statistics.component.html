@@ -63,13 +63,6 @@
                 <p>Kategorien</p>
               </div>
             </div>
-            <div class="stat-item">
-              <mat-icon>warning</mat-icon>
-              <div class="stat-info">
-                <h3>{{ stats.items_without_purchase_date }}</h3>
-                <p>Ohne Kaufdatum</p>
-              </div>
-            </div>
           </div>
         </mat-card-content>
       </mat-card>
@@ -87,6 +80,13 @@
                 <p>Gesamtwert Inventar</p>
               </div>
             </div>
+            <div class="stat-item today-highlight">
+              <mat-icon>today</mat-icon>
+              <div class="stat-info">
+                <h3>{{ (stats.today_expenses || 0) | currency:'EUR':'symbol':'1.2-2' }}</h3>
+                <p>Heute ausgegeben</p>
+              </div>
+            </div>
             <div class="stat-item">
               <mat-icon>shopping_cart</mat-icon>
               <div class="stat-info">
@@ -99,13 +99,6 @@
               <div class="stat-info">
                 <h3>{{ stats.balance | currency:'EUR':'symbol':'1.2-2' }}</h3>
                 <p>Aktueller Kontostand</p>
-              </div>
-            </div>
-            <div class="stat-item">
-              <mat-icon>trending_up</mat-icon>
-              <div class="stat-info">
-                <h3>{{ (stats.total_value / stats.total_items) | currency:'EUR':'symbol':'1.2-2' }}</h3>
-                <p>Ø Wert pro Item</p>
               </div>
             </div>
           </div>
@@ -159,8 +152,6 @@
               <p>{{ getMaxExpenses() | currency:'EUR':'symbol':'1.2-2' }}</p>
             </div>
           </div>
-          
-          <!-- monthly-details Sektion komplett entfernt -->
         </div>
       </mat-card-content>
     </mat-card>

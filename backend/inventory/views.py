@@ -68,23 +68,21 @@ def items_list_create(request):
         if data.get('purchase_price') == '':
             data['purchase_price'] = None
             
-        # ISO-Datum zu YYYY-MM-DD konvertieren
+        # ISO-Datum zu YYYY-MM-DD konvertieren (ohne Debug-Ausgaben)
         if data.get('purchase_date') and isinstance(data['purchase_date'], str):
             try:
                 # Parse ISO format und extrahiere nur das Datum
                 if 'T' in data['purchase_date']:
                     date_obj = datetime.fromisoformat(data['purchase_date'].replace('Z', '+00:00'))
                     data['purchase_date'] = date_obj.date().isoformat()
-                    print(f"DEBUG: Converted date to: {data['purchase_date']}")
-            except ValueError as e:
-                print(f"DEBUG: Date parsing error: {e}")
+            except ValueError:
+                pass  # Bei Fehler das Original-Datum beibehalten
         
         print(f"DEBUG: Cleaned data: {data}")
         
         # Context für Serializer hinzufügen
         serializer = ItemCreateUpdateSerializer(data=data, context={'request': request})
-        print(f"DEBUG: Serializer valid: {serializer.is_valid()}")
-        
+
         if serializer.is_valid():
             print(f"DEBUG: Validated data: {serializer.validated_data}")
             
@@ -213,6 +211,14 @@ def dashboard_stats(request):
     current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     current_month_end = (current_month_start + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
     
+    # Heute - NEU
+    today = now.date()
+    today_items = user_items.filter(
+        purchase_date=today,
+        purchase_date__isnull=False
+    )
+    today_expenses = sum(item.purchase_price or 0 for item in today_items)
+    
     # Items des aktuellen Monats (ALLE Items, auch verbrauchte, für Ausgaben)
     current_month_items = user_items.filter(
         purchase_date__gte=current_month_start.date(),
@@ -223,7 +229,7 @@ def dashboard_stats(request):
     # Monatliche Ausgaben berechnen (ALLE Items)
     current_month_expenses = sum(item.purchase_price or 0 for item in current_month_items)
     
-    # Ausgaben der letzten 6 Monate (ALLE Items)
+    # Ausgaben der letzten 6 Monate (ALLE Items) - ZURÜCK ZUM ORIGINAL
     monthly_expenses = []
     for i in range(6):
         month_date = now - timedelta(days=30 * i)
@@ -250,7 +256,6 @@ def dashboard_stats(request):
     # Berechne Statistiken (nur aktive Items für Inventar)
     total_current_value = sum(item.purchase_price or 0 for item in active_items)
     total_purchase_price = sum(item.purchase_price or 0 for item in user_items)  # Alle Items
-    items_without_purchase_date = user_items.filter(purchase_date__isnull=True).count()
     
     stats = {
         'total_items': active_items.count(),
@@ -258,13 +263,13 @@ def dashboard_stats(request):
         'total_value': total_current_value,
         'total_purchase_price': total_purchase_price,
         'current_month_expenses': float(current_month_expenses),
+        'today_expenses': float(today_expenses),
         'monthly_expenses': monthly_expenses,
-        'items_without_purchase_date': items_without_purchase_date,
         'categories_count': user_categories.count(),
         'balance': float(request.user.balance),
         'items_by_category': {},
         'recent_items': ItemSerializer(
-            active_items.order_by('-created_at')[:5],
+            active_items.order_by('-purchase_date', '-created_at')[:5],
             many=True, 
             context={'request': request}
         ).data

@@ -188,7 +188,9 @@ export class InventoryComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
           if (result) {
+            // Items UND Kategorien neu laden (falls neue Kategorie erstellt wurde)
             this.loadItems();
+            this.loadCategories();
           }
         });
       },
@@ -202,6 +204,14 @@ export class InventoryComponent implements OnInit {
           data: { 
             item: item || null, 
             categories: []
+          }
+        });
+
+        // WICHTIG: Auch hier das Dialog-Ergebnis abfangen!
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            this.loadItems();
+            this.loadCategories();
           }
         });
       }

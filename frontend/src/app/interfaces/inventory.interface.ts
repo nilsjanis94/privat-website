@@ -56,6 +56,7 @@ export interface DashboardStats {
   total_value: number;
   total_purchase_price: number;
   current_month_expenses: number;
+  today_expenses: number;
   monthly_expenses: MonthlyExpense[];
   items_without_purchase_date: number;
   categories_count: number;

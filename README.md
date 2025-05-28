@@ -1,3 +1,7 @@
+
+Gerne! Ich füge die neuen Features zur README hinzu:
+
+```markdown:README.md
 # 🏠 Haushalts-Inventar-System
 
 Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich mit erweiterten Features wie Kontostand-Management, Ausgaben-Tracking, Verbrauchs-Verwaltung, interaktiven Charts und automatisiertem Deployment.
@@ -22,7 +26,7 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - **Erweiterte Suche**: Multi-Filter-System (Name, Kategorie, Ort)
 - **Paginierung**: Automatische Seiteneinteilung bei vielen Items (25 pro Seite)
 - **Benutzerfreundlichkeit**: Reduzierte Formular-Komplexität für bessere UX
-- **Optionale Felder**: Kaufdatum ist optional für mehr Flexibilität
+- **Korrekte Datumsverarbeitung**: Lokale Datumskonvertierung ohne UTC-Zeitzonenfehler
 - **Bearbeitung**: Vollständige Edit-Funktionalität für alle Items
 - **Löschung**: Sichere Löschung mit Bestätigungsdialogen
 - **Direkte Formular-Navigation**: "Gegenstand hinzufügen" öffnet direkt das Formular
@@ -30,6 +34,7 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 ### 💰 Finanz-Management
 - **Kontostand-Verwaltung**: Persönlicher Kontostand mit manueller Anpassung
 - **Automatische Ausgaben**: Kaufpreis wird automatisch vom Kontostand abgezogen
+- **Tages-Ausgaben-Tracking**: Echtzeit-Verfolgung der heutigen Ausgaben
 - **Monatliche Ausgaben**: Tracking der Ausgaben nach Kaufdatum
 - **Ausgaben-Historie**: 6-Monats-Übersicht der Ausgaben
 - **Balance-Update**: Dialog zum manuellen Anpassen des Kontostands
@@ -43,19 +48,21 @@ Ein modernes, vollständiges Web-basiertes Inventar-Verwaltungssystem für den H
 - **Erhaltung der Finanzdaten**: Ausgaben und Kontostand bleiben bei Verbrauch erhalten
 
 ### 📊 Dashboard & Analytics
-- **Vereinfachtes Dashboard**: Fokus auf wichtigste Kennzahlen und neueste Items
+- **Optimiertes Dashboard**: Korrekte Sortierung für letzte Aktivitäten (neueste zuerst)
+- **Top-Kategorien-Ranking**: Kategorien sortiert nach Anzahl der Items
 - **Separate Statistiken-Seite**: Detaillierte Charts und Analysen
 - **Interaktive Charts**: Chart.js-basierte Visualisierungen
   - **Kategorien-Donut-Chart**: Mit Prozentangaben direkt im Chart
   - **Monatliche Ausgaben Bar-Chart**: Mit Werten über den Balken (6 Monate)
-- **Echtzeit-Statistiken**: Aktuelle Inventar-Übersicht
-- **Finanz-Übersicht**: Kontostand, monatliche Ausgaben, Gesamtwerte
+- **Echtzeit-Statistiken**: Aktuelle Inventar-Übersicht mit Tages-Ausgaben
+- **Finanz-Übersicht**: Kontostand, Tages- und Monatsausgaben, Gesamtwerte
 - **Intelligente Durchschnitte**: Monate ohne Ausgaben werden nicht in Durchschnittsberechnung einbezogen
 - **Responsive Charts**: Optimiert für alle Bildschirmgrößen
 
 ### 🎨 Benutzeroberfläche
 - **Responsive Design**: Optimiert für Desktop, Tablet und Mobile
 - **Angular Material**: Moderne, konsistente UI-Komponenten
+- **Harmonisierte Button-Styles**: Einheitliche Button-Designs zwischen allen Formularen
 - **Toast-Benachrichtigungen**: Sofortiges Benutzer-Feedback
 - **Intuitive Navigation**: Klare Menüstruktur mit separaten Bereichen für Dashboard und Statistiken
 - **Optimierte Layouts**: 
@@ -255,7 +262,7 @@ inventar-system/
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── components/           # UI-Komponenten
-│   │   │   │   ├── dashboard/        # Dashboard mit Finanz-Übersicht
+│   │   │   │   ├── dashboard/        # Dashboard mit korrekter Sortierung
 │   │   │   │   ├── inventory/        # Inventar mit Edit/Delete/Consumed
 │   │   │   │   ├── item-form/        # Item-Formular (Create/Edit)
 │   │   │   │   ├── category-form/    # Kategorie-Formular
@@ -378,7 +385,7 @@ RewriteRule ^.*$ /index.html [L]
 | `/api/inventory/items/{id}/` | GET/PUT/DELETE | Item-Details | JWT |
 | `/api/inventory/items/{id}/consume/` | POST | Als verbraucht markieren | JWT |
 | `/api/inventory/items/{id}/unconsume/` | POST | Verbrauch rückgängig | JWT |
-| `/api/inventory/dashboard/` | GET | Dashboard-Statistiken | JWT |
+| `/api/inventory/dashboard/` | GET | Dashboard-Statistiken mit Tages-Ausgaben | JWT |
 
 ## 🗄️ Datenmodell
 
@@ -408,7 +415,7 @@ class Item(Model):
     description = TextField(blank=True)                 # Beschreibung
     category = ForeignKey(Category, on_delete=CASCADE)  # Kategorie
     owner = ForeignKey(User, on_delete=CASCADE)         # Besitzer
-    purchase_date = DateField(null=True, blank=True)    # Kaufdatum
+    purchase_date = DateField(null=True, blank=True)    # Kaufdatum (korrekt verarbeitet)
     purchase_price = DecimalField(max_digits=10, decimal_places=2)  # Kaufpreis
     location = CharField(max_length=200, blank=True)    # Aufbewahrungsort
     image = ImageField(upload_to='items/', null=True)   # Produktbild
@@ -533,6 +540,13 @@ sudo chown -R $USER:$USER /var/www/project
 sudo chown -R www-data:www-data /var/www/html/
 ```
 
+**5. Datumsverarbeitungsfehler**
+```bash
+# Prüfe, ob Datum korrekt gespeichert wird
+# Frontend sollte lokale Datumskonvertierung verwenden
+# Backend sollte ISO-Strings korrekt parsen
+```
+
 ## ⚠️ Bekannte Probleme & Lösungen
 
 ### ✅ Gelöste Probleme
@@ -541,12 +555,16 @@ sudo chown -R www-data:www-data /var/www/html/
 - ~~Mobile Navigation funktioniert nicht~~ → **Behoben**: mat-sidenav mit Touch-Gesten implementiert
 - ~~Filter nicht responsive~~ → **Behoben**: Mobile-optimierte Filter mit vertikalem Layout
 - ~~CSS line-clamp Kompatibilität~~ → **Behoben**: Standard line-clamp Property hinzugefügt
+- ~~UTC-Datumsfehler (28.05 → 27.05)~~ → **Behoben**: Lokale Datumskonvertierung ohne UTC-Probleme
+- ~~Dashboard falsche Sortierung~~ → **Behoben**: Neueste Items zuerst, Top-Kategorien nach Anzahl
 
 ### 🔧 Aktuelle Optimierungen
 - Card-Titel Lesbarkeit mit #333 Farbwerten optimiert
 - Mobile Filter-Responsivität für alle Bildschirmgrößen
 - Touch-Bedienung mit 44-48px Mindestgröße für alle interaktiven Elemente
 - iOS-spezifische Optimierungen (Zoom-Verhinderung, Touch-Targets)
+- Harmonisierte Button-Styles zwischen allen Formularen
+- Eliminierte doppelte API-Calls für bessere Performance
 
 ### 🚀 Performance-Status
 - **PageSpeed Insights**: A+ Rating
@@ -564,7 +582,29 @@ sudo chown -R www-data:www-data /var/www/html/
 
 ## 📝 Changelog
 
-### Version 2.5.0 (Aktuell - Mai 2025)
+### Version 2.6.0 (Aktuell - Mai 2025)
+- ✅ **Datum-Fix**: Korrigierte Datumsverarbeitung ohne UTC-Zeitzonenfehler
+  - Frontend: Lokale Datumskonvertierung ohne ISO-String UTC-Probleme  
+  - Backend: Verbesserte ISO-zu-lokales-Datum Konvertierung
+  - Behoben: Datum wird jetzt korrekt gespeichert (28.05 statt 27.05)
+- ✅ **Dashboard-Sortierung**: Korrekte Sortierung für letzte Aktivitäten und Top-Kategorien
+  - Letzte Aktivitäten: Neueste Items zuerst (nach Kaufdatum, dann Erstellung)
+  - Top-Kategorien: Kategorien mit meisten Items zuerst
+  - Eliminiert: Doppelte API-Calls durch stats.recent_items Verwendung
+- ✅ **Statistiken-Optimierung**: "Heute ausgegeben" Feature hinzugefügt
+  - Neue Statistik-Karte: Ausgaben des aktuellen Tages
+  - Finanz-Übersicht erweitert um Tages-Tracking
+  - Backend: today_expenses Berechnung für Real-time Spending-Tracking
+- ✅ **UI-Bereinigung**: Entfernung obsoleter "Ohne Kaufdatum" Statistik
+  - Grund: Alle neuen Items haben automatisch Kaufdatum
+  - Sauberere Statistiken-Ansicht ohne irrelevante Daten
+  - Interface-Optimierung für relevante Metriken
+- ✅ **Button-Styling-Harmonisierung**: Einheitliche Button-Designs
+  - Item-Form und Kategorie-Form haben identische Button-Styles
+  - Angular Material konforme Button-Implementierung
+  - Verbesserte Scroll-Funktionalität ohne störende Scrollbars
+
+### Version 2.5.0 (Mai 2025)
 - ✅ **Intelligente Kategorie-Verwaltung**: 
   - Automatische Standard-Kategorien bei Login/Registrierung
   - Plus-Button im Item-Formular für direkte Kategorie-Erstellung
@@ -672,6 +712,8 @@ Bei Fragen oder Problemen:
 - **Touch-Bedienung**: 44px+ Touch-Targets für optimale Bedienbarkeit
 - **SPA-Routing**: Alle URLs funktionieren mit direktem Aufruf und Refresh
 - **Real-time Updates**: Live-Dashboard mit Echtzeit-Statistiken
+- **Datumsverarbeitung**: Korrekte lokale Datumskonvertierung ohne UTC-Fehler
+- **Sortierte Listen**: Neueste Aktivitäten und Top-Kategorien korrekt sortiert
 
 ### 🔧 Test-Szenarien
 1. **Desktop**: Vollständige Feature-Palette testen
@@ -679,17 +721,19 @@ Bei Fragen oder Problemen:
 3. **Smartphone**: Mobile-optimierte Filter und Navigation
 4. **URL-Refresh**: Beliebige Seite neu laden (SPA-Routing)
 5. **Offline-Verhalten**: PWA-Features (falls implementiert)
+6. **Datumserfassung**: Teste Item-Erstellung mit verschiedenen Daten
+7. **Dashboard-Sortierung**: Prüfe korrekte Reihenfolge bei neuen Items
 
 **Test-Account**: Registrierung erforderlich (kostenlos)  
 **Demo-Daten**: Automatisch generierte Beispiel-Items verfügbar
 
 ---
 
-**Version**: 2.5.0  
+**Version**: 2.6.0  
 **Letztes Update**: Mai 2025  
 **Status**: ✅ Production Ready & Live Deployed  
 **Mobile**: ✅ Vollständig responsive & touch-optimiert  
 **Deployment**: Automatisiert mit Apache2 & .htaccess  
-**Performance**: A+ Rating (PageSpeed Insights)
+**Performance**: A+ Rating (PageSpeed Insights)  
+**Datum-Handling**: ✅ Korrekte lokale Datumsverarbeitung ohne UTC-Probleme
 ```
-

@@ -332,4 +332,40 @@ export class InventoryComponent implements OnInit {
     // Debounced search - optional für bessere Performance
     this.applyFilters();
   }
+
+  getCategoryIcon(categoryName: string): string {
+    const iconMap: { [key: string]: string } = {
+      'elektronik': 'devices',
+      'möbel': 'chair', 
+      'kleidung': 'checkroom',
+      'küche': 'kitchen',
+      'bücher': 'book',
+      'medien': 'movie',
+      'sport': 'sports_soccer',
+      'freizeit': 'sports_esports',
+      'werkzeug': 'build',
+      'garten': 'yard',
+      'auto': 'directions_car',
+      'lebensmittel': 'restaurant',
+      'getränke': 'local_drink',
+      'hygiene': 'soap',
+      'reinigung': 'cleaning_services',
+      'büro': 'business_center',
+      'spielzeug': 'toys',
+      'haustier': 'pets',
+      'medizin': 'medical_services',
+      'sonstiges': 'category'
+    };
+    
+    const normalizedName = categoryName.toLowerCase().trim();
+    
+    // Suche nach Teilübereinstimmungen
+    for (const [key, icon] of Object.entries(iconMap)) {
+      if (normalizedName.includes(key)) {
+        return icon;
+      }
+    }
+    
+    return 'category'; // Standard-Icon für unbekannte Kategorien
+  }
 }

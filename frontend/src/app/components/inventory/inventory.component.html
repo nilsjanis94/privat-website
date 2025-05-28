@@ -20,40 +20,41 @@
         <h3><mat-icon>category</mat-icon> Kategorien</h3>
       </div>
       <div class="categories-chips">
-        <mat-chip-set>
-          <mat-chip class="category-chip"
-                    [class.selected]="selectedCategory === null"
-                    (click)="clearCategoryFilter()">
-            Alle ({{ items.length }})
-          </mat-chip>
+        <div class="custom-chip-set">
+          <button class="custom-chip"
+                  [class.selected]="selectedCategory === null"
+                  (click)="clearCategoryFilter()">
+            <mat-icon>all_inclusive</mat-icon>
+            <span>Alle ({{ items.length }})</span>
+          </button>
           
-          <!-- Zeige nur erste 6 Kategorien oder alle wenn expanded -->
-          <mat-chip *ngFor="let category of (showAllCategories ? categories : categories.slice(0, 6))" 
-                    class="category-chip"
-                    [class.selected]="selectedCategory === category.id"
-                    (click)="filterByCategory(category.id)">
-            {{ category.name }} ({{ category.items_count }})
-            <button mat-icon-button 
-                    class="edit-btn"
-                    (click)="openCategoryDialog(category); $event.stopPropagation()">
+          <button *ngFor="let category of (showAllCategories ? categories : categories.slice(0, 6))" 
+                  class="custom-chip"
+                  [class.selected]="selectedCategory === category.id"
+                  (click)="filterByCategory(category.id)">
+            <mat-icon>{{ getCategoryIcon(category.name) }}</mat-icon>
+            <span>{{ category.name }} ({{ category.items_count }})</span>
+            <button class="edit-btn"
+                    (click)="openCategoryDialog(category); $event.stopPropagation()"
+                    title="Kategorie bearbeiten">
               <mat-icon>edit</mat-icon>
             </button>
-          </mat-chip>
+          </button>
           
-          <!-- "Mehr anzeigen" Button -->
-          <mat-chip *ngIf="categories.length > 6 && !showAllCategories"
-                    class="category-chip more-chip"
-                    (click)="showAllCategories = true">
-            +{{ categories.length - 6 }} mehr
-          </mat-chip>
+          <button *ngIf="categories.length > 6 && !showAllCategories"
+                  class="custom-chip more-chip"
+                  (click)="showAllCategories = true">
+            <mat-icon>expand_more</mat-icon>
+            <span>+{{ categories.length - 6 }} mehr</span>
+          </button>
           
-          <!-- "Weniger anzeigen" Button -->
-          <mat-chip *ngIf="showAllCategories && categories.length > 6"
-                    class="category-chip less-chip"
-                    (click)="showAllCategories = false">
+          <button *ngIf="showAllCategories && categories.length > 6"
+                  class="custom-chip less-chip"
+                  (click)="showAllCategories = false">
             <mat-icon>expand_less</mat-icon>
-          </mat-chip>
-        </mat-chip-set>
+            <span>Weniger</span>
+          </button>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

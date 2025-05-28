@@ -144,62 +144,58 @@ ng build --configuration production
 
 ## 🚀 Production Deployment
 
-### Automatisiertes Deployment mit Script
+### Apache Virtual Host Konfiguration
 
-Das Projekt enthält ein vollautomatisches Deployment-Script für Apache2-Server:
+Erstelle eine spezifische Virtual Host Konfiguration:
 
-```bash
-# Auf dem Server: Repository klonen/aktualisieren
-git clone <repository-url>
-cd inventar-system
-git pull origin main
-
-# Virtual Environment aktivieren
-source venv/bin/activate
-
-# Automatisches Deployment ausführen
-./deploy.sh
+```apache
+# /etc/apache2/sites-available/your-domain.conf
+<VirtualHost *:80>
+    ServerName yourdomain.com
+    ServerAlias www.yourdomain.com
+    
+    # Angular Frontend (Produktions-Build)
+    DocumentRoot /var/www/your-project/frontend/dist/frontend/browser
+    
+    # .htaccess Verarbeitung aktivieren (wichtig für SPA-Routing!)
+    <Directory /var/www/your-project/frontend/dist/frontend/browser>
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    # API-Requests zu Django weiterleiten
+    ProxyPass /api/ http://localhost:8000/api/
+    ProxyPassReverse /api/ http://localhost:8000/api/
+    
+    ErrorLog ${APACHE_LOG_DIR}/your-domain_error.log
+    CustomLog ${APACHE_LOG_DIR}/your-domain_access.log combined
+</VirtualHost>
 ```
 
-### Was das Deployment-Script macht:
+### Automatische .htaccess-Kopierung
 
-1. **Frontend Build**: Angular Production-Build erstellen
-2. **Backend Setup**: Dependencies installieren, Migrationen ausführen
-3. **File Deployment**: Dateien nach `/var/www/html/` kopieren
-4. **Apache Konfiguration**: `.htaccess` für SPA-Routing konfigurieren
-5. **Module Aktivierung**: Benötigte Apache-Module aktivieren
-6. **Berechtigungen**: Korrekte Dateiberechtigungen setzen
-7. **Service Restart**: Apache bei Bedarf neu starten
+Die `.htaccess` wird automatisch bei jedem Build mitkopiert durch die Angular-Konfiguration:
 
-### Manuelle Deployment-Schritte
-
-Falls das automatische Script nicht verwendet werden kann:
-
-```bash
-# 1. Frontend Build
-cd frontend
-ng build --configuration production
-
-# 2. Backend Setup
-cd ../backend
-source ../venv/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py collectstatic --noinput
-
-# 3. Dateien kopieren
-sudo cp -r ../frontend/dist/frontend/* /var/www/html/
-sudo cp ../.htaccess /var/www/html/
-
-# 4. Apache Module aktivieren
-sudo a2enmod rewrite headers expires deflate
-sudo systemctl restart apache2
-
-# 5. Berechtigungen setzen
-sudo chown -R www-data:www-data /var/www/html/
-sudo chmod -R 644 /var/www/html/
-sudo chmod 755 /var/www/html/
+```json
+// frontend/angular.json
+"assets": [
+  {
+    "glob": "**/*",
+    "input": "public"
+  },
+  {
+    "glob": ".htaccess",
+    "input": "../",
+    "output": "/"
+  }
+],
 ```
+
+### SPA-Routing Problem gelöst
+
+✅ **Problem**: Angular-Routen funktionieren nicht bei direktem Aufruf oder Refresh  
+✅ **Lösung**: Kombination aus `.htaccess` Rewrite-Regeln und `AllowOverride All`  
+✅ **Ergebnis**: Alle URLs funktionieren ohne Hash (`#`) und können refresht werden
 
 ## 📁 Detaillierte Projektstruktur
 

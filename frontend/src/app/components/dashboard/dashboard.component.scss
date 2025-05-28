@@ -38,7 +38,7 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
 }
 
@@ -286,7 +286,7 @@
     .amount {
       font-weight: 600;
       font-size: 1.1rem;
-      color: #f44336;  // Rot für Ausgaben
+      color: #f44336;
     }
   }
 }
@@ -331,20 +331,53 @@
   }
 }
 
+// Mobile Optimierungen
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
   }
   
+  .dashboard-header {
+    margin-bottom: 1.5rem;
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+    
+    p {
+      font-size: 1rem;
+    }
+  }
+  
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .stat-card {
+    .stat-content {
+      gap: 0.75rem;
+    }
+    
+    .stat-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+    
+    .stat-info h2 {
+      font-size: 1.5rem;
+    }
   }
   
   .action-buttons {
     flex-direction: column;
+    gap: 0.75rem;
     
     button {
       width: 100%;
+      justify-content: center;
+      min-height: 48px;
     }
   }
   
@@ -362,5 +395,157 @@
     .month-amount .amount {
       font-size: 1rem;
     }
+  }
+  
+  .recent-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    
+    .item-value {
+      align-self: flex-end;
+    }
+  }
+  
+  .category-item {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .warning-content {
+    flex-direction: column;
+    gap: 0.75rem;
+    
+    .warning-icon {
+      align-self: flex-start;
+    }
+  }
+  
+  // Bessere Touch-Targets
+  button {
+    min-height: 44px;
+  }
+  
+  mat-chip {
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 0.75rem;
+  }
+  
+  .dashboard-header {
+    h1 {
+      font-size: 1.25rem;
+    }
+    
+    p {
+      font-size: 0.9rem;
+    }
+  }
+  
+  .stats-grid {
+    gap: 0.5rem;
+  }
+  
+  .stat-card {
+    mat-card-content {
+      padding: 12px;
+    }
+    
+    .stat-content {
+      gap: 0.5rem;
+    }
+    
+    .stat-icon {
+      font-size: 1.75rem;
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+    
+    .stat-info {
+      h2 {
+        font-size: 1.25rem;
+      }
+      
+      p {
+        font-size: 0.8rem;
+      }
+    }
+  }
+  
+  .month-expense {
+    padding: 0.5rem;
+    
+    .month-info {
+      h4 {
+        font-size: 0.85rem;
+      }
+      
+      p {
+        font-size: 0.75rem;
+      }
+    }
+    
+    .month-amount .amount {
+      font-size: 0.9rem;
+    }
+  }
+  
+  .category-item {
+    padding: 0.5rem;
+    
+    .category-name {
+      font-size: 0.9rem;
+    }
+    
+    .category-count {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.4rem;
+    }
+  }
+  
+  // Noch bessere Touch-Targets für sehr kleine Bildschirme
+  button {
+    min-height: 48px;
+    font-size: 14px;
+  }
+  
+  .balance-edit-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+// Landscape-Modus für Tablets
+@media (max-width: 1024px) and (orientation: landscape) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+// Sehr kleine Bildschirme (alte Smartphones)
+@media (max-width: 320px) {
+  .dashboard-container {
+    padding: 0.5rem;
+  }
+  
+  .stat-card {
+    .stat-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.5rem;
+    }
+    
+    .stat-icon {
+      align-self: center;
+    }
+  }
+  
+  .recent-item,
+  .month-expense {
+    padding: 0.5rem;
+    font-size: 0.85rem;
   }
 }

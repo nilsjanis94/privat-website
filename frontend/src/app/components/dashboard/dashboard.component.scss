@@ -333,6 +333,23 @@
   }
 }
 
+// Fix für Card-Titel Lesbarkeit
+.stat-card,
+.overview-card,
+.items-list-card,
+.actions-card,
+.warning-card {
+  mat-card-title {
+    color: #333 !important;
+    font-weight: 500 !important;
+    font-size: 1.25rem !important;
+  }
+  
+  mat-card-subtitle {
+    color: #666 !important;
+  }
+}
+
 // Mobile Optimierungen
 @media (max-width: 768px) {
   .dashboard-container {

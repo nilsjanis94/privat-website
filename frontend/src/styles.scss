@@ -218,3 +218,42 @@ body {
     border: 1px solid #ccc !important;
   }
 }
+
+// Fix für mat-card-title Lesbarkeit
+mat-card-title {
+  color: #333 !important;
+  font-weight: 500 !important;
+}
+
+mat-card-subtitle {
+  color: #666 !important;
+}
+
+// Zusätzliche Card-Header Fixes
+.mat-mdc-card-header {
+  .mat-mdc-card-title {
+    color: #333 !important;
+    font-weight: 500 !important;
+  }
+  
+  .mat-mdc-card-subtitle {
+    color: #666 !important;
+  }
+}
+
+// Spezifische Fixes für verschiedene Komponenten
+.filter-card,
+.categories-card,
+.items-card,
+.stat-card,
+.overview-card,
+.actions-card,
+.warning-card {
+  mat-card-title {
+    color: #333 !important;
+  }
+  
+  mat-card-subtitle {
+    color: #666 !important;
+  }
+}

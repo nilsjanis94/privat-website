@@ -529,3 +529,30 @@
     }
   }
 }
+
+// Fix für Card-Titel Lesbarkeit
+.filter-card,
+.categories-card,
+.items-card {
+  mat-card-title {
+    color: #333 !important;
+    font-weight: 500 !important;
+    font-size: 1.25rem !important;
+  }
+  
+  mat-card-subtitle {
+    color: #666 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-card,
+  .categories-card,
+  .items-card {
+    mat-card-title {
+      font-size: 1.1rem !important;
+    }
+  }
+  
+  // ... existing mobile styles ...
+}

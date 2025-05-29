@@ -86,3 +86,14 @@
     </mat-card-actions>
   </mat-card>
 </div>
+
+<!-- Success Overlay -->
+<div class="success-overlay" [class.active]="isLoginSuccess">
+  <div class="success-content">
+    <div class="success-icon">
+      <mat-icon>check_circle</mat-icon>
+    </div>
+    <h2>Erfolgreich angemeldet!</h2>
+    <p>Sie werden zum Dashboard weitergeleitet...</p>
+  </div>
+</div>

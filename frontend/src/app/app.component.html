@@ -3,8 +3,8 @@
   <app-navbar *ngIf="showNavbar$ | async"></app-navbar>
   
   <!-- Main Content -->
-  <main class="main-content">
-    <router-outlet />
+  <main class="main-content" [@routeAnimations]="getRouteAnimation()">
+    <router-outlet #routerOutlet />
   </main>
 </div>
 

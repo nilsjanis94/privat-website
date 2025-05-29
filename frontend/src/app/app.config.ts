@@ -15,22 +15,27 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideNativeDateAdapter(),
     provideToastr({
-      timeOut: 5000,
+      timeOut: 4000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
       progressBar: true,
+      progressAnimation: 'increasing',
       closeButton: true,
       enableHtml: false,
       tapToDismiss: true,
-      toastClass: 'ngx-toastr',
-      maxOpened: 3,
+      toastClass: 'ngx-toastr modern-toast',
+      maxOpened: 2,
       autoDismiss: true,
       newestOnTop: true,
+      includeTitleDuplicates: false,
+      resetTimeoutOnDuplicate: false,
+      easeTime: 300,
+      easing: 'ease-out',
       iconClasses: {
-        error: '',
-        info: '',
-        success: '',
-        warning: ''
+        error: 'toast-error',
+        info: 'toast-info', 
+        success: 'toast-success',
+        warning: 'toast-warning'
       }
     })
   ]

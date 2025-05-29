@@ -34,6 +34,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   hidePassword = true;
   isLoading = false;
+  isLoginSuccess = false;
   errorMessage = '';
 
   constructor(
@@ -62,13 +63,18 @@ export class LoginComponent {
       this.authService.login(loginData).subscribe({
         next: () => {
           this.isLoading = false;
-          this.toastr.success('Willkommen zurück!', 'Erfolgreich angemeldet');
-          this.router.navigate(['/dashboard']);
+          this.isLoginSuccess = true;
+          
+          // Verzögerung für schöne Animation
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 1500);
         },
         error: (error: any) => {
           this.isLoading = false;
+          this.isLoginSuccess = false;
           this.errorMessage = 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre E-Mail und Ihr Passwort.';
-          this.toastr.error(this.errorMessage, 'Anmeldung fehlgeschlagen');
+          this.toastr.error('Ungültige Anmeldedaten', 'Anmeldung fehlgeschlagen');
         }
       });
     } else {

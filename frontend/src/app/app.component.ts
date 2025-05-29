@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { RouterOutlet, RouterModule, Router, NavigationEnd } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -6,15 +6,19 @@ import { Observable, map, filter, startWith } from 'rxjs';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MobileMenuService } from './services/mobile-menu.service';
 import { AuthService } from './services/auth.service';
+import { routeAnimations } from './animations/route-animations';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, RouterModule, MatIconModule, CommonModule, NavbarComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  animations: [routeAnimations]
 })
 export class AppComponent {
+  @ViewChild(RouterOutlet) routerOutlet!: RouterOutlet;
+  
   isMobileMenuOpen$: Observable<boolean>;
   currentUser$: Observable<any>;
   showNavbar$: Observable<boolean>;
@@ -41,6 +45,11 @@ export class AppComponent {
   private shouldShowNavbar(url: string): boolean {
     const authRoutes = ['/login', '/register'];
     return !authRoutes.includes(url);
+  }
+
+  // Animation helper
+  getRouteAnimation() {
+    return this.routerOutlet?.activatedRouteData?.['animation'] || '';
   }
 
   closeMobileMenu(): void {

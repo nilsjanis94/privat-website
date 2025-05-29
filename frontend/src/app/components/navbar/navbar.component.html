@@ -11,34 +11,31 @@
       </div>
     </div>
 
-    <!-- Navigation Links -->
-    <div class="nav-links" [class.nav-open]="isMenuOpen">
+    <!-- Navigation Links (nur Desktop) -->
+    <div class="nav-links">
       <a routerLink="/dashboard" 
          routerLinkActive="active"
-         class="nav-link"
-         (click)="closeMenu()">
+         class="nav-link">
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
       </a>
       
       <a routerLink="/inventory" 
          routerLinkActive="active"
-         class="nav-link"
-         (click)="closeMenu()">
+         class="nav-link">
         <mat-icon>inventory</mat-icon>
         <span>Inventar</span>
       </a>
       
       <a routerLink="/statistics" 
          routerLinkActive="active"
-         class="nav-link"
-         (click)="closeMenu()">
+         class="nav-link">
         <mat-icon>analytics</mat-icon>
         <span>Statistiken</span>
       </a>
     </div>
 
-    <!-- User Menu -->
+    <!-- User Menu (nur Desktop) -->
     <div class="user-menu" *ngIf="currentUser$ | async as user">
       <button mat-button [matMenuTriggerFor]="userDropdown" class="user-button">
         <div class="user-avatar">
@@ -57,7 +54,7 @@
             <div class="dropdown-avatar">
               <mat-icon>account_circle</mat-icon>
             </div>
-            <div>
+            <div class="dropdown-text-info">
               <div class="dropdown-name">{{ user.first_name }} {{ user.last_name }}</div>
               <div class="dropdown-email">{{ user.email }}</div>
             </div>
@@ -90,14 +87,9 @@
     <!-- Mobile Menu Button -->
     <button mat-icon-button 
             class="mobile-menu-btn"
-            (click)="toggleMenu()"
-            [attr.aria-label]="isMenuOpen ? 'Menü schließen' : 'Menü öffnen'">
-      <mat-icon>{{ isMenuOpen ? 'close' : 'menu' }}</mat-icon>
+            (click)="toggleMobileMenu()"
+            [attr.aria-label]="(isMobileMenuOpen$ | async) ? 'Menü schließen' : 'Menü öffnen'">
+      <mat-icon>{{ (isMobileMenuOpen$ | async) ? 'close' : 'menu' }}</mat-icon>
     </button>
   </div>
-
-  <!-- Mobile Overlay -->
-  <div class="mobile-overlay" 
-       [class.active]="isMenuOpen"
-       (click)="closeMenu()"></div>
 </nav>

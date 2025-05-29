@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -8,6 +8,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { MobileMenuService } from '../../services/mobile-menu.service';
 
 @Component({
   selector: 'app-navbar',
@@ -22,27 +23,32 @@ import { AuthService } from '../../services/auth.service';
     MatDividerModule
   ],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss'
+  styleUrl: './navbar.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class NavbarComponent implements OnInit {
   currentUser$: Observable<any>;
-  isMenuOpen = false;
+  isMobileMenuOpen$: Observable<boolean>;
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private mobileMenuService: MobileMenuService
   ) {
     this.currentUser$ = this.authService.currentUser$;
+    this.isMobileMenuOpen$ = this.mobileMenuService.isOpen$;
   }
 
   ngOnInit(): void {}
 
-  toggleMenu(): void {
-    this.isMenuOpen = !this.isMenuOpen;
+  toggleMobileMenu(): void {
+    this.mobileMenuService.toggle();
+    console.log('Mobile menu toggled:', this.mobileMenuService.isOpen);
   }
 
-  closeMenu(): void {
-    this.isMenuOpen = false;
+  closeMobileMenu(): void {
+    this.mobileMenuService.close();
+    console.log('Mobile menu closed');
   }
 
   logout(): void {

@@ -6,6 +6,7 @@
   border-bottom: 1px solid var(--gray-200);
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(8px);
+  overflow-x: hidden;
 
   .navbar-container {
     max-width: 1400px;
@@ -16,10 +17,18 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-8);
+    min-width: 0;
+    overflow: hidden;
 
     @media (max-width: 768px) {
       padding: 0 var(--space-4);
       height: 56px;
+      gap: var(--space-4);
+    }
+    
+    @media (max-width: 480px) {
+      padding: 0 var(--space-3);
+      gap: var(--space-2);
     }
   }
 
@@ -76,33 +85,14 @@
     }
   }
 
-  // Navigation Links
+  // Navigation Links (nur Desktop)
   .nav-links {
     display: flex;
     align-items: center;
     gap: var(--space-2);
 
     @media (max-width: 768px) {
-      position: fixed;
-      top: 56px;
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border-bottom: 1px solid var(--gray-200);
-      box-shadow: var(--shadow-lg);
-      flex-direction: column;
-      padding: var(--space-6) var(--space-4);
-      gap: var(--space-4);
-      transform: translateY(-100%);
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-
-      &.nav-open {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
-      }
+      display: none;
     }
 
     .nav-link {
@@ -166,6 +156,11 @@
 
   // User Menu
   .user-menu {
+    // Komplett ausblenden für mobile Geräte
+    @media (max-width: 768px) {
+      display: none;
+    }
+
     .user-button {
       display: flex;
       align-items: center;
@@ -176,16 +171,16 @@
       background: var(--surface);
       transition: all 0.2s ease;
       min-width: 0;
+      max-width: 280px;
+
+      @media (max-width: 1200px) {
+        max-width: 220px;
+      }
 
       @media (max-width: 1024px) {
         gap: var(--space-2);
         padding: var(--space-2);
-      }
-
-      @media (max-width: 640px) {
-        .user-info {
-          display: none;
-        }
+        max-width: 180px;
       }
 
       &:hover {
@@ -203,6 +198,7 @@
         border-radius: 50%;
         background: var(--gray-100);
         color: var(--gray-600);
+        flex-shrink: 0;
 
         mat-icon {
           font-size: 24px;
@@ -216,6 +212,8 @@
         flex-direction: column;
         align-items: flex-start;
         min-width: 0;
+        flex: 1;
+        overflow: hidden;
 
         .user-name {
           font-size: var(--text-sm);
@@ -225,7 +223,16 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          max-width: 120px;
+          width: 100%;
+          max-width: 180px;
+          
+          @media (max-width: 1200px) {
+            max-width: 140px;
+          }
+          
+          @media (max-width: 1024px) {
+            max-width: 100px;
+          }
         }
 
         .user-email {
@@ -235,7 +242,16 @@
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          max-width: 120px;
+          width: 100%;
+          max-width: 180px;
+          
+          @media (max-width: 1200px) {
+            max-width: 140px;
+          }
+          
+          @media (max-width: 1024px) {
+            max-width: 100px;
+          }
         }
       }
 
@@ -245,6 +261,7 @@
         height: 18px;
         color: var(--gray-500);
         transition: transform 0.2s ease;
+        flex-shrink: 0;
       }
 
       &[aria-expanded="true"] > mat-icon:last-child {
@@ -267,51 +284,46 @@
       height: 24px;
     }
   }
-
-  // Mobile Overlay
-  .mobile-overlay {
-    display: none;
-
-    @media (max-width: 768px) {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-
-      &.active {
-        display: block;
-        opacity: 1;
-        visibility: visible;
-      }
-    }
-  }
 }
 
 // User Dropdown Styling
 ::ng-deep .user-dropdown {
   .mat-mdc-menu-panel {
-    min-width: 240px;
+    min-width: 280px !important;
+    max-width: 320px !important;
     border-radius: var(--radius-lg) !important;
     box-shadow: var(--shadow-xl) !important;
     border: 1px solid var(--gray-200) !important;
-    overflow: hidden;
+    overflow: hidden !important;
+    
+    @media (max-width: 1200px) {
+      min-width: 240px !important;
+      max-width: 280px !important;
+    }
+    
+    @media (max-width: 1024px) {
+      min-width: 220px !important;
+      max-width: 260px !important;
+    }
+    
+    // Dropdown ist auf mobilen Geräten nicht sichtbar
+    @media (max-width: 768px) {
+      display: none !important;
+    }
   }
 
   .dropdown-header {
     padding: var(--space-4);
     background: var(--gray-50);
     border-bottom: 1px solid var(--gray-200);
+    overflow: hidden;
 
     .dropdown-user-info {
       display: flex;
       align-items: center;
       gap: var(--space-3);
+      min-width: 0;
+      overflow: hidden;
 
       .dropdown-avatar {
         display: flex;
@@ -322,6 +334,7 @@
         border-radius: 50%;
         background: var(--primary-100);
         color: var(--primary-600);
+        flex-shrink: 0;
 
         mat-icon {
           font-size: 24px;
@@ -330,27 +343,64 @@
         }
       }
 
+      .dropdown-text-info {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+      }
+
       .dropdown-name {
         font-size: var(--text-sm);
         font-weight: 600;
         color: var(--gray-900);
         line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+        
+        @media (max-width: 1200px) {
+          max-width: 140px;
+        }
+        
+        @media (max-width: 1024px) {
+          max-width: 120px;
+        }
       }
 
       .dropdown-email {
         font-size: var(--text-xs);
         color: var(--gray-600);
         line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+        
+        @media (max-width: 1200px) {
+          max-width: 140px;
+        }
+        
+        @media (max-width: 1024px) {
+          max-width: 120px;
+        }
       }
     }
   }
 
   .mat-mdc-menu-item {
     min-height: 44px !important;
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    position: relative;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--space-3) !important;
+    position: relative !important;
+    padding: 0 var(--space-4) !important;
+    
+    @media (max-width: 480px) {
+      min-height: 40px !important;
+      gap: var(--space-2) !important;
+      padding: 0 var(--space-3) !important;
+    }
 
     &:hover {
       background: var(--gray-50) !important;
@@ -367,6 +417,11 @@
       background: var(--gray-100);
       padding: 2px 6px;
       border-radius: var(--radius-sm);
+      flex-shrink: 0;
+      
+      @media (max-width: 480px) {
+        display: none;
+      }
     }
 
     &.logout-item {
@@ -381,6 +436,14 @@
       font-size: 18px;
       width: 18px;
       height: 18px;
+      flex-shrink: 0;
+    }
+    
+    span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
     }
   }
 

@@ -7,3 +7,65 @@
     <router-outlet />
   </main>
 </div>
+
+<!-- Mobile Menu Portal -->
+<div class="mobile-menu-portal" [class.active]="isMobileMenuOpen$ | async">
+  <div class="mobile-nav-content">
+    <a routerLink="/dashboard" 
+       routerLinkActive="active"
+       class="mobile-nav-link"
+       (click)="closeMobileMenu()">
+      <mat-icon>dashboard</mat-icon>
+      <span>Dashboard</span>
+    </a>
+    
+    <a routerLink="/inventory" 
+       routerLinkActive="active"
+       class="mobile-nav-link"
+       (click)="closeMobileMenu()">
+      <mat-icon>inventory</mat-icon>
+      <span>Inventar</span>
+    </a>
+    
+    <a routerLink="/statistics" 
+       routerLinkActive="active"
+       class="mobile-nav-link"
+       (click)="closeMobileMenu()">
+      <mat-icon>analytics</mat-icon>
+      <span>Statistiken</span>
+    </a>
+
+    <div class="mobile-user-section" *ngIf="currentUser$ | async as user">
+      <div class="mobile-user-info">
+        <div class="mobile-user-avatar">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <div class="mobile-user-details">
+          <div class="mobile-user-name">{{ user.first_name }} {{ user.last_name }}</div>
+          <div class="mobile-user-email">{{ user.email }}</div>
+        </div>
+      </div>
+      
+      <div class="mobile-user-actions">
+        <button class="mobile-menu-item" disabled>
+          <mat-icon>settings</mat-icon>
+          <span>Einstellungen</span>
+          <span class="coming-soon">Bald</span>
+        </button>
+        
+        <button class="mobile-menu-item" disabled>
+          <mat-icon>help</mat-icon>
+          <span>Hilfe</span>
+          <span class="coming-soon">Bald</span>
+        </button>
+        
+        <button class="mobile-menu-item logout-mobile" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Abmelden</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-overlay-portal" [class.active]="isMobileMenuOpen$ | async" (click)="closeMobileMenu()"></div>

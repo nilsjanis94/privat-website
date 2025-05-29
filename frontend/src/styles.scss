@@ -884,3 +884,257 @@ html, body {
   font-weight: 500 !important;
   border: 1px solid var(--border-accent) !important;
 }
+
+// === DARK MODE OVERLAY STYLES (GLOBAL) ===
+.dark-theme {
+  // All Angular Material Overlays in Dark Mode
+  .cdk-overlay-container {
+    // Menu-Panels (für alle Dropdown-Menüs)
+    .mat-mdc-menu-panel {
+      background: var(--surface) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      color: var(--text-primary) !important;
+      
+      .mat-mdc-menu-item {
+        color: var(--text-primary) !important;
+        background: var(--surface) !important;
+        
+        &:hover:not(:disabled) {
+          background: var(--surface-hover) !important;
+          color: var(--text-primary) !important;
+        }
+        
+        &:disabled {
+          color: var(--text-muted) !important;
+          opacity: 0.5 !important;
+        }
+        
+        .mat-mdc-menu-item-text {
+          color: inherit !important;
+        }
+        
+        mat-icon {
+          color: var(--text-secondary) !important;
+        }
+        
+        .coming-soon {
+          background: var(--surface-variant) !important;
+          color: var(--text-muted) !important;
+          border-color: var(--border-primary) !important;
+        }
+        
+        &.logout-item {
+          color: var(--error) !important;
+          
+          &:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+          }
+        }
+        
+        &.active {
+          background: var(--surface-accent) !important;
+          color: var(--primary-400) !important;
+        }
+      }
+      
+      .mat-mdc-menu-divider {
+        border-color: var(--border-primary) !important;
+        background: var(--border-primary) !important;
+      }
+    }
+    
+    // Select-Dropdowns
+    .mat-mdc-select-panel {
+      background: var(--surface) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      
+      .mat-mdc-option {
+        color: var(--text-primary) !important;
+        background: var(--surface) !important;
+        
+        &:hover:not(.mdc-list-item--disabled) {
+          background: var(--surface-hover) !important;
+        }
+        
+        &.mdc-list-item--selected {
+          background: var(--primary-900) !important;
+          color: var(--primary-300) !important;
+        }
+        
+        &.mat-mdc-option-active {
+          background: var(--surface-hover) !important;
+        }
+      }
+    }
+    
+    // Autocomplete-Dropdowns
+    .mat-mdc-autocomplete-panel {
+      background: var(--surface) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      
+      .mat-mdc-option {
+        color: var(--text-primary) !important;
+        background: var(--surface) !important;
+        
+        &:hover:not(.mdc-list-item--disabled) {
+          background: var(--surface-hover) !important;
+        }
+        
+        &.mdc-list-item--selected {
+          background: var(--primary-900) !important;
+          color: var(--primary-300) !important;
+        }
+      }
+    }
+    
+    // Tooltips
+    .mat-mdc-tooltip {
+      background: var(--surface-secondary) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-md) !important;
+    }
+    
+    // Dialog-Overlays
+    .mat-mdc-dialog-container {
+      background: var(--surface) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      
+      .mat-mdc-dialog-title {
+        color: var(--text-primary) !important;
+      }
+      
+      .mat-mdc-dialog-content {
+        color: var(--text-secondary) !important;
+      }
+    }
+    
+    // Snackbar-Overlays
+    .mat-mdc-snack-bar-container {
+      background: var(--surface-secondary) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-primary) !important;
+      
+      .mat-mdc-button {
+        color: var(--primary-400) !important;
+      }
+    }
+    
+    // Datepicker-Overlays
+    .mat-datepicker-popup {
+      background: var(--surface) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      
+      .mat-calendar {
+        background: var(--surface) !important;
+        color: var(--text-primary) !important;
+      }
+      
+      .mat-calendar-header {
+        background: var(--surface-secondary) !important;
+        color: var(--text-primary) !important;
+      }
+      
+      .mat-calendar-body-cell {
+        color: var(--text-primary) !important;
+        
+        &:hover {
+          background: var(--surface-hover) !important;
+        }
+        
+        &.mat-calendar-body-active {
+          background: var(--primary-600) !important;
+          color: white !important;
+        }
+      }
+    }
+  }
+  
+  // User Dropdown Dark Mode
+  .cdk-overlay-pane .user-dropdown {
+    .mat-mdc-menu-panel {
+      background: var(--surface) !important;
+      border-color: var(--border-primary) !important;
+    }
+    
+    .dropdown-name {
+      color: var(--text-primary) !important;
+    }
+    
+    .dropdown-email {
+      color: var(--text-secondary) !important;
+    }
+    
+    .mat-mdc-menu-item:hover:not(:disabled) {
+      background: var(--surface-hover) !important;
+    }
+    
+    .coming-soon {
+      background: var(--surface-variant) !important;
+      color: var(--text-muted) !important;
+      border-color: var(--border-primary) !important;
+    }
+    
+    .theme-indicator {
+      background: var(--surface-accent) !important;
+      color: var(--primary-400) !important;
+      border-color: var(--border-accent) !important;
+    }
+  }
+  
+  // Theme Menu Dark Mode
+  .cdk-overlay-pane .theme-menu {
+    .mat-mdc-menu-panel {
+      background: var(--surface) !important;
+      border-color: var(--border-primary) !important;
+    }
+    
+    .theme-menu-header {
+      background: var(--surface-accent) !important;
+      color: var(--primary-400) !important;
+      border-bottom-color: var(--border-primary) !important;
+    }
+    
+    .mat-mdc-menu-item {
+      color: var(--text-primary) !important;
+      
+      &:hover {
+        background: var(--surface-hover) !important;
+      }
+      
+      &.active {
+        background: var(--surface-accent) !important;
+        color: var(--primary-400) !important;
+      }
+      
+      .check-icon {
+        color: var(--primary-400) !important;
+      }
+    }
+  }
+}
+
+// Sort-Header Dark Mode (falls später hinzugefügt)
+.dark-theme {
+  .mat-sort-header-button {
+    color: var(--text-primary) !important;
+    
+    &:hover {
+      color: var(--primary-400) !important;
+    }
+  }
+  
+  .mat-sort-header-arrow {
+    color: var(--primary-400) !important;
+  }
+  
+  .mat-sort-header-sorted {
+    color: var(--primary-400) !important;
+  }
+}

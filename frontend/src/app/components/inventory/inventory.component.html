@@ -34,11 +34,19 @@
                   (click)="filterByCategory(category.id)">
             <mat-icon>{{ getCategoryIcon(category.name) }}</mat-icon>
             <span>{{ category.name }} ({{ category.items_count }})</span>
-            <button class="edit-btn"
-                    (click)="openCategoryDialog(category); $event.stopPropagation()"
-                    title="Kategorie bearbeiten">
-              <mat-icon>edit</mat-icon>
-            </button>
+            <div class="category-actions">
+              <button class="edit-btn"
+                      (click)="openCategoryDialog(category); $event.stopPropagation()"
+                      title="Kategorie bearbeiten">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="delete-btn"
+                      (click)="deleteCategory(category); $event.stopPropagation()"
+                      title="Kategorie löschen"
+                      [disabled]="category.items_count > 0">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </button>
           
           <button *ngIf="categories.length > 6 && !showAllCategories"
@@ -123,7 +131,8 @@
       </div>
 
       <div *ngIf="!isLoading && filteredItems.length > 0" class="table-container">
-        <table mat-table [dataSource]="paginatedItems" class="items-table">
+        <!-- Desktop/Tablet Tabelle -->
+        <table mat-table [dataSource]="paginatedItems" class="items-table desktop-table">
           <!-- Name Column -->
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -209,11 +218,108 @@
               [class.consumed-row]="row.consumed"></tr>
         </table>
 
+        <!-- Mobile Card Layout -->
+        <div class="mobile-items-container">
+          <div *ngFor="let item of paginatedItems" 
+               class="mobile-item-card"
+               [class.consumed-card]="item.consumed">
+            
+            <!-- Header mit Name und Verbraucht-Status -->
+            <div class="card-header">
+              <div class="item-info">
+                <h3 class="item-name">{{ item.name }}</h3>
+                <span *ngIf="item.consumed" class="consumed-badge">
+                  <mat-icon>restaurant</mat-icon>
+                  Verbraucht
+                </span>
+              </div>
+            </div>
+
+            <!-- Beschreibung -->
+            <p *ngIf="item.description" class="item-description">
+              {{ item.description }}
+            </p>
+
+            <!-- Details Grid -->
+            <div class="item-details">
+              <div class="detail-item">
+                <mat-icon>category</mat-icon>
+                <div class="detail-content">
+                  <span class="detail-label">Kategorie</span>
+                  <span class="detail-value">{{ item.category_name }}</span>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <mat-icon>place</mat-icon>
+                <div class="detail-content">
+                  <span class="detail-label">Ort</span>
+                  <span class="detail-value">{{ item.location_display || item.location || '-' }}</span>
+                </div>
+              </div>
+
+              <div class="detail-item" *ngIf="item.purchase_price">
+                <mat-icon>euro</mat-icon>
+                <div class="detail-content">
+                  <span class="detail-label">Kaufpreis</span>
+                  <span class="detail-value">{{ item.purchase_price | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+              </div>
+
+              <div class="detail-item">
+                <mat-icon>schedule</mat-icon>
+                <div class="detail-content">
+                  <span class="detail-label">Hinzugefügt</span>
+                  <span class="detail-value">{{ item.created_at | date:'short' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card-actions">
+              <button mat-stroked-button 
+                      color="primary" 
+                      (click)="openItemDialog(item)"
+                      class="mobile-action-btn">
+                <mat-icon>edit</mat-icon>
+                <span>Bearbeiten</span>
+              </button>
+              
+              <button mat-stroked-button 
+                      color="warn" 
+                      (click)="deleteItem(item)"
+                      class="mobile-action-btn">
+                <mat-icon>delete</mat-icon>
+                <span>Löschen</span>
+              </button>
+              
+              <button *ngIf="!item.consumed" 
+                      mat-stroked-button 
+                      color="accent" 
+                      (click)="markAsConsumed(item)"
+                      class="mobile-action-btn">
+                <mat-icon>restaurant</mat-icon>
+                <span>Verbraucht</span>
+              </button>
+              
+              <button *ngIf="item.consumed" 
+                      mat-stroked-button 
+                      color="primary" 
+                      (click)="unmarkAsConsumed(item)"
+                      class="mobile-action-btn">
+                <mat-icon>restore</mat-icon>
+                <span>Wiederherstellen</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
         <mat-paginator 
           *ngIf="filteredItems.length > pageSize"
           [length]="filteredItems.length"
           [pageSize]="pageSize"
-          [pageSizeOptions]="[10, 25, 50, 100]"
+          [pageSizeOptions]="responsivePaginationOptions"
           [pageIndex]="currentPage"
           (page)="onPageChange($event)"
           showFirstLastButtons

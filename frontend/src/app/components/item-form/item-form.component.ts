@@ -97,7 +97,11 @@ export class ItemFormComponent {
 
   openCategoryDialog(): void {
     const dialogRef = this.dialog.open(CategoryFormComponent, {
-      width: '400px',
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '80vh',
+      position: { top: '2vh' },
+      panelClass: 'category-dialog-container',
       data: { mode: 'create' }
     });
 

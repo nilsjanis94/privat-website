@@ -27,6 +27,10 @@ export class InventoryService {
     return this.http.post<any>(`${environment.apiUrl}/inventory/categories/`, category);
   }
 
+  updateCategory(id: number, category: any): Observable<any> {
+    return this.http.put<any>(`${environment.apiUrl}/inventory/categories/${id}/`, category);
+  }
+
   deleteCategory(id: number): Observable<any> {
     return this.http.delete(`${environment.apiUrl}/inventory/categories/${id}/`);
   }

@@ -39,12 +39,19 @@ export class CategoryFormComponent {
     private toastr: ToastrService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    this.isEditMode = false;
+    this.isEditMode = !!(data && data.category);
     
     this.categoryForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', [Validators.maxLength(500)]]
     });
+
+    if (this.isEditMode && data.category) {
+      this.categoryForm.patchValue({
+        name: data.category.name,
+        description: data.category.description || ''
+      });
+    }
   }
 
   getErrorMessage(field: string): string {
@@ -71,16 +78,29 @@ export class CategoryFormComponent {
       description: this.categoryForm.value.description?.trim() || ''
     };
 
-    this.inventoryService.createCategory(categoryData).subscribe({
-      next: (result: any) => {
-        this.toastr.success('Kategorie erfolgreich erstellt!');
-        this.dialogRef.close(result);
-      },
-      error: (error: any) => {
-        this.toastr.error('Fehler beim Erstellen der Kategorie');
-        this.isLoading = false;
-      }
-    });
+    if (this.isEditMode) {
+      this.inventoryService.updateCategory(this.data.category.id, categoryData).subscribe({
+        next: (result: any) => {
+          this.toastr.success('Kategorie erfolgreich aktualisiert!');
+          this.dialogRef.close(result);
+        },
+        error: (error: any) => {
+          this.toastr.error('Fehler beim Aktualisieren der Kategorie');
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.inventoryService.createCategory(categoryData).subscribe({
+        next: (result: any) => {
+          this.toastr.success('Kategorie erfolgreich erstellt!');
+          this.dialogRef.close(result);
+        },
+        error: (error: any) => {
+          this.toastr.error('Fehler beim Erstellen der Kategorie');
+          this.isLoading = false;
+        }
+      });
+    }
   }
 
   onCancel(): void {

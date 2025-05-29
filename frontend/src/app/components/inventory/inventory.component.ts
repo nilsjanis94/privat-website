@@ -91,6 +91,44 @@ export class InventoryComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     this.loadItems();
+    this.setResponsivePageSize();
+    
+    // Listen für Fenster-Resize-Events
+    window.addEventListener('resize', () => {
+      this.setResponsivePageSize();
+    });
+  }
+
+  // Responsive Page Size basierend auf Bildschirmgröße
+  setResponsivePageSize(): void {
+    const screenWidth = window.innerWidth;
+    
+    if (screenWidth <= 480) {
+      // Mobile: Weniger Items pro Seite
+      this.pageSize = 5;
+    } else if (screenWidth <= 768) {
+      // Tablet: Mittlere Anzahl
+      this.pageSize = 8;
+    } else {
+      // Desktop: Normale Anzahl
+      this.pageSize = 25;
+    }
+    
+    // Pagination neu berechnen bei Änderung
+    this.updatePaginatedItems();
+  }
+
+  // Getter für responsive Pagination-Optionen
+  get responsivePaginationOptions(): number[] {
+    const screenWidth = window.innerWidth;
+    
+    if (screenWidth <= 480) {
+      return [5, 10, 15];
+    } else if (screenWidth <= 768) {
+      return [8, 15, 25];
+    } else {
+      return [10, 25, 50, 100];
+    }
   }
 
   loadCategories(): void {
@@ -161,6 +199,18 @@ export class InventoryComponent implements OnInit {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
     this.updatePaginatedItems();
+    
+    // Auf mobilen Geräten nach oben scrollen für bessere UX
+    if (window.innerWidth <= 768) {
+      // Scroll zur Items-Card oder zum oberen Paginator
+      const itemsCard = document.querySelector('.items-card');
+      if (itemsCard) {
+        itemsCard.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }
   }
 
   clearFilters(): void {
@@ -180,6 +230,7 @@ export class InventoryComponent implements OnInit {
           width: '90vw',
           maxWidth: '700px',
           maxHeight: '90vh',
+          panelClass: 'item-dialog-container',
           data: { 
             item: item || null, 
             categories: this.categories
@@ -201,6 +252,7 @@ export class InventoryComponent implements OnInit {
           width: '90vw',
           maxWidth: '700px',
           maxHeight: '90vh',
+          panelClass: 'item-dialog-container',
           data: { 
             item: item || null, 
             categories: []

@@ -1,7 +1,7 @@
 <div class="category-dialog">
   <!-- Dialog Header -->
   <div mat-dialog-title class="dialog-header">
-    <h2>Neue Kategorie hinzufügen</h2>
+    <h2>{{ isEditMode ? 'Kategorie bearbeiten' : 'Neue Kategorie hinzufügen' }}</h2>
   </div>
 
   <!-- Dialog Content -->
@@ -48,8 +48,8 @@
             [disabled]="!categoryForm.valid || isLoading"
             class="submit-button">
       <mat-spinner diameter="18" *ngIf="isLoading"></mat-spinner>
-      <mat-icon *ngIf="!isLoading">add</mat-icon>
-      <span>Hinzufügen</span>
+      <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode ? 'Aktualisieren' : 'Hinzufügen' }}</span>
     </button>
   </div>
 </div>

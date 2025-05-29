@@ -53,6 +53,20 @@ export class NavbarComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+  }
+
+  getInitials(firstName: string, lastName: string): string {
+    if (!firstName && !lastName) return 'U';
+    
+    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
+    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
+    
+    return firstInitial + lastInitial || 'U';
+  }
+
+  navigateToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+    // Mobile Menu schließen falls offen
+    this.closeMobileMenu();
   }
 }

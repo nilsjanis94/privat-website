@@ -114,6 +114,7 @@ export class DashboardComponent implements OnInit {
           width: '90vw',
           maxWidth: '700px',
           maxHeight: '90vh',
+          panelClass: 'item-dialog-container',
           data: { 
             item: null, // Neues Item
             categories: Array.isArray(categories) ? categories : []
@@ -134,6 +135,7 @@ export class DashboardComponent implements OnInit {
           width: '90vw',
           maxWidth: '700px',
           maxHeight: '90vh',
+          panelClass: 'item-dialog-container',
           data: { 
             item: null,
             categories: []

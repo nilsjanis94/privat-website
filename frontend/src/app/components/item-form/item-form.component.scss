@@ -1,14 +1,14 @@
 // === MODERNE ITEM-FORM STYLES mit höchster Spezifität ===
 
-// Globale Dialog Styles überschreiben
-.cdk-overlay-container .cdk-global-overlay-wrapper .mat-mdc-dialog-container {
+// Spezifische Dialog Styles nur für Item Dialog
+.cdk-overlay-container .item-dialog-container .mat-mdc-dialog-container {
   --mdc-dialog-container-color: transparent !important;
   background: transparent !important;
   padding: 0 !important;
   border-radius: var(--radius-xl) !important;
 }
 
-.cdk-overlay-container .mat-mdc-dialog-surface {
+.cdk-overlay-container .item-dialog-container .mat-mdc-dialog-surface {
   background: var(--surface) !important;
   border-radius: var(--radius-xl) !important;
   box-shadow: var(--shadow-xl) !important;
@@ -17,10 +17,52 @@
   margin: var(--space-4) !important;
 }
 
-.cdk-overlay-container .mat-mdc-dialog-content {
-  padding: 0 !important;
+.cdk-overlay-container .item-dialog-container .mat-mdc-dialog-content {
+  padding: var(--space-6) var(--space-6) var(--space-6) var(--space-6) !important;
   margin: 0 !important;
+  min-height: 300px !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--primary-400) var(--gray-100) !important;
+  
+  &::-webkit-scrollbar {
+    width: 8px !important;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--gray-100) !important;
+    border-radius: var(--radius-sm) !important;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--primary-400) !important;
+    border-radius: var(--radius-sm) !important;
+    
+    &:hover {
+      background: var(--primary-500) !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-4) !important;
+  }
+
+  @media (max-width: 480px) {
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-3) !important;
+  }
+}
+
+// Fallback für Standard-Dialoge ohne spezifische panelClass
+.cdk-overlay-container:has(.item-dialog) .mat-mdc-dialog-surface {
+  background: var(--surface) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-xl) !important;
+  max-height: 90vh !important;
   overflow: hidden !important;
+  margin: var(--space-4) !important;
 }
 
 .item-dialog {
@@ -68,7 +110,7 @@
 }
 
 .item-dialog .dialog-content {
-  padding: var(--space-8) var(--space-8) var(--space-8) var(--space-8) !important;
+  padding: var(--space-6) var(--space-6) var(--space-6) var(--space-6) !important;
   margin: 0 !important;
   min-height: 300px !important;
   max-height: 70vh !important;
@@ -97,11 +139,11 @@
   }
 
   @media (max-width: 768px) {
-    padding: var(--space-6) var(--space-6) var(--space-6) var(--space-6) !important;
+    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-4) !important;
   }
 
   @media (max-width: 480px) {
-    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-4) !important;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-3) !important;
   }
 }
 

@@ -100,32 +100,11 @@
     }
     
     &.primary {
-      background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
-      color: white;
-      border-color: var(--primary-600);
+      border-left: 4px solid var(--primary-600);
       
-      .metric-icon {
-        background: rgba(255, 255, 255, 0.15);
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        
-        mat-icon {
-          color: white;
-        }
-      }
-      
-      .metric-info {
-        h2, p {
-          color: white;
-        }
-        
-        p {
-          opacity: 0.9;
-        }
-      }
-
       &:hover {
-        box-shadow: var(--shadow-xl);
-        transform: translateY(-4px) scale(1.02);
+        border-left-color: var(--primary-600);
+        box-shadow: 0 8px 25px rgba(124, 58, 237, 0.15);
       }
     }
     

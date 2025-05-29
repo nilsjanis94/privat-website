@@ -1,30 +1,26 @@
-// === MODERNE KATEGORIE-FORM STYLES mit höherer Spezifität ===
+// === MODERNE KATEGORIE-FORM STYLES ===
 
-// Überschreibe Angular Material Dialog Styles ZUERST
-.cdk-overlay-container .mat-mdc-dialog-container {
+// Spezifische Dialog-Styles für Category Dialog
+.cdk-overlay-container .category-dialog-container .mat-mdc-dialog-container {
   --mdc-dialog-container-color: transparent !important;
   background: transparent !important;
   padding: 0 !important;
   border-radius: var(--radius-xl) !important;
 }
 
-.cdk-overlay-container .mat-mdc-dialog-surface {
+.cdk-overlay-container .category-dialog-container .mat-mdc-dialog-surface {
   background: var(--surface) !important;
   border-radius: var(--radius-xl) !important;
   box-shadow: var(--shadow-xl) !important;
-  max-height: 90vh !important;
+  max-height: 80vh !important;
   overflow: hidden !important;
-  margin: var(--space-4) !important;
+  margin: var(--space-2) !important;
 }
 
-.cdk-overlay-container .mat-mdc-dialog-content {
-  padding: 0 !important;
+.cdk-overlay-container .category-dialog-container .mat-mdc-dialog-content {
+  padding: var(--space-6) var(--space-8) var(--space-6) var(--space-8) !important;
   margin: 0 !important;
   overflow: hidden !important;
-}
-
-.cdk-overlay-container .mat-mdc-dialog-actions {
-  display: none !important;
 }
 
 // Hauptkomponente
@@ -73,10 +69,10 @@
 }
 
 .category-dialog .dialog-content {
-  padding: var(--space-8) var(--space-8) var(--space-6) var(--space-8) !important;
+  padding: var(--space-6) var(--space-8) var(--space-6) var(--space-8) !important;
   margin: 0 !important;
-  min-height: 200px !important;
-  max-height: 70vh !important;
+  min-height: 220px !important;
+  max-height: 50vh !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   
@@ -102,22 +98,26 @@
   }
 
   @media (max-width: 600px) {
-    padding: var(--space-6) var(--space-6) var(--space-4) var(--space-6) !important;
+    padding: var(--space-4) var(--space-6) var(--space-4) var(--space-6) !important;
+    max-height: 55vh !important;
   }
 
   @media (max-width: 480px) {
-    padding: var(--space-4) var(--space-4) var(--space-3) var(--space-4) !important;
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-4) !important;
+    max-height: 60vh !important;
   }
 }
 
 .category-dialog .category-form {
   display: flex !important;
   flex-direction: column !important;
-  gap: var(--space-6) !important;
+  gap: var(--space-5) !important;
   width: 100% !important;
+  padding-top: var(--space-2) !important;
   
   .form-field {
     width: 100% !important;
+    margin-bottom: var(--space-3) !important;
     
     .mat-mdc-form-field-outline {
       border-radius: var(--radius) !important;

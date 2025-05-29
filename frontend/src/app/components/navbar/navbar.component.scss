@@ -40,6 +40,25 @@
     text-decoration: none;
     color: inherit;
     cursor: pointer;
+    border: none;
+    background: none;
+    padding: var(--space-2);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: var(--gray-50);
+      transform: translateY(-1px);
+      
+      .brand-icon {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+      }
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
 
     .brand-icon {
       display: flex;
@@ -51,6 +70,7 @@
       background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-600) 100%);
       color: white;
       box-shadow: var(--shadow);
+      transition: all 0.3s ease;
 
       mat-icon {
         font-size: 24px;
@@ -73,6 +93,7 @@
         font-weight: 600;
         color: var(--gray-900);
         line-height: 1.2;
+        transition: color 0.3s ease;
       }
 
       .brand-subtitle {
@@ -81,6 +102,18 @@
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        transition: color 0.3s ease;
+      }
+    }
+    
+    // Zusätzliche Hover-Effekte für Text
+    &:hover .brand-text {
+      h3 {
+        color: var(--primary-700);
+      }
+      
+      .brand-subtitle {
+        color: var(--primary-600);
       }
     }
   }
@@ -196,14 +229,16 @@
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        background: var(--gray-100);
-        color: var(--gray-600);
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-600) 100%);
+        color: white;
         flex-shrink: 0;
+        box-shadow: var(--shadow-sm);
 
-        mat-icon {
-          font-size: 24px;
-          width: 24px;
-          height: 24px;
+        .avatar-initials {
+          font-size: 14px;
+          font-weight: 600;
+          line-height: 1;
+          text-transform: uppercase;
         }
       }
 
@@ -286,169 +321,4 @@
   }
 }
 
-// User Dropdown Styling
-::ng-deep .user-dropdown {
-  .mat-mdc-menu-panel {
-    min-width: 280px !important;
-    max-width: 320px !important;
-    border-radius: var(--radius-lg) !important;
-    box-shadow: var(--shadow-xl) !important;
-    border: 1px solid var(--gray-200) !important;
-    overflow: hidden !important;
-    
-    @media (max-width: 1200px) {
-      min-width: 240px !important;
-      max-width: 280px !important;
-    }
-    
-    @media (max-width: 1024px) {
-      min-width: 220px !important;
-      max-width: 260px !important;
-    }
-    
-    // Dropdown ist auf mobilen Geräten nicht sichtbar
-    @media (max-width: 768px) {
-      display: none !important;
-    }
-  }
-
-  .dropdown-header {
-    padding: var(--space-4);
-    background: var(--gray-50);
-    border-bottom: 1px solid var(--gray-200);
-    overflow: hidden;
-
-    .dropdown-user-info {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      min-width: 0;
-      overflow: hidden;
-
-      .dropdown-avatar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: var(--primary-100);
-        color: var(--primary-600);
-        flex-shrink: 0;
-
-        mat-icon {
-          font-size: 24px;
-          width: 24px;
-          height: 24px;
-        }
-      }
-
-      .dropdown-text-info {
-        min-width: 0;
-        flex: 1;
-        overflow: hidden;
-      }
-
-      .dropdown-name {
-        font-size: var(--text-sm);
-        font-weight: 600;
-        color: var(--gray-900);
-        line-height: 1.2;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 180px;
-        
-        @media (max-width: 1200px) {
-          max-width: 140px;
-        }
-        
-        @media (max-width: 1024px) {
-          max-width: 120px;
-        }
-      }
-
-      .dropdown-email {
-        font-size: var(--text-xs);
-        color: var(--gray-600);
-        line-height: 1.2;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 180px;
-        
-        @media (max-width: 1200px) {
-          max-width: 140px;
-        }
-        
-        @media (max-width: 1024px) {
-          max-width: 120px;
-        }
-      }
-    }
-  }
-
-  .mat-mdc-menu-item {
-    min-height: 44px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: var(--space-3) !important;
-    position: relative !important;
-    padding: 0 var(--space-4) !important;
-    
-    @media (max-width: 480px) {
-      min-height: 40px !important;
-      gap: var(--space-2) !important;
-      padding: 0 var(--space-3) !important;
-    }
-
-    &:hover {
-      background: var(--gray-50) !important;
-    }
-
-    &:disabled {
-      opacity: 0.6;
-    }
-
-    .coming-soon {
-      margin-left: auto;
-      font-size: var(--text-xs);
-      color: var(--gray-500);
-      background: var(--gray-100);
-      padding: 2px 6px;
-      border-radius: var(--radius-sm);
-      flex-shrink: 0;
-      
-      @media (max-width: 480px) {
-        display: none;
-      }
-    }
-
-    &.logout-item {
-      color: var(--error);
-
-      &:hover {
-        background: rgba(239, 68, 68, 0.05) !important;
-      }
-    }
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
-    
-    span {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
-    }
-  }
-
-  .mat-mdc-menu-divider {
-    margin: 0 !important;
-    border-color: var(--gray-200) !important;
-  }
-}
+// Alle Dropdown-Styles wurden zu styles.scss verschoben

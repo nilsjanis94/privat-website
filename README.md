@@ -37,10 +37,20 @@ Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungss
   - **Ausgaben-Chart**: Stock-Chart-Style mit Zeitraumfiltern (1W, 1M, 1Y, Max)
   - **Kategorien-Donut-Chart**: Mit Prozentangaben direkt im Chart
   - **Monatliche Ausgaben Bar-Chart**: Mit Werten über den Balken
+  - **🌗 Dark Mode Integration**: Vollständig theme-aware Charts mit dynamischen Farbanpassungen
+    - **Responsive Legenden**: Automatische Textfarben-Anpassung für optimalen Kontrast
+    - **Theme-aware Tooltips**: Hintergrund und Farben passen sich dem Theme an
+    - **Grid-Optimierung**: Erhöhte Transparenz und Sichtbarkeit für Dark Mode
+    - **Live Updates**: Charts aktualisieren sich ohne Neuaufbau bei Theme-Wechsel
 - **Echtzeit-Statistiken**: Aktuelle Inventar-Übersicht mit Tages-Ausgaben und intelligenten Durchschnitten
 
 ### 🎨 Modern UI/UX Design
 - **Purple Design System**: Kohärentes Design mit modernen lila/purple Farbschemas
+- **🌗 Dark Mode Support**: Vollständig implementiertes Dark/Light/Auto Theme-System
+  - **Intelligente Theme-Erkennung**: Automatische Systemeinstellungen-Synchronisation  
+  - **Persistente Speicherung**: Theme-Wahl wird lokal gespeichert
+  - **Theme-aware Charts**: Chart.js Integration mit dynamischen Farbanpassungen
+  - **Mobile & Desktop**: Dedizierte Theme-Toggles in Navigation und Mobile-Menu
 - **Mobile-First Responsive**: Vollständig optimiert für alle Geräte (320px - 1920px+)
 - **Touch-Optimierung**: 44-48px Touch-Targets für perfekte mobile Bedienung
 - **Adaptive Layouts**: 
@@ -157,6 +167,12 @@ RewriteRule ^.*$ /index.html [L]
 
 ### Version 3.0.0 (Aktuell - Mai 2025)
 - 🎨 **Purple Design System**: Vollständig implementiertes kohärentes Design-System
+- 🌗 **Dark Mode Support**: Vollständiges Theme-System mit Light/Dark/Auto-Modi
+  - **Theme Service**: Reactive Theme-Management mit LocalStorage-Persistierung  
+  - **System Integration**: Automatische OS-Theme-Erkennung und Synchronisation
+  - **Theme-aware Charts**: Chart.js Integration mit dynamischen Farbanpassungen für alle Charts
+  - **Navigation Integration**: Theme-Toggle in Desktop-Navbar und Mobile-Menu
+  - **CSS Variables System**: Umfassendes Design-Token-System für konsistente Theming
 - 📱 **Mobile-Responsive Revolution**: 
   - Touch-optimierte Bedienung mit 44-48px Touch-Targets
   - Mobile Card-Layout für Inventar-Items (keine horizontalen Scroll-Probleme)
@@ -235,6 +251,10 @@ ps aux | grep python
 
 ### Test-Features (Mobile & Desktop)
 - **Mobile Navigation**: Teste die Touch-Gesten und Card-Layouts auf dem Smartphone
+- **🌗 Dark Mode**: Teste den Theme-Wechsel über Navbar (Desktop) oder Mobile-Menu
+  - **Auto-Modus**: Synchronisierung mit Systemeinstellungen testen
+  - **Charts Dark Mode**: Alle Charts (Donut, Bar, Line) im Dark Mode prüfen
+  - **Theme-Persistierung**: Reload der Seite - Theme-Wahl bleibt erhalten
 - **Kategorie-Management**: Teste Edit/Delete-Funktionalität in den Kategorie-Chips
 - **Brand-Navigation**: Klicke auf das Inventar-Logo für Dashboard-Navigation
 - **Responsive Pagination**: Teste verschiedene Seitengrößen auf verschiedenen Geräten

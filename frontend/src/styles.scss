@@ -1,5 +1,92 @@
 /* You can add global styles to this file, and also import other style files */
 
+// Modern Design System - Purple Theme
+:root {
+  // Primary Purple Colors
+  --primary-50: #f3f1ff;
+  --primary-100: #ede9fe;
+  --primary-200: #ddd6fe;
+  --primary-300: #c4b5fd;
+  --primary-400: #a78bfa;
+  --primary-500: #8b5cf6;
+  --primary-600: #7c3aed;
+  --primary-700: #6d28d9;
+  --primary-800: #5b21b6;
+  --primary-900: #4c1d95;
+
+  // Secondary/Accent Colors (Complementary Pink-Purple)
+  --accent-50: #fdf4ff;
+  --accent-100: #fae8ff;
+  --accent-200: #f5d0fe;
+  --accent-300: #f0abfc;
+  --accent-400: #e879f9;
+  --accent-500: #d946ef;
+  --accent-600: #c026d3;
+  --accent-700: #a21caf;
+  --accent-800: #86198f;
+  --accent-900: #701a75;
+
+  // Neutral Colors
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-400: #bdbdbd;
+  --gray-500: #9e9e9e;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+
+  // Semantic Colors
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  // Surface Colors
+  --surface: #ffffff;
+  --surface-variant: #f8fafc;
+  --background: var(--gray-50);
+  
+  // Shadows
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  // Border Radius
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  
+  // Spacing Scale
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  
+  // Typography Scale
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+}
+
 // Global styles
 * {
   margin: 0;
@@ -10,119 +97,233 @@
 html, body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: 'Inter', 'Roboto', "Helvetica Neue", sans-serif;
+  background-color: var(--background);
+  color: var(--gray-900);
+  line-height: 1.6;
+  font-size: var(--text-base);
 }
 
-body {
-  background-color: #fafafa;
-}
+// Typography Classes
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+.text-3xl { font-size: var(--text-3xl); }
+.text-4xl { font-size: var(--text-4xl); }
+
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+// Color Classes
+.text-primary { color: var(--primary-600); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-error { color: var(--error); }
+.text-muted { color: var(--gray-600); }
 
 // Utility classes
-.full-width {
-  width: 100% !important;
+.full-width { width: 100% !important; }
+.text-center { text-align: center !important; }
+
+// Modern Spacing System
+.p-1 { padding: var(--space-1) !important; }
+.p-2 { padding: var(--space-2) !important; }
+.p-3 { padding: var(--space-3) !important; }
+.p-4 { padding: var(--space-4) !important; }
+.p-6 { padding: var(--space-6) !important; }
+.p-8 { padding: var(--space-8) !important; }
+
+.m-1 { margin: var(--space-1) !important; }
+.m-2 { margin: var(--space-2) !important; }
+.m-3 { margin: var(--space-3) !important; }
+.m-4 { margin: var(--space-4) !important; }
+.m-6 { margin: var(--space-6) !important; }
+.m-8 { margin: var(--space-8) !important; }
+
+.mt-1 { margin-top: var(--space-1) !important; }
+.mt-2 { margin-top: var(--space-2) !important; }
+.mt-3 { margin-top: var(--space-3) !important; }
+.mt-4 { margin-top: var(--space-4) !important; }
+.mt-6 { margin-top: var(--space-6) !important; }
+.mt-8 { margin-top: var(--space-8) !important; }
+
+.mb-1 { margin-bottom: var(--space-1) !important; }
+.mb-2 { margin-bottom: var(--space-2) !important; }
+.mb-3 { margin-bottom: var(--space-3) !important; }
+.mb-4 { margin-bottom: var(--space-4) !important; }
+.mb-6 { margin-bottom: var(--space-6) !important; }
+.mb-8 { margin-bottom: var(--space-8) !important; }
+
+// Modern Card Styles
+.card-modern {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
 }
 
-.text-center {
-  text-align: center !important;
+// Modern Button Styles
+.btn-modern {
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+  
+  &.btn-primary {
+    background: var(--primary-600);
+    color: white;
+    box-shadow: var(--shadow);
+    
+    &:hover {
+      background: var(--primary-700);
+      box-shadow: var(--shadow-md);
+    }
+  }
+  
+  &.btn-secondary {
+    background: var(--accent-600);
+    color: white;
+    box-shadow: var(--shadow);
+    
+    &:hover {
+      background: var(--accent-700);
+      box-shadow: var(--shadow-md);
+    }
+  }
 }
-
-.mt-1 { margin-top: 0.5rem !important; }
-.mt-2 { margin-top: 1rem !important; }
-.mt-3 { margin-top: 1.5rem !important; }
-.mt-4 { margin-top: 2rem !important; }
-
-.mb-1 { margin-bottom: 0.5rem !important; }
-.mb-2 { margin-bottom: 1rem !important; }
-.mb-3 { margin-bottom: 1.5rem !important; }
-.mb-4 { margin-bottom: 2rem !important; }
 
 // Custom scrollbar
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: var(--gray-400);
+  border-radius: var(--radius-sm);
+  
+  &:hover {
+    background: var(--gray-500);
+  }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+// Material Design Overrides
+.mat-mdc-card {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow) !important;
+  border: 1px solid var(--gray-200) !important;
+  
+  &:hover {
+    box-shadow: var(--shadow-md) !important;
+    transform: translateY(-1px);
+  }
 }
 
-/* Material Design Theme wird automatisch geladen */
+.mat-mdc-raised-button {
+  border-radius: var(--radius) !important;
+  font-weight: 500 !important;
+  box-shadow: var(--shadow) !important;
+  
+  &:hover {
+    box-shadow: var(--shadow-md) !important;
+    transform: translateY(-1px);
+  }
+}
 
-/* Toastr Styles mit korrigierter Icon-Ausrichtung */
+.mat-mdc-form-field {
+  .mat-mdc-form-field-outline {
+    border-radius: var(--radius) !important;
+  }
+}
+
+// Toastr Styles with modern purple design
 .ngx-toastr {
   position: fixed !important;
   top: 20px !important;
   right: 20px !important;
   z-index: 999999 !important;
   width: 350px !important;
-  padding: 16px 20px !important; /* Normales Padding ohne extra Icon-Platz */
+  padding: 16px 20px !important;
   margin-bottom: 10px !important;
-  border-radius: 8px !important;
+  border-radius: var(--radius-lg) !important;
   font-size: 14px !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: var(--shadow-xl) !important;
   opacity: 1 !important;
   color: white !important;
   display: block !important;
   min-height: auto !important;
   pointer-events: auto !important;
   position: relative !important;
+  border: none !important;
 }
 
-/* Entferne alle selbst erstellten Icons */
 .ngx-toastr:before {
   display: none !important;
 }
 
-/* Toast-Inhalt Container */
 .ngx-toastr .toast-message {
   display: block !important;
   margin: 0 !important;
-  padding-right: 30px !important; /* Platz für Close-Button */
+  padding-right: 30px !important;
   word-wrap: break-word !important;
   line-height: 1.4 !important;
 }
 
-/* Toast-Titel */
 .ngx-toastr .toast-title {
   display: block !important;
   font-weight: 600 !important;
   font-size: 15px !important;
   margin-bottom: 6px !important;
   line-height: 1.3 !important;
-  padding-right: 30px !important; /* Platz für Close-Button */
+  padding-right: 30px !important;
 }
 
-/* Toast-Typen Hintergründe */
 .toast-success {
-  background-color: #28a745 !important;
-  border-left: 4px solid #1e7e34 !important;
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%) !important;
+  border-left: 4px solid #047857 !important;
 }
 
 .toast-error {
-  background-color: #dc3545 !important;
-  border-left: 4px solid #c82333 !important;
+  background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%) !important;
+  border-left: 4px solid #b91c1c !important;
 }
 
 .toast-info {
-  background-color: #17a2b8 !important;
-  border-left: 4px solid #138496 !important;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%) !important;
+  border-left: 4px solid var(--primary-800) !important;
 }
 
 .toast-warning {
-  background-color: #ffc107 !important;
-  color: #212529 !important;
-  border-left: 4px solid #e0a800 !important;
+  background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%) !important;
+  color: #ffffff !important;
+  border-left: 4px solid #b45309 !important;
 }
 
-/* Close Button */
 .ngx-toastr .toast-close-button {
   position: absolute !important;
   top: 12px !important;
@@ -140,15 +341,14 @@ body {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  border-radius: var(--radius-sm) !important;
 }
 
 .ngx-toastr .toast-close-button:hover {
   opacity: 1 !important;
   background-color: rgba(255, 255, 255, 0.1) !important;
-  border-radius: 2px !important;
 }
 
-/* Progress Bar */
 .toast-progress {
   position: absolute !important;
   bottom: 0 !important;
@@ -156,10 +356,9 @@ body {
   right: 0 !important;
   height: 3px !important;
   background-color: rgba(255, 255, 255, 0.7) !important;
-  border-radius: 0 0 8px 8px !important;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
 }
 
-/* Container */
 #toast-container {
   position: fixed !important;
   top: 20px !important;
@@ -174,7 +373,7 @@ body {
   margin-bottom: 8px !important;
 }
 
-/* Mobile Optimierungen */
+// Mobile Optimizations
 @media (max-width: 768px) {
   .ngx-toastr {
     width: calc(100vw - 40px) !important;
@@ -202,93 +401,62 @@ body {
     top: 10px !important;
     right: 10px !important;
     left: 10px !important;
-    max-width: calc(100vw - 20px) !important;
+  }
+}
+
+// Animation Classes
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+// Focus Styles
+*:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+// Modern Loading States
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16);
+  color: var(--gray-600);
+  
+  .loading-spinner {
+    margin-bottom: var(--space-4);
   }
   
-  .ngx-toastr .toast-title {
-    font-size: 14px !important;
-  }
-  
-  .ngx-toastr .toast-message {
-    font-size: 13px !important;
-  }
-}
-
-// Accessibility Verbesserungen
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-// High Contrast Mode Support
-@media (prefers-contrast: high) {
-  .mat-mdc-card {
-    border: 2px solid #000;
-  }
-  
-  .mat-mdc-button {
-    border: 1px solid currentColor;
-  }
-}
-
-// Dark Mode Vorbereitung (falls später implementiert)
-@media (prefers-color-scheme: dark) {
-  // Hier können später Dark Mode Styles hinzugefügt werden
-}
-
-// Print Styles
-@media print {
-  .mat-toolbar,
-  .mat-fab,
-  .mat-mini-fab,
-  button {
-    display: none !important;
-  }
-  
-  .mat-card {
-    box-shadow: none !important;
-    border: 1px solid #ccc !important;
-  }
-}
-
-// Fix für mat-card-title Lesbarkeit
-mat-card-title {
-  color: #333 !important;
-  font-weight: 500 !important;
-}
-
-mat-card-subtitle {
-  color: #666 !important;
-}
-
-// Zusätzliche Card-Header Fixes
-.mat-mdc-card-header {
-  .mat-mdc-card-title {
-    color: #333 !important;
-    font-weight: 500 !important;
-  }
-  
-  .mat-mdc-card-subtitle {
-    color: #666 !important;
-  }
-}
-
-// Spezifische Fixes für verschiedene Komponenten
-.filter-card,
-.categories-card,
-.items-card,
-.stat-card,
-.overview-card,
-.actions-card,
-.warning-card {
-  mat-card-title {
-    color: #333 !important;
-  }
-  
-  mat-card-subtitle {
-    color: #666 !important;
+  .loading-text {
+    font-size: var(--text-sm);
+    font-weight: 500;
   }
 }

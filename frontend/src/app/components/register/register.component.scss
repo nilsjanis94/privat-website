@@ -1,38 +1,236 @@
+// === MODERNE REGISTER STYLES ===
 .register-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 64px);
-  padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: var(--space-6);
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-600) 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="white" opacity="0.1"/><circle cx="40" cy="80" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+    z-index: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--space-4);
+  }
+
+  @media (max-width: 480px) {
+    padding: var(--space-3);
+    align-items: flex-start;
+    padding-top: var(--space-8);
+  }
 }
 
 .register-card {
   width: 100%;
   max-width: 500px;
-  padding: 2rem;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+
+  mat-card-header {
+    text-align: center;
+    padding: var(--space-8) var(--space-6) var(--space-6) var(--space-6);
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+
+    mat-card-title {
+      color: var(--gray-900) !important;
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+
+      &::before {
+        content: '';
+        width: 4px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-600) 100%);
+        border-radius: 2px;
+      }
+
+      @media (max-width: 768px) {
+        font-size: var(--text-xl);
+      }
+    }
+
+    mat-card-subtitle {
+      color: var(--gray-600) !important;
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+  }
+
+  mat-card-content {
+    padding: var(--space-6) !important;
+
+    @media (max-width: 768px) {
+      padding: var(--space-4) !important;
+    }
+  }
+
+  mat-card-actions {
+    padding: 0 var(--space-6) var(--space-6) var(--space-6) !important;
+    text-align: center;
+
+    @media (max-width: 768px) {
+      padding: 0 var(--space-4) var(--space-4) var(--space-4) !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
 }
 
+// === FORM FIELDS ===
 .full-width {
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  ::ng-deep .mat-mdc-form-field-outline {
+    border-radius: var(--radius) !important;
+  }
+
+  ::ng-deep .mat-mdc-form-field-focus-overlay {
+    border-radius: var(--radius) !important;
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    border-radius: var(--radius) !important;
+  }
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    margin-top: var(--space-2);
+  }
+
+  // Error styles
+  ::ng-deep .mat-mdc-form-field.mat-form-field-invalid {
+    .mat-mdc-form-field-outline-thick {
+      border-color: var(--error) !important;
+    }
+  }
+
+  ::ng-deep .mat-mdc-form-field-error {
+    color: var(--error) !important;
+    font-size: var(--text-xs) !important;
+    font-weight: 500 !important;
+  }
 }
 
 .name-row {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
 }
 
 .half-width {
   flex: 1;
+
+  ::ng-deep .mat-mdc-form-field-outline {
+    border-radius: var(--radius) !important;
+  }
+
+  ::ng-deep .mat-mdc-form-field-focus-overlay {
+    border-radius: var(--radius) !important;
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    border-radius: var(--radius) !important;
+  }
+
+  // Error styles
+  ::ng-deep .mat-mdc-form-field.mat-form-field-invalid {
+    .mat-mdc-form-field-outline-thick {
+      border-color: var(--error) !important;
+    }
+  }
+
+  ::ng-deep .mat-mdc-form-field-error {
+    color: var(--error) !important;
+    font-size: var(--text-xs) !important;
+    font-weight: 500 !important;
+  }
 }
 
-mat-card-actions {
-  text-align: center;
-  padding-top: 1rem;
+// === BUTTONS ===
+::ng-deep .mat-mdc-raised-button {
+  width: 100%;
+  padding: var(--space-3) var(--space-6) !important;
+  border-radius: var(--radius) !important;
+  font-weight: 600 !important;
+  font-size: var(--text-base) !important;
+  transition: all 0.3s ease !important;
+
+  &.mat-primary {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%) !important;
+    color: white !important;
+    box-shadow: var(--shadow) !important;
+
+    &:hover {
+      background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-800) 100%) !important;
+      transform: translateY(-2px) !important;
+      box-shadow: var(--shadow-md) !important;
+    }
+
+    &:disabled {
+      background: var(--gray-300) !important;
+      color: var(--gray-600) !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--space-3) var(--space-4) !important;
+    font-size: var(--text-sm) !important;
+  }
 }
 
+// === LOADING SPINNER ===
 mat-spinner {
-  margin-right: 0.5rem;
+  margin-right: var(--space-2);
+  
+  ::ng-deep circle {
+    stroke: white !important;
+  }
+}
+
+// === RESPONSIVE IMPROVEMENTS ===
+@media (max-width: 480px) {
+  .register-card {
+    border-radius: var(--radius-lg);
+    
+    mat-card-header {
+      padding: var(--space-6) var(--space-4) var(--space-4) var(--space-4);
+    }
+  }
 }

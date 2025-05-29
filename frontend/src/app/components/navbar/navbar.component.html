@@ -1,1 +1,103 @@
-<p>navbar works!</p>
+<nav class="modern-navbar">
+  <div class="navbar-container">
+    <!-- Logo/Brand -->
+    <div class="brand">
+      <div class="brand-icon">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <div class="brand-text">
+        <h3>Inventar</h3>
+        <span class="brand-subtitle">System</span>
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="nav-links" [class.nav-open]="isMenuOpen">
+      <a routerLink="/dashboard" 
+         routerLinkActive="active"
+         class="nav-link"
+         (click)="closeMenu()">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      
+      <a routerLink="/inventory" 
+         routerLinkActive="active"
+         class="nav-link"
+         (click)="closeMenu()">
+        <mat-icon>inventory</mat-icon>
+        <span>Inventar</span>
+      </a>
+      
+      <a routerLink="/statistics" 
+         routerLinkActive="active"
+         class="nav-link"
+         (click)="closeMenu()">
+        <mat-icon>analytics</mat-icon>
+        <span>Statistiken</span>
+      </a>
+    </div>
+
+    <!-- User Menu -->
+    <div class="user-menu" *ngIf="currentUser$ | async as user">
+      <button mat-button [matMenuTriggerFor]="userDropdown" class="user-button">
+        <div class="user-avatar">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+          <span class="user-email">{{ user.email }}</span>
+        </div>
+        <mat-icon>expand_more</mat-icon>
+      </button>
+      
+      <mat-menu #userDropdown="matMenu" class="user-dropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-user-info">
+            <div class="dropdown-avatar">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div>
+              <div class="dropdown-name">{{ user.first_name }} {{ user.last_name }}</div>
+              <div class="dropdown-email">{{ user.email }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <mat-divider></mat-divider>
+        
+        <button mat-menu-item disabled>
+          <mat-icon>settings</mat-icon>
+          <span>Einstellungen</span>
+          <span class="coming-soon">Bald verfügbar</span>
+        </button>
+        
+        <button mat-menu-item disabled>
+          <mat-icon>help</mat-icon>
+          <span>Hilfe</span>
+          <span class="coming-soon">Bald verfügbar</span>
+        </button>
+        
+        <mat-divider></mat-divider>
+        
+        <button mat-menu-item (click)="logout()" class="logout-item">
+          <mat-icon>logout</mat-icon>
+          <span>Abmelden</span>
+        </button>
+      </mat-menu>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button mat-icon-button 
+            class="mobile-menu-btn"
+            (click)="toggleMenu()"
+            [attr.aria-label]="isMenuOpen ? 'Menü schließen' : 'Menü öffnen'">
+      <mat-icon>{{ isMenuOpen ? 'close' : 'menu' }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay" 
+       [class.active]="isMenuOpen"
+       (click)="closeMenu()"></div>
+</nav>

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule, MatDialog } from '@angular/material/dialog';
@@ -36,7 +36,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     MatProgressSpinnerModule
   ],
   templateUrl: './item-form.component.html',
-  styleUrls: ['./item-form.component.scss']
+  styleUrls: ['./item-form.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ItemFormComponent {
   itemForm: FormGroup;

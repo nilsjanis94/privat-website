@@ -187,136 +187,167 @@
     }
   }
 
-  // User Menu
-  .user-menu {
-    // Komplett ausblenden für mobile Geräte
-    @media (max-width: 768px) {
-      display: none;
-    }
+  // Right Side Actions Container
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
 
-    .user-button {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--gray-200);
-      background: var(--surface);
+    // Theme Toggle Button
+    .theme-toggle-btn {
+      color: var(--text-secondary);
       transition: all 0.2s ease;
-      min-width: 0;
-      max-width: 280px;
-
-      @media (max-width: 1200px) {
-        max-width: 220px;
-      }
-
-      @media (max-width: 1024px) {
-        gap: var(--space-2);
-        padding: var(--space-2);
-        max-width: 180px;
-      }
-
+      border-radius: var(--radius);
+      
       &:hover {
-        border-color: var(--gray-300);
-        box-shadow: var(--shadow);
+        background: var(--surface-variant);
+        color: var(--primary-600);
         transform: translateY(-1px);
       }
 
-      .user-avatar {
+      @media (max-width: 768px) {
+        display: none;
+      }
+    }
+
+    // User Menu
+    .user-menu {
+      // Komplett ausblenden für mobile Geräte
+      @media (max-width: 768px) {
+        display: none;
+      }
+
+      .user-button {
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-600) 100%);
-        color: white;
-        flex-shrink: 0;
-        box-shadow: var(--shadow-sm);
-
-        .avatar-initials {
-          font-size: 14px;
-          font-weight: 600;
-          line-height: 1;
-          text-transform: uppercase;
-        }
-      }
-
-      .user-info {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-primary);
+        background: var(--surface);
+        transition: all 0.2s ease;
         min-width: 0;
-        flex: 1;
-        overflow: hidden;
+        max-width: 280px;
 
-        .user-name {
-          font-size: var(--text-sm);
-          font-weight: 600;
-          color: var(--gray-900);
-          line-height: 1.2;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          width: 100%;
+        @media (max-width: 1200px) {
+          max-width: 220px;
+        }
+
+        @media (max-width: 1024px) {
+          gap: var(--space-2);
+          padding: var(--space-2);
           max-width: 180px;
-          
-          @media (max-width: 1200px) {
-            max-width: 140px;
-          }
-          
-          @media (max-width: 1024px) {
-            max-width: 100px;
+        }
+
+        &:hover {
+          border-color: var(--border-secondary);
+          box-shadow: var(--shadow);
+          transform: translateY(-1px);
+        }
+
+        .user-avatar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-600) 100%);
+          color: white;
+          flex-shrink: 0;
+          box-shadow: var(--shadow-sm);
+
+          .avatar-initials {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            text-transform: uppercase;
           }
         }
 
-        .user-email {
-          font-size: var(--text-xs);
-          color: var(--gray-600);
-          line-height: 1.2;
-          white-space: nowrap;
+        .user-info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          min-width: 0;
+          flex: 1;
           overflow: hidden;
-          text-overflow: ellipsis;
-          width: 100%;
-          max-width: 180px;
-          
-          @media (max-width: 1200px) {
-            max-width: 140px;
+
+          .user-name {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            max-width: 180px;
+            
+            @media (max-width: 1200px) {
+              max-width: 140px;
+            }
+            
+            @media (max-width: 1024px) {
+              max-width: 100px;
+            }
           }
-          
-          @media (max-width: 1024px) {
-            max-width: 100px;
+
+          .user-email {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            max-width: 180px;
+            
+            @media (max-width: 1200px) {
+              max-width: 140px;
+            }
+            
+            @media (max-width: 1024px) {
+              max-width: 100px;
+            }
           }
         }
-      }
 
-      > mat-icon:last-child {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-        color: var(--gray-500);
-        transition: transform 0.2s ease;
-        flex-shrink: 0;
-      }
+        > mat-icon:last-child {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          color: var(--text-muted);
+          transition: transform 0.2s ease;
+          flex-shrink: 0;
+        }
 
-      &[aria-expanded="true"] > mat-icon:last-child {
-        transform: rotate(180deg);
+        &[aria-expanded="true"] > mat-icon:last-child {
+          transform: rotate(180deg);
+        }
       }
     }
-  }
 
-  // Mobile Menu Button
-  .mobile-menu-btn {
-    display: none;
+    // Mobile Menu Button
+    .mobile-menu-btn {
+      display: none;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
 
-    @media (max-width: 768px) {
-      display: flex;
-    }
+      @media (max-width: 768px) {
+        display: flex;
+      }
 
-    mat-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+      &:hover {
+        background: var(--surface-variant);
+        color: var(--primary-600);
+      }
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
     }
   }
 }

@@ -9,6 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { MobileMenuService } from '../../services/mobile-menu.service';
+import { ThemeService, Theme } from '../../services/theme.service';
 
 @Component({
   selector: 'app-navbar',
@@ -29,14 +30,20 @@ import { MobileMenuService } from '../../services/mobile-menu.service';
 export class NavbarComponent implements OnInit {
   currentUser$: Observable<any>;
   isMobileMenuOpen$: Observable<boolean>;
+  currentTheme$: Observable<Theme>;
+  
+  // Theme options für das Dropdown
+  themeOptions: Theme[] = ['light', 'dark', 'auto'];
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private mobileMenuService: MobileMenuService
+    private mobileMenuService: MobileMenuService,
+    private themeService: ThemeService
   ) {
     this.currentUser$ = this.authService.currentUser$;
     this.isMobileMenuOpen$ = this.mobileMenuService.isOpen$;
+    this.currentTheme$ = this.themeService.currentTheme$;
   }
 
   ngOnInit(): void {}
@@ -68,5 +75,22 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/dashboard']);
     // Mobile Menu schließen falls offen
     this.closeMobileMenu();
+  }
+
+  // Theme Management
+  setTheme(theme: Theme): void {
+    this.themeService.setTheme(theme);
+  }
+
+  getThemeIcon(theme?: Theme): string {
+    return this.themeService.getThemeIcon(theme);
+  }
+
+  getThemeLabel(theme?: Theme): string {
+    return this.themeService.getThemeLabel(theme);
+  }
+
+  get isDarkMode(): boolean {
+    return this.themeService.isDarkMode;
   }
 }

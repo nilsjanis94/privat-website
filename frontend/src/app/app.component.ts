@@ -6,6 +6,7 @@ import { Observable, map, filter, startWith } from 'rxjs';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MobileMenuService } from './services/mobile-menu.service';
 import { AuthService } from './services/auth.service';
+import { ThemeService, Theme } from './services/theme.service';
 import { routeAnimations } from './animations/route-animations';
 
 @Component({
@@ -22,14 +23,20 @@ export class AppComponent {
   isMobileMenuOpen$: Observable<boolean>;
   currentUser$: Observable<any>;
   showNavbar$: Observable<boolean>;
+  currentTheme$: Observable<Theme>;
+  
+  // Theme options für das Mobile Menu
+  themeOptions: Theme[] = ['light', 'dark', 'auto'];
 
   constructor(
     private mobileMenuService: MobileMenuService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private themeService: ThemeService
   ) {
     this.isMobileMenuOpen$ = this.mobileMenuService.isOpen$;
     this.currentUser$ = this.authService.currentUser$;
+    this.currentTheme$ = this.themeService.currentTheme$;
     
     // Navbar nur anzeigen wenn nicht auf Auth-Seiten
     this.showNavbar$ = this.router.events.pipe(
@@ -59,5 +66,22 @@ export class AppComponent {
   logout(): void {
     this.authService.logout();
     this.closeMobileMenu();
+  }
+
+  // Theme Management für Mobile Menu
+  setTheme(theme: Theme): void {
+    this.themeService.setTheme(theme);
+  }
+
+  getThemeIcon(theme?: Theme): string {
+    return this.themeService.getThemeIcon(theme);
+  }
+
+  getThemeLabel(theme?: Theme): string {
+    return this.themeService.getThemeLabel(theme);
+  }
+
+  get isDarkMode(): boolean {
+    return this.themeService.isDarkMode;
   }
 }

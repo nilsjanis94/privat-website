@@ -35,56 +35,103 @@
       </a>
     </div>
 
-    <!-- User Menu (nur Desktop) -->
-    <div class="user-menu" *ngIf="currentUser$ | async as user">
-      <button mat-button [matMenuTriggerFor]="userDropdown" class="user-button">
-        <div class="user-avatar">
-          <span class="avatar-initials">{{ getInitials(user.first_name, user.last_name) }}</span>
-        </div>
+    <!-- Right Side Actions -->
+    <div class="navbar-actions">
+      <!-- Theme Toggle (Desktop) -->
+      <button mat-icon-button 
+              class="theme-toggle-btn"
+              [matMenuTriggerFor]="themeMenu"
+              [title]="'Theme: ' + getThemeLabel()">
+        <mat-icon>{{ getThemeIcon() }}</mat-icon>
       </button>
-      
-      <mat-menu #userDropdown="matMenu" class="user-dropdown">
-        <div class="dropdown-header">
-          <div class="dropdown-user-info">
-            <div class="dropdown-avatar">
-              <span class="dropdown-initials">{{ getInitials(user.first_name, user.last_name) }}</span>
-            </div>
-            <div class="dropdown-text-info">
-              <div class="dropdown-name">{{ user.first_name }} {{ user.last_name }}</div>
-              <div class="dropdown-email">{{ user.email }}</div>
-            </div>
-          </div>
+
+      <!-- Theme Menu -->
+      <mat-menu #themeMenu="matMenu" class="theme-menu">
+        <div class="theme-menu-header">
+          <mat-icon>palette</mat-icon>
+          <span>Design auswählen</span>
         </div>
-        
         <mat-divider></mat-divider>
         
-        <button mat-menu-item disabled>
-          <mat-icon>settings</mat-icon>
-          <span>Einstellungen</span>
-          <span class="coming-soon">Bald verfügbar</span>
-        </button>
-        
-        <button mat-menu-item disabled>
-          <mat-icon>help</mat-icon>
-          <span>Hilfe</span>
-          <span class="coming-soon">Bald verfügbar</span>
-        </button>
-        
-        <mat-divider></mat-divider>
-        
-        <button mat-menu-item (click)="logout()" class="logout-item">
-          <mat-icon>logout</mat-icon>
-          <span>Abmelden</span>
+        <button mat-menu-item 
+                *ngFor="let theme of themeOptions"
+                (click)="setTheme(theme)"
+                [class.active]="(currentTheme$ | async) === theme">
+          <mat-icon>{{ getThemeIcon(theme) }}</mat-icon>
+          <span>{{ getThemeLabel(theme) }}</span>
+          <mat-icon *ngIf="(currentTheme$ | async) === theme" class="check-icon">check</mat-icon>
         </button>
       </mat-menu>
-    </div>
 
-    <!-- Mobile Menu Button -->
-    <button mat-icon-button 
-            class="mobile-menu-btn"
-            (click)="toggleMobileMenu()"
-            [attr.aria-label]="(isMobileMenuOpen$ | async) ? 'Menü schließen' : 'Menü öffnen'">
-      <mat-icon>{{ (isMobileMenuOpen$ | async) ? 'close' : 'menu' }}</mat-icon>
-    </button>
+      <!-- User Menu (nur Desktop) -->
+      <div class="user-menu" *ngIf="currentUser$ | async as user">
+        <button mat-button [matMenuTriggerFor]="userDropdown" class="user-button">
+          <div class="user-avatar">
+            <span class="avatar-initials">{{ getInitials(user.first_name, user.last_name) }}</span>
+          </div>
+        </button>
+        
+        <mat-menu #userDropdown="matMenu" class="user-dropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-user-info">
+              <div class="dropdown-avatar">
+                <span class="dropdown-initials">{{ getInitials(user.first_name, user.last_name) }}</span>
+              </div>
+              <div class="dropdown-text-info">
+                <div class="dropdown-name">{{ user.first_name }} {{ user.last_name }}</div>
+                <div class="dropdown-email">{{ user.email }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <mat-divider></mat-divider>
+          
+          <!-- Theme Options im User Menu -->
+          <button mat-menu-item [matMenuTriggerFor]="themeSubmenu">
+            <mat-icon>{{ getThemeIcon() }}</mat-icon>
+            <span>Design</span>
+            <span class="theme-indicator">{{ getThemeLabel() }}</span>
+          </button>
+          
+          <mat-menu #themeSubmenu="matMenu" class="theme-submenu">
+            <button mat-menu-item 
+                    *ngFor="let theme of themeOptions"
+                    (click)="setTheme(theme)"
+                    [class.active]="(currentTheme$ | async) === theme">
+              <mat-icon>{{ getThemeIcon(theme) }}</mat-icon>
+              <span>{{ getThemeLabel(theme) }}</span>
+              <mat-icon *ngIf="(currentTheme$ | async) === theme" class="check-icon">check</mat-icon>
+            </button>
+          </mat-menu>
+          
+          <button mat-menu-item disabled>
+            <mat-icon>settings</mat-icon>
+            <span>Einstellungen</span>
+            <span class="coming-soon">Bald verfügbar</span>
+          </button>
+          
+          <button mat-menu-item disabled>
+            <mat-icon>help</mat-icon>
+            <span>Hilfe</span>
+            <span class="coming-soon">Bald verfügbar</span>
+          </button>
+          
+          <mat-divider></mat-divider>
+          
+          <button mat-menu-item (click)="logout()" class="logout-item">
+            <mat-icon>logout</mat-icon>
+            <span>Abmelden</span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button mat-icon-button 
+              class="mobile-menu-btn"
+              (click)="toggleMobileMenu()"
+              [attr.aria-label]="(isMobileMenuOpen$ | async) ? 'Menü schließen' : 'Menü öffnen'">
+        <mat-icon>{{ (isMobileMenuOpen$ | async) ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
   </div>
 </nav>

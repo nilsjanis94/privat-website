@@ -11,6 +11,7 @@
 <!-- Mobile Menu Portal -->
 <div class="mobile-menu-portal" [class.active]="isMobileMenuOpen$ | async" *ngIf="showNavbar$ | async">
   <div class="mobile-nav-content">
+    <!-- Navigation Links -->
     <a routerLink="/dashboard" 
        routerLinkActive="active"
        class="mobile-nav-link"
@@ -35,6 +36,27 @@
       <span>Statistiken</span>
     </a>
 
+    <!-- Theme Section -->
+    <div class="mobile-theme-section">
+      <div class="mobile-section-header">
+        <mat-icon>palette</mat-icon>
+        <span>Design</span>
+        <span class="current-theme-indicator">{{ getThemeLabel() }}</span>
+      </div>
+      
+      <div class="mobile-theme-options">
+        <button *ngFor="let theme of themeOptions"
+                class="mobile-theme-btn"
+                [class.active]="(currentTheme$ | async) === theme"
+                (click)="setTheme(theme)">
+          <mat-icon>{{ getThemeIcon(theme) }}</mat-icon>
+          <span>{{ getThemeLabel(theme) }}</span>
+          <mat-icon *ngIf="(currentTheme$ | async) === theme" class="check-icon">check</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- User Section -->
     <div class="mobile-user-section" *ngIf="currentUser$ | async as user">
       <div class="mobile-user-info">
         <div class="mobile-user-avatar">

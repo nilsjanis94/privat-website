@@ -161,53 +161,103 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
         datasets: [{
           label: `Ausgaben (€) - ${this.selectedPeriod}`,
           data: data,
-          borderColor: '#3f51b5',
-          backgroundColor: 'rgba(63, 81, 181, 0.1)',
-          borderWidth: 2,
+          borderColor: '#8b5cf6', // Primary Purple
+          backgroundColor: 'rgba(139, 92, 246, 0.1)', // Primary Purple with low opacity
+          borderWidth: 3,
           fill: true,
-          tension: 0.3,
-          pointBackgroundColor: '#3f51b5',
+          tension: 0.4,
+          pointBackgroundColor: '#8b5cf6', // Primary Purple
           pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6
+          pointBorderWidth: 3,
+          pointRadius: 5,
+          pointHoverRadius: 8,
+          pointHoverBackgroundColor: '#7c3aed', // Primary 600
+          pointHoverBorderColor: '#ffffff',
+          pointHoverBorderWidth: 3
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         animation: {
-          duration: 0
+          duration: 1200,
+          easing: 'easeOutQuart'
         },
         plugins: {
           legend: {
             display: true,
-            position: 'top'
+            position: 'top',
+            labels: {
+              color: '#374151',
+              font: {
+                size: 13,
+                family: 'Inter, system-ui, sans-serif',
+                weight: 600
+              },
+              usePointStyle: true,
+              padding: 20
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#8b5cf6',
+            borderWidth: 2,
+            cornerRadius: 12,
+            titleFont: {
+              size: 14,
+              family: 'Inter, system-ui, sans-serif',
+              weight: 600
+            },
+            bodyFont: {
+              size: 13,
+              family: 'Inter, system-ui, sans-serif'
+            },
+            callbacks: {
+              label: (context) => {
+                return `Ausgaben: ${context.parsed.y.toFixed(2)}€`;
+              }
+            }
           }
         },
         scales: {
           x: {
             grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
+              color: 'rgba(139, 92, 246, 0.1)',
+              lineWidth: 1
             },
             ticks: {
-              color: '#666',
-              font: { size: 11 }
+              color: '#6b7280',
+              font: { 
+                size: 11,
+                family: 'Inter, system-ui, sans-serif',
+                weight: 500
+              }
             }
           },
           y: {
             beginAtZero: true,
             grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
+              color: 'rgba(139, 92, 246, 0.1)',
+              lineWidth: 1
             },
             ticks: {
-              color: '#666',
-              font: { size: 11 },
+              color: '#6b7280',
+              font: { 
+                size: 11,
+                family: 'Inter, system-ui, sans-serif',
+                weight: 500
+              },
               callback: function(value) {
                 return value + '€';
               }
             }
           }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
         }
       }
     });

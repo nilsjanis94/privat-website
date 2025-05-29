@@ -1,87 +1,123 @@
+// === MODERNE EXPENSES CHART STYLES ===
 .expenses-chart-card {
-  margin: 1rem 0;
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow);
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-300);
+  }
+
   mat-card-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    padding: 1.5rem;
-    
+    padding: var(--space-6) var(--space-6) var(--space-4) var(--space-6) !important;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+
     mat-card-title {
+      color: var(--gray-900) !important;
+      font-size: var(--text-xl) !important;
+      font-weight: 700 !important;
+      margin-bottom: var(--space-2) !important;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: #333;
-      margin: 0;
-      
+      gap: var(--space-2);
+
+      &::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-600) 100%);
+        border-radius: 2px;
+      }
+
       mat-icon {
-        color: #3f51b5;
-        font-size: 1.4rem;
+        color: var(--primary-600);
+        margin-right: var(--space-1);
       }
     }
-    
+
     mat-card-subtitle {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #666;
+      color: var(--gray-600) !important;
+      font-size: var(--text-sm) !important;
       font-weight: 500;
+      margin-top: var(--space-1);
     }
   }
-  
+
   mat-card-content {
-    padding: 1.5rem;
+    padding: var(--space-6) !important;
+
+    @media (max-width: 768px) {
+      padding: var(--space-4) !important;
+    }
   }
 }
 
 .period-selector {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
   display: flex;
   justify-content: center;
-  
+
   mat-button-toggle-group {
-    border-radius: 8px;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-300);
     overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
+    box-shadow: var(--shadow-sm);
+
     mat-button-toggle {
-      padding: 0.5rem 1rem;
-      font-weight: 600;
-      font-size: 0.9rem;
       border: none !important;
-      min-width: 50px;
-      
-      &.mat-button-toggle-checked {
-        background-color: #3f51b5 !important;
-        color: white !important;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+      color: var(--gray-700);
+      background: var(--surface);
+      font-weight: 500;
+      font-size: var(--text-sm);
+      padding: var(--space-2) var(--space-4);
+      transition: all 0.3s ease;
+
+      &:hover:not(.mat-button-toggle-checked) {
+        background: var(--gray-50);
+        color: var(--primary-600);
       }
-      
-      &:not(.mat-button-toggle-checked) {
-        background-color: #f5f5f5;
-        color: #666;
-        
-        &:hover {
-          background-color: #e0e0e0;
-          color: #333;
-        }
+
+      &.mat-button-toggle-checked {
+        background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+        color: white;
+        font-weight: 600;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: var(--space-4);
+
+    mat-button-toggle-group {
+      mat-button-toggle {
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--text-xs);
       }
     }
   }
 }
 
 .chart-container {
-  height: 400px;
-  margin: 1rem 0;
-  position: relative;
-  background: #fafafa;
-  border-radius: 8px;
-  padding: 1rem;
-  
+  margin: var(--space-6) 0;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  border: 1px solid var(--gray-200);
+
   canvas {
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (max-width: 768px) {
+    margin: var(--space-4) 0;
+    padding: var(--space-3);
   }
 }
 
@@ -91,17 +127,20 @@
   align-items: center;
   justify-content: center;
   height: 400px;
-  gap: 1rem;
-  color: #666;
-  background: #fafafa;
-  border-radius: 8px;
+  gap: var(--space-4);
+  color: var(--gray-600);
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
   
   mat-spinner {
-    margin-bottom: 0.5rem;
+    ::ng-deep circle {
+      stroke: var(--primary-600) !important;
+    }
   }
   
   span {
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     font-weight: 500;
   }
 }
@@ -112,57 +151,87 @@
   align-items: center;
   justify-content: center;
   height: 400px;
-  gap: 1rem;
-  color: #999;
-  background: #fafafa;
-  border-radius: 8px;
+  gap: var(--space-4);
+  color: var(--gray-500);
+  background: var(--gray-50);
+  border-radius: var(--radius);
   text-align: center;
+  border: 1px solid var(--gray-200);
   
   mat-icon {
     font-size: 4rem;
     width: 4rem;
     height: 4rem;
-    color: #ccc;
+    color: var(--gray-400);
   }
   
   h3 {
     margin: 0;
-    font-size: 1.2rem;
-    color: #666;
+    font-size: var(--text-lg);
+    color: var(--gray-600);
+    font-weight: 600;
   }
   
   p {
     margin: 0;
-    font-size: 0.9rem;
-    color: #999;
+    font-size: var(--text-sm);
+    color: var(--gray-500);
+    line-height: 1.5;
   }
 }
 
 .chart-stats {
   display: flex;
   justify-content: space-around;
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: linear-gradient(135deg, var(--primary-50) 0%, var(--accent-50) 100%);
+  border-radius: var(--radius);
+  border: 1px solid var(--primary-200);
   
   .stat-item {
     text-align: center;
     
     .label {
       display: block;
-      font-size: 0.8rem;
-      color: #666;
-      margin-bottom: 0.25rem;
-      font-weight: 500;
+      font-size: var(--text-xs);
+      color: var(--gray-600);
+      margin-bottom: var(--space-1);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
     .value {
       display: block;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #3f51b5;
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--primary-700);
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-top: var(--space-4);
+    padding: var(--space-3);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+
+    .stat-item {
+      flex: 1;
+      min-width: 120px;
+
+      .value {
+        font-size: var(--text-base);
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: var(--space-2);
+
+    .stat-item {
+      min-width: unset;
     }
   }
 }
@@ -170,87 +239,28 @@
 // Mobile Responsivität
 @media (max-width: 768px) {
   .expenses-chart-card {
-    margin: 0.5rem 0;
-    
     mat-card-header {
-      padding: 1rem;
-      
-      mat-card-title {
-        font-size: 1.1rem;
-      }
-      
-      mat-card-subtitle {
-        font-size: 0.8rem;
-      }
-    }
-    
-    mat-card-content {
-      padding: 1rem;
-    }
-  }
+      padding: var(--space-5) var(--space-5) var(--space-3) var(--space-5) !important;
 
-  .period-selector {
-    mat-button-toggle-group {
-      mat-button-toggle {
-        padding: 0.4rem 0.6rem;
-        font-size: 0.8rem;
-        min-width: 40px;
-      }
-    }
-  }
-  
-  .chart-container {
-    height: 300px;
-    padding: 0.5rem;
-  }
-  
-  .loading-container,
-  .no-data-container {
-    height: 300px;
-  }
-  
-  .chart-stats {
-    flex-direction: column;
-    gap: 0.5rem;
-    
-    .stat-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #e9ecef;
-      
-      &:last-child {
-        border-bottom: none;
-      }
-      
-      .label, .value {
-        display: inline;
-      }
-      
-      .label {
-        margin-bottom: 0;
+      mat-card-title {
+        font-size: var(--text-lg) !important;
       }
     }
   }
 }
 
 @media (max-width: 480px) {
-  .period-selector {
-    mat-button-toggle-group {
-      width: 100%;
-      
-      mat-button-toggle {
-        flex: 1;
-        padding: 0.4rem 0.3rem;
-        font-size: 0.75rem;
-        min-width: auto;
+  .expenses-chart-card {
+    mat-card-header {
+      padding: var(--space-4) var(--space-4) var(--space-2) var(--space-4) !important;
+
+      mat-card-title {
+        font-size: var(--text-base) !important;
+      }
+
+      mat-card-subtitle {
+        font-size: var(--text-xs) !important;
       }
     }
-  }
-  
-  .chart-container {
-    height: 250px;
-    margin: 0.5rem 0;
   }
 }

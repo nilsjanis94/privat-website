@@ -24,45 +24,78 @@ Chart.register(...registerables, ChartDataLabels);
 export class DashboardChartsComponent implements OnInit, OnChanges {
   @Input() stats: DashboardStats | null = null;
 
-  // Kategorien Donut Chart
+  // Kategorien Donut Chart - MODERN PURPLE DESIGN
   categoryChartData: ChartData<'doughnut'> = {
     labels: [],
     datasets: [{
       data: [],
       backgroundColor: [
-        '#3f51b5', '#4caf50', '#ff9800', '#f44336', '#9c27b0',
-        '#2196f3', '#795548', '#607d8b', '#e91e63', '#00bcd4'
+        // Lila-Pink Gradient Palette
+        '#8b5cf6', // Primary Purple
+        '#c026d3', // Accent Pink-Purple  
+        '#7c3aed', // Primary 600
+        '#a855f7', // Primary 500
+        '#d946ef', // Accent 500
+        '#f0abfc', // Accent 300
+        '#ddd6fe', // Primary 200
+        '#e879f9', // Accent 400
+        '#9333ea', // Primary 700
+        '#be185d', // Rose 700 for contrast
       ],
       borderWidth: 3,
-      borderColor: '#fff',
-      hoverBorderWidth: 4
+      borderColor: '#ffffff',
+      hoverBorderWidth: 4,
+      hoverBackgroundColor: [
+        '#7c3aed', // Darker versions on hover
+        '#a21caf',
+        '#6d28d9',
+        '#9333ea',
+        '#c026d3',
+        '#e879f9',
+        '#c4b5fd',
+        '#f0abfc',
+        '#7e22ce',
+        '#9f1239',
+      ]
     }]
   };
 
   categoryChartOptions: ChartConfiguration<'doughnut'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: '60%', // Macht es zu einem modernen Donut
+    cutout: '65%', // Moderner Donut-Stil
     plugins: {
       legend: {
         position: 'bottom',
         labels: {
-          padding: 20,
+          padding: 24,
           usePointStyle: true,
           font: {
-            size: 13,
-            family: 'Inter, system-ui, sans-serif'
+            size: 14,
+            family: 'Inter, system-ui, sans-serif',
+            weight: 500
           },
-          color: '#374151'
+          color: '#374151',
+          boxWidth: 12,
+          boxHeight: 12
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
-        borderColor: '#374151',
-        borderWidth: 1,
-        cornerRadius: 8,
+        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        borderColor: '#8b5cf6',
+        borderWidth: 2,
+        cornerRadius: 12,
+        titleFont: {
+          size: 14,
+          family: 'Inter, system-ui, sans-serif',
+          weight: 600
+        },
+        bodyFont: {
+          size: 13,
+          family: 'Inter, system-ui, sans-serif'
+        },
         callbacks: {
           label: (context) => {
             const label = context.label || '';
@@ -75,18 +108,18 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
       },
       datalabels: {
         display: true,
-        color: '#fff',
+        color: '#ffffff',
         font: {
           weight: 'bold',
-          size: 14,
+          size: 13,
           family: 'Inter, system-ui, sans-serif'
         },
         formatter: (value: number, context: any) => {
           const total = (context.dataset.data as number[]).reduce((a: number, b: number) => a + b, 0);
           const percentage = ((value / total) * 100).toFixed(1);
           
-          // Nur Prozente über 6% anzeigen für optimale Lesbarkeit
-          if (parseFloat(percentage) >= 6) {
+          // Nur Prozente über 5% anzeigen für optimale Lesbarkeit
+          if (parseFloat(percentage) >= 5) {
             return percentage + '%';
           }
           return '';
@@ -95,8 +128,8 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
         align: 'center',
         offset: 0,
         textAlign: 'center',
-        textStrokeColor: 'rgba(0, 0, 0, 0.3)',
-        textStrokeWidth: 1
+        textStrokeColor: 'rgba(0, 0, 0, 0.4)',
+        textStrokeWidth: 2
       }
     },
     interaction: {
@@ -106,24 +139,24 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
     animation: {
       animateRotate: true,
       animateScale: true,
-      duration: 1000,
+      duration: 1200,
       easing: 'easeOutQuart'
     }
   };
 
-  // Monatliche Ausgaben Bar Chart - MODERNISIERT
+  // Monatliche Ausgaben Bar Chart - MODERN PURPLE DESIGN
   expensesChartData: ChartData<'bar'> = {
     labels: [],
     datasets: [{
       label: 'Ausgaben (€)',
       data: [],
-      backgroundColor: 'rgba(244, 67, 54, 0.8)',
-      borderColor: '#d32f2f',
+      backgroundColor: 'rgba(139, 92, 246, 0.8)', // Primary Purple
+      borderColor: '#7c3aed', // Primary 600
       borderWidth: 2,
       borderRadius: 8,
       borderSkipped: false,
-      hoverBackgroundColor: 'rgba(244, 67, 54, 0.9)',
-      hoverBorderColor: '#b71c1c',
+      hoverBackgroundColor: 'rgba(124, 58, 237, 0.9)', // Primary 600 with opacity
+      hoverBorderColor: '#6d28d9', // Primary 700
       hoverBorderWidth: 3
     }]
   };
@@ -144,12 +177,21 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
-        borderColor: '#374151',
-        borderWidth: 1,
-        cornerRadius: 8,
+        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+        titleColor: '#ffffff',
+        bodyColor: '#ffffff',
+        borderColor: '#8b5cf6',
+        borderWidth: 2,
+        cornerRadius: 12,
+        titleFont: {
+          size: 14,
+          family: 'Inter, system-ui, sans-serif',
+          weight: 600
+        },
+        bodyFont: {
+          size: 13,
+          family: 'Inter, system-ui, sans-serif'
+        },
         callbacks: {
           label: (context) => {
             return `Ausgaben: ${context.parsed.y.toFixed(2)}€`;
@@ -165,8 +207,8 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
           family: 'Inter, system-ui, sans-serif'
         },
         formatter: (value: number) => {
-          // Nur Werte über 10€ anzeigen für bessere Lesbarkeit
-          if (value >= 10) {
+          // Nur Werte über 5€ anzeigen für bessere Lesbarkeit
+          if (value >= 5) {
             return value.toFixed(0) + '€';
           }
           return '';
@@ -184,10 +226,11 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
           display: false
         },
         ticks: {
-          color: '#6B7280',
+          color: '#6b7280',
           font: {
             size: 12,
-            family: 'Inter, system-ui, sans-serif'
+            family: 'Inter, system-ui, sans-serif',
+            weight: 500
           }
         }
       },
@@ -195,14 +238,15 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
         beginAtZero: true,
         suggestedMax: undefined,
         grid: {
-          color: 'rgba(107, 114, 128, 0.1)',
+          color: 'rgba(139, 92, 246, 0.1)', // Purple grid lines
           lineWidth: 1
         },
         ticks: {
-          color: '#6B7280',
+          color: '#6b7280',
           font: {
             size: 12,
-            family: 'Inter, system-ui, sans-serif'
+            family: 'Inter, system-ui, sans-serif',
+            weight: 500
           },
           callback: function(value) {
             return value + '€';
@@ -215,7 +259,7 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
       mode: 'index'
     },
     animation: {
-      duration: 1000,
+      duration: 1200,
       easing: 'easeOutQuart'
     }
   };
@@ -284,7 +328,7 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
       }]
     };
 
-    // Y-Achse dynamisch anpassen - FIX
+    // Y-Achse dynamisch anpassen
     if (this.expensesChartOptions?.scales?.['y']) {
       this.expensesChartOptions.scales['y'].suggestedMax = suggestedMax;
     }

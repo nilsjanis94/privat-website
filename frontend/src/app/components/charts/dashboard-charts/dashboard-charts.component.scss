@@ -1,32 +1,106 @@
+// === MODERNE DASHBOARD CHARTS STYLES ===
 .charts-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2rem;
-  margin: 2rem 0;
+  gap: var(--space-8);
+  margin: var(--space-8) 0;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin: var(--space-6) 0;
+  }
+
+  @media (max-width: 480px) {
+    gap: var(--space-4);
+    margin: var(--space-4) 0;
+  }
 }
 
 .chart-card {
   min-height: 450px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-300);
+  }
   
   mat-card-header {
-    padding: 24px 24px 16px 24px !important;
-    margin-bottom: 16px;
+    padding: var(--space-6) var(--space-6) var(--space-4) var(--space-6) !important;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
   }
   
   mat-card-title {
-    color: #333 !important;
-    font-weight: 500 !important;
-    font-size: 1.25rem !important;
-    margin-bottom: 8px !important;
+    color: var(--gray-900) !important;
+    font-weight: 700 !important;
+    font-size: var(--text-xl) !important;
+    margin-bottom: var(--space-2) !important;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    &::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--primary-600) 0%, var(--accent-600) 100%);
+      border-radius: 2px;
+    }
   }
 
   mat-card-subtitle {
-    color: #666 !important;
-    font-size: 0.9rem !important;
+    color: var(--gray-600) !important;
+    font-size: var(--text-sm) !important;
+    font-weight: 500;
+    margin-top: var(--space-1);
   }
   
   mat-card-content {
-    padding: 0 24px 24px 24px !important;
+    padding: 0 var(--space-6) var(--space-6) var(--space-6) !important;
+  }
+
+  @media (max-width: 768px) {
+    min-height: 400px;
+    
+    mat-card-header {
+      padding: var(--space-5) var(--space-5) var(--space-3) var(--space-5) !important;
+    }
+    
+    mat-card-content {
+      padding: 0 var(--space-5) var(--space-5) var(--space-5) !important;
+    }
+
+    mat-card-title {
+      font-size: var(--text-lg) !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    min-height: 350px;
+    
+    mat-card-header {
+      padding: var(--space-4) var(--space-4) var(--space-2) var(--space-4) !important;
+    }
+    
+    mat-card-content {
+      padding: 0 var(--space-4) var(--space-4) var(--space-4) !important;
+    }
+    
+    mat-card-title {
+      font-size: var(--text-base) !important;
+    }
+
+    mat-card-subtitle {
+      font-size: var(--text-xs) !important;
+    }
   }
 }
 
@@ -34,61 +108,114 @@
   position: relative;
   height: 350px;
   width: 100%;
-  margin-top: 16px;
-}
+  margin-top: var(--space-4);
+  background: var(--surface);
+  border-radius: var(--radius);
+  
+  // Chart canvas styling
+  canvas {
+    border-radius: var(--radius);
+  }
 
-// Mobile Optimierungen
-@media (max-width: 768px) {
-  .charts-container {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin: 1.5rem 0;
-  }
-  
-  .chart-card {
-    min-height: 400px;
-    
-    mat-card-header {
-      padding: 20px 20px 12px 20px !important;
-      margin-bottom: 12px;
-    }
-    
-    mat-card-content {
-      padding: 0 20px 20px 20px !important;
-    }
-  }
-  
-  .chart-wrapper {
+  @media (max-width: 768px) {
     height: 310px;
-    margin-top: 12px;
+    margin-top: var(--space-3);
+  }
+
+  @media (max-width: 480px) {
+    height: 270px;
+    margin-top: var(--space-2);
   }
 }
 
-@media (max-width: 480px) {
-  .charts-container {
-    gap: 1rem;
-    margin: 1rem 0;
-  }
+// Loading and Error States
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  color: var(--gray-600);
   
-  .chart-card {
-    min-height: 350px;
+  mat-spinner {
+    margin-bottom: var(--space-3);
     
-    mat-card-header {
-      padding: 16px 16px 8px 16px !important;
-      margin-bottom: 8px;
-    }
-    
-    mat-card-content {
-      padding: 0 16px 16px 16px !important;
-    }
-    
-    mat-card-title {
-      font-size: 1.1rem !important;
+    ::ng-deep circle {
+      stroke: var(--primary-600) !important;
     }
   }
   
-  .chart-wrapper {
-    height: 270px;
-    margin-top: 8px;
+  p {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.chart-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.05);
+  border-radius: var(--radius);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--space-3);
+  }
+  
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin: 0 0 var(--space-2) 0;
+  }
+  
+  p {
+    font-size: var(--text-sm);
+    margin: 0;
+    color: var(--gray-600);
+  }
+}
+
+.chart-no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--gray-500);
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--space-3);
+    color: var(--gray-400);
+  }
+  
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin: 0 0 var(--space-2) 0;
+    color: var(--gray-600);
+  }
+  
+  p {
+    font-size: var(--text-sm);
+    margin: 0;
+    line-height: 1.5;
   }
 }

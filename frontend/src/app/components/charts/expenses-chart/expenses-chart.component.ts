@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Chart, registerables } from 'chart.js';
 import { InventoryService } from '../../../services/inventory.service';
+import { ThemeService } from '../../../services/theme.service';
+import { Subscription } from 'rxjs';
 
 // Chart.js Module registrieren
 Chart.register(...registerables);
@@ -38,7 +40,7 @@ interface ExpensesChartResponse {
   templateUrl: './expenses-chart.component.html',
   styleUrl: './expenses-chart.component.scss'
 })
-export class ExpensesChartComponent implements OnInit, AfterViewInit {
+export class ExpensesChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('chartCanvas', { static: false }) chartCanvas!: ElementRef<HTMLCanvasElement>;
   
   selectedPeriod = '1W';
@@ -46,10 +48,24 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
   chartResponse: ExpensesChartResponse | null = null;
   lastLoadedPeriod = ''; // Jetzt public statt private
   private chart: Chart | null = null;
+  private themeSubscription?: Subscription;
+  private isDarkMode = false;
 
-  constructor(private inventoryService: InventoryService) {}
+  constructor(
+    private inventoryService: InventoryService,
+    private themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
+    // Theme-Änderungen überwachen
+    this.themeSubscription = this.themeService.currentTheme$.subscribe(() => {
+      this.isDarkMode = this.themeService.isDarkMode;
+      if (this.chart) {
+        this.updateChartForTheme();
+      }
+    });
+
+    this.isDarkMode = this.themeService.isDarkMode;
     this.loadChartData();
   }
 
@@ -167,12 +183,12 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
           fill: true,
           tension: 0.4,
           pointBackgroundColor: '#8b5cf6', // Primary Purple
-          pointBorderColor: '#ffffff',
+          pointBorderColor: this.isDarkMode ? '#1f2937' : '#ffffff',
           pointBorderWidth: 3,
           pointRadius: 5,
           pointHoverRadius: 8,
           pointHoverBackgroundColor: '#7c3aed', // Primary 600
-          pointHoverBorderColor: '#ffffff',
+          pointHoverBorderColor: this.isDarkMode ? '#1f2937' : '#ffffff',
           pointHoverBorderWidth: 3
         }]
       },
@@ -188,7 +204,7 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
             display: true,
             position: 'top',
             labels: {
-              color: '#374151',
+              color: this.isDarkMode ? '#e5e7eb' : '#374151',
               font: {
                 size: 13,
                 family: 'Inter, system-ui, sans-serif',
@@ -199,7 +215,7 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
             }
           },
           tooltip: {
-            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+            backgroundColor: this.isDarkMode ? 'rgba(31, 41, 55, 0.95)' : 'rgba(17, 24, 39, 0.95)',
             titleColor: '#ffffff',
             bodyColor: '#ffffff',
             borderColor: '#8b5cf6',
@@ -224,11 +240,11 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
         scales: {
           x: {
             grid: {
-              color: 'rgba(139, 92, 246, 0.1)',
+              color: this.isDarkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)',
               lineWidth: 1
             },
             ticks: {
-              color: '#6b7280',
+              color: this.isDarkMode ? '#9ca3af' : '#6b7280',
               font: { 
                 size: 11,
                 family: 'Inter, system-ui, sans-serif',
@@ -239,11 +255,11 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
           y: {
             beginAtZero: true,
             grid: {
-              color: 'rgba(139, 92, 246, 0.1)',
+              color: this.isDarkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)',
               lineWidth: 1
             },
             ticks: {
-              color: '#6b7280',
+              color: this.isDarkMode ? '#9ca3af' : '#6b7280',
               font: { 
                 size: 11,
                 family: 'Inter, system-ui, sans-serif',
@@ -263,6 +279,56 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
     });
 
     console.log('Chart created successfully');
+  }
+
+  private updateChartForTheme(): void {
+    if (!this.chart) return;
+
+    // Update legend colors
+    if (this.chart.options.plugins?.legend?.labels) {
+      this.chart.options.plugins.legend.labels.color = this.isDarkMode ? '#e5e7eb' : '#374151';
+    }
+
+    // Update tooltip colors
+    if (this.chart.options.plugins?.tooltip) {
+      this.chart.options.plugins.tooltip.backgroundColor = this.isDarkMode ? 'rgba(31, 41, 55, 0.95)' : 'rgba(17, 24, 39, 0.95)';
+    }
+
+    // Update scales colors
+    if (this.chart.options.scales?.['x']) {
+      if (this.chart.options.scales['x'].grid) {
+        this.chart.options.scales['x'].grid.color = this.isDarkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)';
+      }
+      if (this.chart.options.scales['x'].ticks) {
+        this.chart.options.scales['x'].ticks.color = this.isDarkMode ? '#9ca3af' : '#6b7280';
+      }
+    }
+
+    if (this.chart.options.scales?.['y']) {
+      if (this.chart.options.scales['y'].grid) {
+        this.chart.options.scales['y'].grid.color = this.isDarkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(139, 92, 246, 0.1)';
+      }
+      if (this.chart.options.scales['y'].ticks) {
+        this.chart.options.scales['y'].ticks.color = this.isDarkMode ? '#9ca3af' : '#6b7280';
+      }
+    }
+
+    // Update point border colors for line chart (safe update)
+    if (this.chart.data.datasets[0]) {
+      const dataset = this.chart.data.datasets[0] as any;
+      try {
+        if (dataset.pointBorderColor !== undefined) {
+          dataset.pointBorderColor = this.isDarkMode ? '#1f2937' : '#ffffff';
+        }
+        if (dataset.pointHoverBorderColor !== undefined) {
+          dataset.pointHoverBorderColor = this.isDarkMode ? '#1f2937' : '#ffffff';
+        }
+      } catch (e) {
+        // Ignore errors for non-line charts
+      }
+    }
+
+    this.chart.update();
   }
 
   getPeriodDescription(): string {
@@ -308,5 +374,8 @@ export class ExpensesChartComponent implements OnInit, AfterViewInit {
 
   ngOnDestroy(): void {
     this.destroyChart();
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
   }
 }

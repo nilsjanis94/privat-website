@@ -2,7 +2,7 @@
 .expenses-chart-card {
   background: var(--surface);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border-primary);
   box-shadow: var(--shadow);
   overflow: hidden;
   transition: all 0.3s ease;
@@ -15,11 +15,11 @@
 
   mat-card-header {
     padding: var(--space-6) var(--space-6) var(--space-4) var(--space-6) !important;
-    background: var(--gray-50);
-    border-bottom: 1px solid var(--gray-200);
+    background: var(--surface-secondary);
+    border-bottom: 1px solid var(--border-primary);
 
     mat-card-title {
-      color: var(--gray-900) !important;
+      color: var(--text-primary) !important;
       font-size: var(--text-xl) !important;
       font-weight: 700 !important;
       margin-bottom: var(--space-2) !important;
@@ -42,7 +42,7 @@
     }
 
     mat-card-subtitle {
-      color: var(--gray-600) !important;
+      color: var(--text-secondary) !important;
       font-size: var(--text-sm) !important;
       font-weight: 500;
       margin-top: var(--space-1);
@@ -51,6 +51,7 @@
 
   mat-card-content {
     padding: var(--space-6) !important;
+    background: var(--surface);
 
     @media (max-width: 768px) {
       padding: var(--space-4) !important;
@@ -65,13 +66,13 @@
 
   mat-button-toggle-group {
     border-radius: var(--radius);
-    border: 1px solid var(--gray-300);
+    border: 1px solid var(--border-secondary);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
 
     mat-button-toggle {
       border: none !important;
-      color: var(--gray-700);
+      color: var(--text-secondary);
       background: var(--surface);
       font-weight: 500;
       font-size: var(--text-sm);
@@ -79,7 +80,7 @@
       transition: all 0.3s ease;
 
       &:hover:not(.mat-button-toggle-checked) {
-        background: var(--gray-50);
+        background: var(--surface-hover);
         color: var(--primary-600);
       }
 
@@ -109,10 +110,11 @@
   background: var(--surface);
   border-radius: var(--radius);
   padding: var(--space-4);
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border-primary);
 
   canvas {
     border-radius: var(--radius-sm);
+    background: var(--surface);
   }
 
   @media (max-width: 768px) {
@@ -128,10 +130,10 @@
   justify-content: center;
   height: 400px;
   gap: var(--space-4);
-  color: var(--gray-600);
-  background: var(--gray-50);
+  color: var(--text-secondary);
+  background: var(--surface-secondary);
   border-radius: var(--radius);
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border-primary);
   
   mat-spinner {
     ::ng-deep circle {
@@ -142,6 +144,7 @@
   span {
     font-size: var(--text-sm);
     font-weight: 500;
+    color: var(--text-secondary);
   }
 }
 
@@ -152,30 +155,30 @@
   justify-content: center;
   height: 400px;
   gap: var(--space-4);
-  color: var(--gray-500);
-  background: var(--gray-50);
+  color: var(--text-secondary);
+  background: var(--surface-secondary);
   border-radius: var(--radius);
   text-align: center;
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border-primary);
   
   mat-icon {
     font-size: 4rem;
     width: 4rem;
     height: 4rem;
-    color: var(--gray-400);
+    color: var(--text-tertiary);
   }
   
   h3 {
     margin: 0;
     font-size: var(--text-lg);
-    color: var(--gray-600);
+    color: var(--text-secondary);
     font-weight: 600;
   }
   
   p {
     margin: 0;
     font-size: var(--text-sm);
-    color: var(--gray-500);
+    color: var(--text-tertiary);
     line-height: 1.5;
   }
 }
@@ -185,9 +188,9 @@
   justify-content: space-around;
   margin-top: var(--space-6);
   padding: var(--space-4);
-  background: linear-gradient(135deg, var(--primary-50) 0%, var(--accent-50) 100%);
+  background: var(--surface-accent);
   border-radius: var(--radius);
-  border: 1px solid var(--primary-200);
+  border: 1px solid var(--border-accent);
   
   .stat-item {
     text-align: center;
@@ -195,7 +198,7 @@
     .label {
       display: block;
       font-size: var(--text-xs);
-      color: var(--gray-600);
+      color: var(--text-secondary);
       margin-bottom: var(--space-1);
       font-weight: 600;
       text-transform: uppercase;
@@ -206,7 +209,7 @@
       display: block;
       font-size: var(--text-lg);
       font-weight: 700;
-      color: var(--primary-700);
+      color: var(--primary-600);
     }
   }
 
@@ -260,6 +263,69 @@
 
       mat-card-subtitle {
         font-size: var(--text-xs) !important;
+      }
+    }
+  }
+}
+
+// === DARK MODE OPTIMIZATIONS ===
+:host-context(.dark) {
+  .expenses-chart-card {
+    &:hover {
+      box-shadow: var(--shadow-xl);
+      border-color: var(--primary-400);
+    }
+  }
+
+  .period-selector {
+    mat-button-toggle-group {
+      border-color: var(--border-secondary);
+
+      mat-button-toggle {
+        &:hover:not(.mat-button-toggle-checked) {
+          background: var(--surface-hover);
+          color: var(--primary-400);
+        }
+
+        &.mat-button-toggle-checked {
+          background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+        }
+      }
+    }
+  }
+
+  .chart-container {
+    background: var(--surface);
+    border-color: var(--border-secondary);
+
+    canvas {
+      background: var(--surface);
+    }
+  }
+
+  .loading-container {
+    background: var(--surface-secondary);
+    border-color: var(--border-secondary);
+    
+    mat-spinner {
+      ::ng-deep circle {
+        stroke: var(--primary-500) !important;
+      }
+    }
+  }
+
+  .no-data-container {
+    background: var(--surface-secondary);
+    border-color: var(--border-secondary);
+  }
+
+  .chart-stats {
+    background: var(--surface-accent);
+    border-color: var(--border-accent);
+    
+    .stat-item {
+      .value {
+        color: var(--primary-400);
       }
     }
   }

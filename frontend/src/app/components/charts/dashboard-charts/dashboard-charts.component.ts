@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { BaseChartDirective } from 'ng2-charts';
@@ -6,6 +6,8 @@ import { Chart, ChartConfiguration, ChartData, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DashboardStats } from '../../../interfaces/inventory.interface';
 import { ExpensesChartComponent } from '../expenses-chart/expenses-chart.component';
+import { ThemeService } from '../../../services/theme.service';
+import { Subscription } from 'rxjs';
 
 // Chart.js registrieren
 Chart.register(...registerables, ChartDataLabels);
@@ -21,10 +23,13 @@ Chart.register(...registerables, ChartDataLabels);
   templateUrl: './dashboard-charts.component.html',
   styleUrl: './dashboard-charts.component.scss'
 })
-export class DashboardChartsComponent implements OnInit, OnChanges {
+export class DashboardChartsComponent implements OnInit, OnChanges, OnDestroy {
   @Input() stats: DashboardStats | null = null;
 
-  // Kategorien Donut Chart - MODERN PURPLE DESIGN
+  private themeSubscription?: Subscription;
+  private isDarkMode = false;
+
+  // Kategorien Donut Chart - THEME AWARE DESIGN
   categoryChartData: ChartData<'doughnut'> = {
     labels: [],
     datasets: [{
@@ -75,7 +80,7 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
             family: 'Inter, system-ui, sans-serif',
             weight: 500
           },
-          color: '#374151',
+          color: '#374151', // Will be updated based on theme
           boxWidth: 12,
           boxHeight: 12
         }
@@ -144,7 +149,7 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
     }
   };
 
-  // Monatliche Ausgaben Bar Chart - MODERN PURPLE DESIGN
+  // Monatliche Ausgaben Bar Chart - THEME AWARE DESIGN
   expensesChartData: ChartData<'bar'> = {
     labels: [],
     datasets: [{
@@ -200,7 +205,7 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
       },
       datalabels: {
         display: true,
-        color: '#374151',
+        color: '#374151', // Will be updated based on theme
         font: {
           weight: 'bold',
           size: 12,
@@ -226,7 +231,7 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
           display: false
         },
         ticks: {
-          color: '#6b7280',
+          color: '#6b7280', // Will be updated based on theme
           font: {
             size: 12,
             family: 'Inter, system-ui, sans-serif',
@@ -242,7 +247,7 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
           lineWidth: 1
         },
         ticks: {
-          color: '#6b7280',
+          color: '#6b7280', // Will be updated based on theme
           font: {
             size: 12,
             family: 'Inter, system-ui, sans-serif',
@@ -264,13 +269,27 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
     }
   };
 
+  constructor(private themeService: ThemeService) {}
+
   ngOnInit(): void {
+    // Theme-Änderungen überwachen
+    this.themeSubscription = this.themeService.currentTheme$.subscribe(() => {
+      this.isDarkMode = this.themeService.isDarkMode;
+      this.updateChartsForTheme();
+    });
+
     this.updateCharts();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['stats'] && this.stats) {
       this.updateCharts();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
     }
   }
 
@@ -282,6 +301,41 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
   hasExpensesData(): boolean {
     return !!(this.stats?.monthly_expenses && 
            this.stats.monthly_expenses.length > 0);
+  }
+
+  private updateChartsForTheme(): void {
+    // Update category chart for theme
+    if (this.categoryChartOptions?.plugins?.legend?.labels) {
+      this.categoryChartOptions.plugins.legend.labels.color = this.isDarkMode ? '#e5e7eb' : '#374151';
+    }
+
+    // Update category chart border colors for dark mode
+    if (this.categoryChartData.datasets[0]) {
+      this.categoryChartData.datasets[0].borderColor = this.isDarkMode ? '#1f2937' : '#ffffff';
+    }
+
+    // Update expenses chart for theme
+    if (this.expensesChartOptions?.plugins?.datalabels) {
+      this.expensesChartOptions.plugins.datalabels.color = this.isDarkMode ? '#e5e7eb' : '#374151';
+    }
+
+    // Update scales colors
+    if (this.expensesChartOptions?.scales?.['x']?.ticks) {
+      this.expensesChartOptions.scales['x'].ticks.color = this.isDarkMode ? '#9ca3af' : '#6b7280';
+    }
+    if (this.expensesChartOptions?.scales?.['y']?.ticks) {
+      this.expensesChartOptions.scales['y'].ticks.color = this.isDarkMode ? '#9ca3af' : '#6b7280';
+    }
+
+    // Update grid colors for dark mode
+    if (this.expensesChartOptions?.scales?.['y']?.grid) {
+      this.expensesChartOptions.scales['y'].grid.color = this.isDarkMode 
+        ? 'rgba(139, 92, 246, 0.2)' 
+        : 'rgba(139, 92, 246, 0.1)';
+    }
+
+    // Force chart updates
+    this.updateCharts();
   }
 
   private updateCharts(): void {
@@ -302,7 +356,8 @@ export class DashboardChartsComponent implements OnInit, OnChanges {
       labels: categories,
       datasets: [{
         ...this.categoryChartData.datasets[0],
-        data: values
+        data: values,
+        borderColor: this.isDarkMode ? '#1f2937' : '#ffffff'
       }]
     };
   }

@@ -21,7 +21,7 @@
   min-height: 450px;
   background: var(--surface);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border-primary);
   box-shadow: var(--shadow);
   overflow: hidden;
   transition: all 0.3s ease;
@@ -34,12 +34,12 @@
   
   mat-card-header {
     padding: var(--space-6) var(--space-6) var(--space-4) var(--space-6) !important;
-    background: var(--gray-50);
-    border-bottom: 1px solid var(--gray-200);
+    background: var(--surface-secondary);
+    border-bottom: 1px solid var(--border-primary);
   }
   
   mat-card-title {
-    color: var(--gray-900) !important;
+    color: var(--text-primary) !important;
     font-weight: 700 !important;
     font-size: var(--text-xl) !important;
     margin-bottom: var(--space-2) !important;
@@ -57,7 +57,7 @@
   }
 
   mat-card-subtitle {
-    color: var(--gray-600) !important;
+    color: var(--text-secondary) !important;
     font-size: var(--text-sm) !important;
     font-weight: 500;
     margin-top: var(--space-1);
@@ -65,6 +65,7 @@
   
   mat-card-content {
     padding: 0 var(--space-6) var(--space-6) var(--space-6) !important;
+    background: var(--surface);
   }
 
   @media (max-width: 768px) {
@@ -115,6 +116,7 @@
   // Chart canvas styling
   canvas {
     border-radius: var(--radius);
+    background: var(--surface);
   }
 
   @media (max-width: 768px) {
@@ -135,7 +137,9 @@
   align-items: center;
   justify-content: center;
   height: 350px;
-  color: var(--gray-600);
+  color: var(--text-secondary);
+  background: var(--surface);
+  border-radius: var(--radius);
   
   mat-spinner {
     margin-bottom: var(--space-3);
@@ -149,6 +153,7 @@
     font-size: var(--text-sm);
     font-weight: 500;
     margin: 0;
+    color: var(--text-secondary);
   }
 }
 
@@ -161,27 +166,29 @@
   padding: var(--space-6);
   text-align: center;
   color: var(--error);
-  background: rgba(239, 68, 68, 0.05);
+  background: var(--error-bg);
   border-radius: var(--radius);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid var(--error-border);
   
   mat-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
     margin-bottom: var(--space-3);
+    color: var(--error);
   }
   
   h3 {
     font-size: var(--text-lg);
     font-weight: 600;
     margin: 0 0 var(--space-2) 0;
+    color: var(--error);
   }
   
   p {
     font-size: var(--text-sm);
     margin: 0;
-    color: var(--gray-600);
+    color: var(--text-secondary);
   }
 }
 
@@ -193,29 +200,68 @@
   height: 350px;
   padding: var(--space-6);
   text-align: center;
-  color: var(--gray-500);
-  background: var(--gray-50);
+  color: var(--text-secondary);
+  background: var(--surface-secondary);
   border-radius: var(--radius);
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border-primary);
   
   mat-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
     margin-bottom: var(--space-3);
-    color: var(--gray-400);
+    color: var(--text-tertiary);
   }
   
   h3 {
     font-size: var(--text-lg);
     font-weight: 600;
     margin: 0 0 var(--space-2) 0;
-    color: var(--gray-600);
+    color: var(--text-secondary);
   }
   
   p {
     font-size: var(--text-sm);
     margin: 0;
     line-height: 1.5;
+    color: var(--text-tertiary);
+  }
+}
+
+// === DARK MODE CHART OPTIMIZATIONS ===
+:host-context(.dark) {
+  .chart-wrapper {
+    canvas {
+      // Dark mode optimiertes Canvas
+      background: var(--surface);
+    }
+  }
+
+  .chart-card {
+    // Verstärkte Schatten für Dark Mode
+    &:hover {
+      box-shadow: var(--shadow-xl);
+      border-color: var(--primary-400);
+    }
+  }
+
+  .chart-loading {
+    background: var(--surface);
+    
+    mat-spinner {
+      ::ng-deep circle {
+        stroke: var(--primary-500) !important;
+      }
+    }
+  }
+
+  .chart-error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .chart-no-data {
+    background: var(--surface-secondary);
+    border-color: var(--border-secondary);
   }
 }

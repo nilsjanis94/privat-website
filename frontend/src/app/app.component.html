@@ -1,6 +1,6 @@
-<div class="app-container">
+<div class="app-container" [class.auth-layout]="!(showNavbar$ | async)">
   <!-- Navigation -->
-  <app-navbar></app-navbar>
+  <app-navbar *ngIf="showNavbar$ | async"></app-navbar>
   
   <!-- Main Content -->
   <main class="main-content">
@@ -9,7 +9,7 @@
 </div>
 
 <!-- Mobile Menu Portal -->
-<div class="mobile-menu-portal" [class.active]="isMobileMenuOpen$ | async">
+<div class="mobile-menu-portal" [class.active]="isMobileMenuOpen$ | async" *ngIf="showNavbar$ | async">
   <div class="mobile-nav-content">
     <a routerLink="/dashboard" 
        routerLinkActive="active"
@@ -68,4 +68,4 @@
   </div>
 </div>
 
-<div class="mobile-overlay-portal" [class.active]="isMobileMenuOpen$ | async" (click)="closeMobileMenu()"></div>
+<div class="mobile-overlay-portal" [class.active]="isMobileMenuOpen$ | async" (click)="closeMobileMenu()" *ngIf="showNavbar$ | async"></div>

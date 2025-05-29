@@ -1,47 +1,88 @@
 <div class="login-container">
   <mat-card class="login-card">
     <mat-card-header>
-      <mat-card-title>Anmelden</mat-card-title>
+      <div class="brand-icon">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <mat-card-title>Willkommen zurück!</mat-card-title>
       <mat-card-subtitle>Melden Sie sich in Ihrem Inventar-System an</mat-card-subtitle>
     </mat-card-header>
     
     <mat-card-content>
+      <!-- Error Alert -->
+      <div class="error-alert" *ngIf="errorMessage">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>E-Mail</mat-label>
-          <input matInput type="email" formControlName="email" required>
+          <mat-label>E-Mail-Adresse</mat-label>
+          <input matInput type="email" formControlName="email" required 
+                 placeholder="ihre.email@beispiel.de">
           <mat-icon matSuffix>email</mat-icon>
           <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
             E-Mail ist erforderlich
           </mat-error>
           <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-            Ungültige E-Mail-Adresse
+            Bitte geben Sie eine gültige E-Mail-Adresse ein
           </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Passwort</mat-label>
-          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
-          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+          <input matInput [type]="hidePassword ? 'password' : 'text'" 
+                 formControlName="password" required
+                 placeholder="Ihr sicheres Passwort">
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" 
+                  type="button" [attr.aria-label]="hidePassword ? 'Passwort anzeigen' : 'Passwort verstecken'">
             <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
           <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
             Passwort ist erforderlich
           </mat-error>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
+            Passwort muss mindestens 6 Zeichen lang sein
+          </mat-error>
         </mat-form-field>
 
+        <!-- Remember Me -->
+        <div class="login-options">
+          <mat-checkbox formControlName="rememberMe" color="primary">
+            Angemeldet bleiben
+          </mat-checkbox>
+        </div>
+
         <button mat-raised-button color="primary" type="submit" 
-                [disabled]="loginForm.invalid || isLoading" class="full-width">
-          <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
-          <span *ngIf="!isLoading">Anmelden</span>
+                [disabled]="loginForm.invalid || isLoading" 
+                class="full-width login-button">
+          <div class="button-content">
+            <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+            <mat-icon *ngIf="!isLoading">login</mat-icon>
+            <span>{{ isLoading ? 'Wird angemeldet...' : 'Anmelden' }}</span>
+          </div>
         </button>
       </form>
     </mat-card-content>
     
     <mat-card-actions>
-      <p>Noch kein Konto? 
-        <a routerLink="/register" mat-button color="primary">Registrieren</a>
-      </p>
+      <div class="login-footer">
+        <p class="register-link">
+          Noch kein Konto? 
+          <a routerLink="/register" mat-button color="primary">
+            Jetzt registrieren
+          </a>
+        </p>
+        
+        <div class="divider">
+          <span>oder</span>
+        </div>
+        
+        <p class="demo-hint">
+          <mat-icon>info_outline</mat-icon>
+          Demo-Zugang verwenden: demo&#64;example.com / password123
+        </p>
+      </div>
     </mat-card-actions>
   </mat-card>
 </div>

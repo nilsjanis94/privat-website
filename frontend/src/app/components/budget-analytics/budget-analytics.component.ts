@@ -14,6 +14,8 @@ import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { BudgetService } from '../../services/budget.service';
 import { InventoryService } from '../../services/inventory.service';
+import { StatisticsService, BudgetStatistics } from '../../services/statistics.service';
+import { ChartService } from '../../services/chart.service';
 import { Budget } from '../../interfaces/inventory.interface';
 import { Subscription } from 'rxjs';
 
@@ -77,13 +79,16 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
   categoryAnalysis: CategoryAnalysis[] = [];
   budgetForecasts: BudgetForecast[] = [];
   
-  // Summary Statistics
-  totalBudgeted = 0;
-  totalSpent = 0;
-  totalVariance = 0;
-  totalVariancePercent = 0;
-  budgetsOverLimit = 0;
-  averageUtilization = 0;
+  // Berechnete Budget-Statistiken
+  budgetStats: BudgetStatistics | null = null;
+  
+  // Legacy fields (werden aus budgetStats abgeleitet)
+  get totalBudgeted(): number { return this.budgetStats?.totalBudgeted || 0; }
+  get totalSpent(): number { return this.budgetStats?.totalSpent || 0; }
+  get totalVariance(): number { return this.budgetStats?.totalVariance || 0; }
+  get totalVariancePercent(): number { return this.budgetStats?.totalVariancePercent || 0; }
+  get budgetsOverLimit(): number { return this.budgetStats?.budgetsOverLimit || 0; }
+  get averageUtilization(): number { return this.budgetStats?.averageUtilization || 0; }
   
   // Chart Data
   trendChartData: ChartConfiguration['data'] = {
@@ -117,6 +122,15 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
       title: {
         display: true,
         text: 'Budget vs. Tatsächliche Ausgaben'
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const label = context.dataset.label || '';
+            const value = Number(context.parsed.y);
+            return `${label}: ${value.toFixed(0)}€`;
+          }
+        }
       }
     },
     scales: {
@@ -124,7 +138,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
         beginAtZero: true,
         ticks: {
           callback: function(value) {
-            return value + ' €';
+            return Number(value).toFixed(0) + '€';
           }
         }
       }
@@ -141,6 +155,17 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
       title: {
         display: true,
         text: 'Ausgaben nach Kategorien'
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const label = context.label || '';
+            const value = Number(context.parsed);
+            const total = (context.dataset.data as number[]).reduce((a, b) => Number(a) + Number(b), 0);
+            const percentage = ((value / total) * 100).toFixed(1);
+            return `${label}: ${value.toFixed(0)}€ (${percentage}%)`;
+          }
+        }
       }
     }
   };
@@ -155,6 +180,15 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
       title: {
         display: true,
         text: 'Budget-Prognose'
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const label = context.dataset.label || '';
+            const value = Number(context.parsed.y);
+            return `${label}: ${value.toFixed(0)}€`;
+          }
+        }
       }
     },
     scales: {
@@ -162,7 +196,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
         beginAtZero: true,
         ticks: {
           callback: function(value) {
-            return value + ' €';
+            return Number(value).toFixed(0) + '€';
           }
         }
       }
@@ -180,6 +214,15 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
       title: {
         display: true,
         text: 'Budget-Auslastung'
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const label = context.label || '';
+            const value = Number(context.parsed.x);
+            return `${label}: ${value.toFixed(1)}%`;
+          }
+        }
       }
     },
     scales: {
@@ -187,7 +230,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
         max: 100,
         ticks: {
           callback: function(value) {
-            return value + '%';
+            return Number(value).toFixed(0) + '%';
           }
         }
       }
@@ -198,7 +241,9 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
 
   constructor(
     private budgetService: BudgetService,
-    private inventoryService: InventoryService
+    private inventoryService: InventoryService,
+    private statisticsService: StatisticsService,
+    private chartService: ChartService
   ) {}
 
   ngOnInit(): void {
@@ -240,21 +285,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
   }
 
   private calculateStatistics(): void {
-    this.totalBudgeted = this.budgets.reduce((sum, budget) => sum + budget.amount, 0);
-    this.totalSpent = this.budgets.reduce((sum, budget) => sum + budget.spent_this_period, 0);
-    this.totalVariance = this.totalBudgeted - this.totalSpent;
-    this.totalVariancePercent = this.totalBudgeted > 0 ? (this.totalVariance / this.totalBudgeted) * 100 : 0;
-    this.budgetsOverLimit = this.budgets.filter(budget => budget.is_over_budget).length;
-    
-    // Calculate utilization percentage for each budget
-    const budgetsWithUtilization = this.budgets.map(budget => ({
-      ...budget,
-      utilization_percentage: budget.amount > 0 ? (budget.spent_this_period / budget.amount) * 100 : 0
-    }));
-    
-    this.averageUtilization = budgetsWithUtilization.length > 0 
-      ? budgetsWithUtilization.reduce((sum, budget) => sum + budget.utilization_percentage, 0) / budgetsWithUtilization.length 
-      : 0;
+    this.budgetStats = this.statisticsService.calculateBudgetStatistics(this.budgets);
   }
 
   private generateTrendData(): void {
@@ -339,7 +370,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
       datasets: [
         {
           label: 'Geplant',
-          data: this.budgetTrends.map(trend => trend.planned),
+          data: this.chartService.roundValuesForChart(this.budgetTrends.map(trend => trend.planned)),
           borderColor: '#7C4DFF',
           backgroundColor: 'rgba(124, 77, 255, 0.1)',
           fill: false,
@@ -347,7 +378,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
         },
         {
           label: 'Tatsächlich',
-          data: this.budgetTrends.map(trend => trend.actual),
+          data: this.chartService.roundValuesForChart(this.budgetTrends.map(trend => trend.actual)),
           borderColor: '#FF4081',
           backgroundColor: 'rgba(255, 64, 129, 0.1)',
           fill: false,
@@ -361,7 +392,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
     this.categoryChartData = {
       labels: this.categoryAnalysis.map(cat => cat.category),
       datasets: [{
-        data: this.categoryAnalysis.map(cat => cat.spent),
+        data: this.chartService.roundValuesForChart(this.categoryAnalysis.map(cat => cat.spent)),
         backgroundColor: [
           '#7C4DFF',
           '#FF4081',
@@ -381,7 +412,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
       datasets: [
         {
           label: 'Budget-Limit',
-          data: this.budgetForecasts.map(forecast => forecast.budgetLimit),
+          data: this.chartService.roundValuesForChart(this.budgetForecasts.map(forecast => forecast.budgetLimit)),
           borderColor: '#4CAF50',
           backgroundColor: 'rgba(76, 175, 80, 0.1)',
           fill: false,
@@ -389,7 +420,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
         },
         {
           label: 'Prognostizierte Ausgaben',
-          data: this.budgetForecasts.map(forecast => forecast.projectedSpending),
+          data: this.chartService.roundValuesForChart(this.budgetForecasts.map(forecast => forecast.projectedSpending)),
           borderColor: '#FF9800',
           backgroundColor: 'rgba(255, 152, 0, 0.1)',
           fill: false,
@@ -403,7 +434,8 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
     // Calculate utilization for chart
     const budgetsWithUtilization = this.budgets.map(budget => ({
       ...budget,
-      utilization_percentage: budget.amount > 0 ? (budget.spent_this_period / budget.amount) * 100 : 0
+      utilization_percentage: budget.amount > 0 ? 
+        this.chartService.roundValueForChart((budget.spent_this_period / budget.amount) * 100) : 0
     }));
 
     this.utilizationChartData = {

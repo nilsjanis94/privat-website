@@ -79,8 +79,8 @@ export const routeAnimations = trigger('routeAnimations', [
     ])
   ]),
 
-  // Dashboard zu Statistics - Slide Right mit Scale
-  transition('dashboard => statistics', [
+  // Dashboard zu Analytics - Slide Right mit Scale
+  transition('dashboard => analytics', [
     style({ position: 'relative' }),
     query(':enter, :leave', [
       style({
@@ -118,8 +118,8 @@ export const routeAnimations = trigger('routeAnimations', [
     ])
   ]),
 
-  // Statistics zu Dashboard - Slide Left mit Scale
-  transition('statistics => dashboard', [
+  // Analytics zu Dashboard - Slide Left mit Scale
+  transition('analytics => dashboard', [
     style({ position: 'relative' }),
     query(':enter, :leave', [
       style({
@@ -157,8 +157,8 @@ export const routeAnimations = trigger('routeAnimations', [
     ])
   ]),
 
-  // Inventory zu Statistics - Cross Slide
-  transition('inventory => statistics', [
+  // Inventory zu Analytics - Cross Slide
+  transition('inventory => analytics', [
     style({ position: 'relative' }),
     query(':enter, :leave', [
       style({
@@ -193,8 +193,8 @@ export const routeAnimations = trigger('routeAnimations', [
     ])
   ]),
 
-  // Statistics zu Inventory - Cross Slide Reverse
-  transition('statistics => inventory', [
+  // Analytics zu Inventory - Cross Slide Reverse
+  transition('analytics => inventory', [
     style({ position: 'relative' }),
     query(':enter, :leave', [
       style({

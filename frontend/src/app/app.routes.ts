@@ -26,10 +26,10 @@ export const routes: Routes = [
     data: { animation: 'inventory' }
   },
   { 
-    path: 'statistics', 
-    loadComponent: () => import('./components/statistics/statistics.component').then(m => m.StatisticsComponent),
+    path: 'analytics', 
+    loadComponent: () => import('./components/budget-analytics/budget-analytics.component').then(m => m.BudgetAnalyticsComponent),
     canActivate: [authGuard],
-    data: { animation: 'statistics' }
+    data: { animation: 'analytics' }
   },
   { 
     path: 'budgets', 
@@ -38,22 +38,16 @@ export const routes: Routes = [
     data: { animation: 'budgets' }
   },
   { 
-    path: 'budget-analytics', 
-    loadComponent: () => import('./components/budget-analytics/budget-analytics.component').then(m => m.BudgetAnalyticsComponent),
-    canActivate: [authGuard],
-    data: { animation: 'budget-analytics' }
-  },
-  { 
     path: 'reminders', 
     loadComponent: () => import('./components/reminders/reminders.component').then(m => m.RemindersComponent),
     canActivate: [authGuard],
     data: { animation: 'reminders' }
   },
   { 
-    path: 'scanner', 
+    path: 'barcode-scanner', 
     loadComponent: () => import('./components/barcode-scanner/barcode-scanner.component').then(m => m.BarcodeScannerComponent),
     canActivate: [authGuard],
-    data: { animation: 'scanner' }
+    data: { animation: 'barcode-scanner' }
   },
   { 
     path: 'notifications', 

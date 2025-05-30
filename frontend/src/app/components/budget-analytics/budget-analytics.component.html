@@ -7,6 +7,9 @@
       <mat-form-field appearance="outline">
         <mat-label>Zeitraum</mat-label>
         <mat-select [(value)]="selectedPeriod" (selectionChange)="onPeriodChange()">
+          <mat-option value="1D">1 Tag</mat-option>
+          <mat-option value="1W">1 Woche</mat-option>
+          <mat-option value="1M">1 Monat</mat-option>
           <mat-option value="3M">3 Monate</mat-option>
           <mat-option value="6M">6 Monate</mat-option>
           <mat-option value="12M">12 Monate</mat-option>
@@ -107,12 +110,12 @@
           <!-- Trend Details Table -->
           <mat-card class="trend-details">
             <mat-card-header>
-              <mat-card-title>Monatliche Details</mat-card-title>
+              <mat-card-title>{{ getTimeUnitLabel() === 'Monat' ? 'Monatliche' : getTimeUnitLabel() === 'Woche' ? 'Wöchentliche' : getTimeUnitLabel() === 'Tag' ? 'Tägliche' : 'Stündliche' }} Details</mat-card-title>
             </mat-card-header>
             <mat-card-content>
               <div class="trend-table">
                 <div class="trend-row header">
-                  <span>Monat</span>
+                  <span>{{ getTimeUnitLabel() === 'Monat' ? 'Monat' : getTimeUnitLabel() === 'Woche' ? 'Woche' : getTimeUnitLabel() === 'Tag' ? 'Tag' : 'Stunde' }}</span>
                   <span>Geplant</span>
                   <span>Tatsächlich</span>
                   <span>Differenz</span>
@@ -176,11 +179,11 @@
                     <div class="category-progress">
                       <div class="progress-info">
                         <span>{{ category.spent | currency:'EUR':'symbol':'1.2-2':'de' }} / {{ category.budgeted | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
-                        <span class="percentage">{{ category.percentUsed | number:'1.1-1' }}%</span>
+                        <span class="percentage">{{ category.percent_used | number:'1.1-1' }}%</span>
                       </div>
                       <mat-progress-bar 
-                        [value]="category.percentUsed" 
-                        [color]="category.percentUsed > 100 ? 'warn' : category.percentUsed > 80 ? 'accent' : 'primary'">
+                        [value]="category.percent_used" 
+                        [color]="category.percent_used > 100 ? 'warn' : category.percent_used > 80 ? 'accent' : 'primary'">
                       </mat-progress-bar>
                     </div>
                     

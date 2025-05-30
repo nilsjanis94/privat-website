@@ -20,6 +20,7 @@ urlpatterns = [
     path('budgets/', views.budgets_list_create, name='budget-list-create'),
     path('budgets/<int:pk>/', views.budget_detail, name='budget-detail'),
     path('budget-dashboard/', views.budget_dashboard, name='budget-dashboard'),
+    path('budget-analytics/', views.budget_analytics_data, name='budget-analytics-data'),
     
     # Reminders
     path('reminders/', views.reminders_list, name='reminders-list'),

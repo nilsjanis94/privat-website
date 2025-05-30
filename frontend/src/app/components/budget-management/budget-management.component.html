@@ -154,6 +154,103 @@
     </mat-card-content>
   </mat-card>
 
+  <!-- Budget bearbeiten -->
+  <mat-card *ngIf="editingBudget && !hasError" class="create-form">
+    <mat-card-header>
+      <mat-card-title>✏️ Budget bearbeiten</mat-card-title>
+      <mat-card-subtitle>Ändern Sie die Einstellungen für "{{ editingBudget.name }}"</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="updateBudget()" #editBudgetForm="ngForm">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Budget-Name</mat-label>
+            <input matInput 
+                   [(ngModel)]="editBudgetData.name" 
+                   name="editName" 
+                   required
+                   maxlength="100"
+                   [disabled]="isUpdating"
+                   #editNameInput="ngModel">
+            <mat-hint>z.B. "Lebensmittel Budget" oder "Elektronik Budget"</mat-hint>
+            <mat-error *ngIf="editNameInput.invalid && editNameInput.touched">
+              Budget-Name ist erforderlich
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Budget-Betrag</mat-label>
+            <input matInput 
+                   type="number" 
+                   [(ngModel)]="editBudgetData.amount" 
+                   name="editAmount" 
+                   required 
+                   min="0.01" 
+                   max="999999.99"
+                   step="0.01"
+                   [disabled]="isUpdating"
+                   #editAmountInput="ngModel">
+            <span matSuffix>€</span>
+            <mat-hint>Geben Sie den gewünschten Budget-Betrag ein</mat-hint>
+            <mat-error *ngIf="editAmountInput.invalid && editAmountInput.touched">
+              <span *ngIf="editAmountInput.errors?.['required']">Budget-Betrag ist erforderlich</span>
+              <span *ngIf="editAmountInput.errors?.['min']">Mindestbetrag: 0,01 €</span>
+              <span *ngIf="editAmountInput.errors?.['max']">Maximalbetrag: 999.999,99 €</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Zeitraum</mat-label>
+            <mat-select [(ngModel)]="editBudgetData.period" 
+                        name="editPeriod" 
+                        required
+                        [disabled]="isUpdating">
+              <mat-option value="monthly">Monatlich</mat-option>
+              <mat-option value="yearly">Jährlich</mat-option>
+            </mat-select>
+            <mat-hint>Wählen Sie den Zeitraum für Ihr Budget</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Kategorie (optional)</mat-label>
+            <mat-select [(ngModel)]="editBudgetData.category" 
+                        name="editCategory"
+                        [disabled]="isUpdating">
+              <mat-option [value]="undefined">Alle Kategorien</mat-option>
+              <mat-option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Leer lassen für kategorieübergreifendes Budget</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button 
+                  type="button" 
+                  (click)="cancelEditBudget()"
+                  [disabled]="isUpdating">
+            <mat-icon>clear</mat-icon>
+            Abbrechen
+          </button>
+          <button mat-raised-button 
+                  color="primary" 
+                  type="submit" 
+                  [disabled]="!isEditFormValid || isUpdating">
+            <mat-icon *ngIf="!isUpdating">save</mat-icon>
+            <mat-progress-spinner *ngIf="isUpdating" 
+                                  diameter="20" 
+                                  mode="indeterminate">
+            </mat-progress-spinner>
+            {{ isUpdating ? 'Speichere...' : 'Änderungen speichern' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
   <!-- Budget-Liste -->
   <div *ngIf="budgetDashboard && !hasError && !isLoading" class="budget-list">
     <mat-card *ngFor="let budget of budgetDashboard.budgets; trackBy: trackByBudgetId" class="budget-card">
@@ -198,8 +295,8 @@
         </button>
         <button mat-button 
                 color="primary"
-                disabled
-                title="Funktion kommt bald">
+                (click)="startEditBudget(budget)"
+                [disabled]="isLoading">
           <mat-icon>edit</mat-icon>
           Bearbeiten
         </button>

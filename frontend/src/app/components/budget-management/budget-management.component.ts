@@ -57,6 +57,11 @@ export class BudgetManagementComponent implements OnInit, OnDestroy {
     is_active: true
   };
 
+  // Edit Budget Variablen
+  editingBudget: Budget | null = null;
+  editBudgetData: Partial<Budget> = {};
+  isUpdating = false;
+
   private subscriptions = new Subscription();
 
   constructor(
@@ -218,6 +223,59 @@ export class BudgetManagementComponent implements OnInit, OnDestroy {
     this.subscriptions.add(deleteBudget$.subscribe());
   }
 
+  startEditBudget(budget: Budget): void {
+    this.editingBudget = budget;
+    this.editBudgetData = {
+      name: budget.name,
+      amount: budget.amount,
+      period: budget.period,
+      category: budget.category,
+      is_active: budget.is_active
+    };
+    this.showCreateForm = false; // Verstecke Create-Form falls offen
+  }
+
+  cancelEditBudget(): void {
+    this.editingBudget = null;
+    this.editBudgetData = {};
+  }
+
+  updateBudget(): void {
+    if (!this.editingBudget?.id || !this.editBudgetData.name?.trim() || !this.editBudgetData.amount || this.editBudgetData.amount <= 0) {
+      this.snackBar.open('Bitte füllen Sie alle Pflichtfelder korrekt aus', 'Schließen', { duration: 3000 });
+      return;
+    }
+
+    if (this.isUpdating) return; // Verhindere mehrfache Aufrufe
+
+    this.isUpdating = true;
+
+    const updateBudget$ = this.budgetService.updateBudget(this.editingBudget.id, this.editBudgetData).pipe(
+      tap(updatedBudget => {
+        this.snackBar.open('Budget erfolgreich aktualisiert', 'Schließen', { duration: 3000 });
+        this.cancelEditBudget();
+        // Budget-Dashboard neu laden
+        this.loadBudgetDashboard();
+      }),
+      catchError(error => {
+        console.error('Fehler beim Aktualisieren des Budgets:', error);
+        let errorMsg = 'Fehler beim Aktualisieren des Budgets';
+        
+        if (error.status === 400) {
+          errorMsg = 'Ungültige Budget-Daten. Bitte überprüfen Sie Ihre Eingaben.';
+        } else if (error.status === 404) {
+          errorMsg = 'Budget nicht gefunden. Es wurde möglicherweise bereits gelöscht.';
+        }
+        
+        this.snackBar.open(errorMsg, 'Schließen', { duration: 5000 });
+        return of(null);
+      }),
+      finalize(() => this.isUpdating = false)
+    );
+
+    this.subscriptions.add(updateBudget$.subscribe());
+  }
+
   resetForm(): void {
     this.newBudget = {
       name: '',
@@ -242,8 +300,10 @@ export class BudgetManagementComponent implements OnInit, OnDestroy {
   }
 
   getCategoryName(categoryId?: number): string {
-    if (!categoryId) return 'Alle Kategorien';
-    const category = this.categories.find(c => c.id === categoryId);
+    if (!categoryId) {
+      return 'Alle Kategorien';
+    }
+    const category = this.categories.find(cat => cat.id === categoryId);
     return category ? category.name : 'Unbekannte Kategorie';
   }
 
@@ -267,6 +327,15 @@ export class BudgetManagementComponent implements OnInit, OnDestroy {
       this.newBudget.amount && 
       this.newBudget.amount > 0 &&
       this.newBudget.period
+    );
+  }
+
+  get isEditFormValid(): boolean {
+    return !!(
+      this.editBudgetData.name?.trim() && 
+      this.editBudgetData.amount && 
+      this.editBudgetData.amount > 0 &&
+      this.editBudgetData.period
     );
   }
 }

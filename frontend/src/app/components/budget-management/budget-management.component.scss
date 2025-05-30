@@ -271,45 +271,84 @@
   }
 }
 
-// Dark Mode Support
-@media (prefers-color-scheme: dark) {
-  .budget-management-container {
-    .budget-overview .summary-card {
-      background: linear-gradient(135deg, var(--primary-dark, #7b1fa2), var(--accent-dark, #ad1457));
-      border-left-color: var(--primary-dark, #7b1fa2);
+// Dark Mode Support - Using Angular's theme class instead of media query
+:host-context(.dark-theme) .budget-management-container {
+  .budget-overview .summary-card {
+    background: linear-gradient(135deg, var(--primary-dark, #7b1fa2), var(--accent-dark, #ad1457));
+    border-left-color: var(--primary-dark, #7b1fa2);
+  }
+
+  .create-form {
+    background: var(--surface-dark, #1e1e1e);
+    border-left-color: var(--primary-dark, #7b1fa2);
+  }
+
+  .budget-card {
+    background: var(--surface-dark, #1e1e1e);
+    border-left-color: var(--primary-dark, #7b1fa2);
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
     }
 
-    .create-form {
-      background: var(--surface-dark, #1e1e1e);
-      border-left-color: var(--primary-dark, #7b1fa2);
+    mat-card-actions {
+      border-top-color: var(--border-dark, #404040);
+    }
+  }
+
+  .no-budgets {
+    background: var(--surface-dark, #1e1e1e);
+    border-color: var(--border-dark, #404040);
+  }
+
+  .loading {
+    background: var(--surface-dark, #1e1e1e);
+    border-color: var(--border-dark, #404040);
+  }
+
+  .error-state {
+    background: var(--surface-dark, #1e1e1e);
+  }
+}
+
+// Light Mode Support - Explicit light theme styles
+:host-context(.light-theme) .budget-management-container,
+.budget-management-container {
+  .budget-overview .summary-card {
+    background: linear-gradient(135deg, #9c27b0, #e91e63);
+    border-left-color: #9c27b0;
+  }
+
+  .create-form {
+    background: #ffffff;
+    border-left-color: #9c27b0;
+  }
+
+  .budget-card {
+    background: #ffffff;
+    border-left-color: #9c27b0;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .budget-card {
-      background: var(--surface-dark, #1e1e1e);
-      border-left-color: var(--primary-dark, #7b1fa2);
-      
-      &:hover {
-        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-      }
-
-      mat-card-actions {
-        border-top-color: var(--border-dark, #404040);
-      }
+    mat-card-actions {
+      border-top-color: #e0e0e0;
     }
+  }
 
-    .no-budgets {
-      background: var(--surface-dark, #1e1e1e);
-      border-color: var(--border-dark, #404040);
-    }
+  .no-budgets {
+    background: #ffffff;
+    border-color: #e0e0e0;
+  }
 
-    .loading {
-      background: var(--surface-dark, #1e1e1e);
-      border-color: var(--border-dark, #404040);
-    }
+  .loading {
+    background: #ffffff;
+    border-color: #e0e0e0;
+  }
 
-    .error-state {
-      background: var(--surface-dark, #1e1e1e);
-    }
+  .error-state {
+    background: #ffffff;
   }
 }
 

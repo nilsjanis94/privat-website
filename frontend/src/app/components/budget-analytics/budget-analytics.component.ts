@@ -12,7 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { FormsModule } from '@angular/forms';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { BudgetService } from '../../services/budget.service';
+import { BudgetService, BudgetAnalyticsData, TrendDataPoint, CategoryAnalysis } from '../../services/budget.service';
 import { InventoryService } from '../../services/inventory.service';
 import { StatisticsService, BudgetStatistics } from '../../services/statistics.service';
 import { ChartService } from '../../services/chart.service';
@@ -27,15 +27,6 @@ interface BudgetTrend {
   actual: number;
   variance: number;
   variancePercent: number;
-}
-
-interface CategoryAnalysis {
-  category: string;
-  budgeted: number;
-  spent: number;
-  remaining: number;
-  percentUsed: number;
-  trend: string; // 'up', 'down', 'stable'
 }
 
 interface BudgetForecast {
@@ -70,7 +61,7 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
   Math = Math;
   
   isLoading = false;
-  selectedPeriod = '6M';
+  selectedPeriod = '1M';
   selectedComparison = 'budget-vs-actual';
   
   // Data
@@ -78,6 +69,9 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
   budgetTrends: BudgetTrend[] = [];
   categoryAnalysis: CategoryAnalysis[] = [];
   budgetForecasts: BudgetForecast[] = [];
+  
+  // Analytics-Daten aus der neuen API
+  analyticsData: BudgetAnalyticsData | null = null;
   
   // Berechnete Budget-Statistiken
   budgetStats: BudgetStatistics | null = null;
@@ -257,14 +251,26 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
   loadAnalyticsData(): void {
     this.isLoading = true;
     
+    // Budgets laden (für Summary-Statistiken)
     this.subscription.add(
       this.budgetService.getBudgets().subscribe({
         next: (budgets) => {
           this.budgets = budgets;
           this.calculateStatistics();
-          this.generateTrendData();
-          this.generateCategoryAnalysis();
-          this.generateForecastData();
+        },
+        error: (error) => {
+          console.error('Fehler beim Laden der Budgets:', error);
+        }
+      })
+    );
+    
+    // Analytics-Daten laden (echte Daten!)
+    this.subscription.add(
+      this.budgetService.getBudgetAnalytics(this.selectedPeriod).subscribe({
+        next: (analyticsData) => {
+          this.analyticsData = analyticsData;
+          this.processAnalyticsData();
+          this.generateForecastData(); // Forecast bleibt simuliert für jetzt
           this.updateCharts();
           this.isLoading = false;
         },
@@ -274,6 +280,22 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  private processAnalyticsData(): void {
+    if (!this.analyticsData) return;
+    
+    // Trend-Daten von API in lokales Format konvertieren
+    this.budgetTrends = this.analyticsData.trend_data.map(item => ({
+      month: item.period_label,
+      planned: item.planned,
+      actual: item.actual,
+      variance: item.variance,
+      variancePercent: item.planned > 0 ? (item.variance / item.planned) * 100 : 0
+    }));
+    
+    // Kategorie-Daten direkt von API verwenden
+    this.categoryAnalysis = this.analyticsData.categories_analysis;
   }
 
   onPeriodChange(): void {
@@ -286,54 +308,6 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
 
   private calculateStatistics(): void {
     this.budgetStats = this.statisticsService.calculateBudgetStatistics(this.budgets);
-  }
-
-  private generateTrendData(): void {
-    // Simuliere monatliche Trend-Daten basierend auf dem gewählten Zeitraum
-    const monthCount = this.selectedPeriod === '3M' ? 3 : this.selectedPeriod === '6M' ? 6 : 12;
-    this.budgetTrends = [];
-    
-    for (let i = monthCount - 1; i >= 0; i--) {
-      const date = new Date();
-      date.setMonth(date.getMonth() - i);
-      const monthName = date.toLocaleString('de-DE', { month: 'short', year: '2-digit' });
-      
-      // Simuliere Daten (in echter App würden diese vom Backend kommen)
-      const planned = Math.random() * 1000 + 500;
-      const actual = planned * (0.7 + Math.random() * 0.6); // 70%-130% des geplanten Budgets
-      const variance = planned - actual;
-      const variancePercent = (variance / planned) * 100;
-      
-      this.budgetTrends.push({
-        month: monthName,
-        planned,
-        actual,
-        variance,
-        variancePercent
-      });
-    }
-  }
-
-  private generateCategoryAnalysis(): void {
-    const categories = ['Lebensmittel', 'Haushalt', 'Elektronik', 'Kleidung', 'Sonstiges'];
-    this.categoryAnalysis = [];
-    
-    categories.forEach(category => {
-      const budgeted = Math.random() * 500 + 200;
-      const spent = budgeted * (0.3 + Math.random() * 0.8);
-      const remaining = budgeted - spent;
-      const percentUsed = (spent / budgeted) * 100;
-      const trend = Math.random() > 0.5 ? 'up' : Math.random() > 0.5 ? 'down' : 'stable';
-      
-      this.categoryAnalysis.push({
-        category,
-        budgeted,
-        spent,
-        remaining,
-        percentUsed,
-        trend
-      });
-    });
   }
 
   private generateForecastData(): void {
@@ -358,10 +332,25 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
   }
 
   private updateCharts(): void {
+    this.updateChartOptions();
     this.updateTrendChart();
     this.updateCategoryChart();
     this.updateForecastChart();
     this.updateUtilizationChart();
+  }
+
+  private updateChartOptions(): void {
+    // Update trend chart options with dynamic title
+    this.trendChartOptions = {
+      ...this.trendChartOptions,
+      plugins: {
+        ...this.trendChartOptions?.plugins,
+        title: {
+          display: true,
+          text: this.getChartTitle()
+        }
+      }
+    };
   }
 
   private updateTrendChart(): void {
@@ -493,5 +482,31 @@ export class BudgetAnalyticsComponent implements OnInit, OnDestroy {
     link.download = `budget-analytics-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  // Hilfsmethode um Chart-Titel basierend auf Zeitraum zu generieren
+  private getChartTitle(): string {
+    switch (this.selectedPeriod) {
+      case '1D': return 'Budget vs. Tatsächliche Ausgaben (24 Stunden)';
+      case '1W': return 'Budget vs. Tatsächliche Ausgaben (7 Tage)';
+      case '1M': return 'Budget vs. Tatsächliche Ausgaben (4 Wochen)';
+      case '3M': return 'Budget vs. Tatsächliche Ausgaben (3 Monate)';
+      case '6M': return 'Budget vs. Tatsächliche Ausgaben (6 Monate)';
+      case '12M': return 'Budget vs. Tatsächliche Ausgaben (12 Monate)';
+      default: return 'Budget vs. Tatsächliche Ausgaben';
+    }
+  }
+
+  // Hilfsmethode um Zeitraum-spezifische Labels zu generieren
+  public getTimeUnitLabel(): string {
+    switch (this.selectedPeriod) {
+      case '1D': return 'Stunde';
+      case '1W': return 'Tag';
+      case '1M': return 'Woche';
+      case '3M':
+      case '6M':
+      case '12M': return 'Monat';
+      default: return 'Zeitraum';
+    }
   }
 } 

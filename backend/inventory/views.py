@@ -739,3 +739,233 @@ def budget_dashboard(request):
             'over_budget_details': budgets_over_limit
         }
     })
+
+# Budget Analytics Views - NEU
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def budget_analytics_data(request):
+    """Detaillierte Budget-Analytics mit echten historischen Daten"""
+    from .models import Budget
+    from django.db.models import Sum
+    
+    period = request.query_params.get('period', '1M')
+    user_items = Item.objects.filter(owner=request.user)
+    user_budgets = Budget.objects.filter(owner=request.user, is_active=True)
+    now = timezone.now()
+    
+    # Trend-Daten basierend auf echten Ausgaben generieren
+    trend_data = []
+    
+    if period == '1D':
+        # Letzte 24 Stunden
+        for i in range(24):
+            hour_start = now - timedelta(hours=i+1)
+            hour_end = now - timedelta(hours=i)
+            
+            # Items in dieser Stunde
+            hour_items = user_items.filter(
+                created_at__gte=hour_start,
+                created_at__lt=hour_end,
+                purchase_price__isnull=False
+            )
+            
+            actual_spending = sum(item.purchase_price or 0 for item in hour_items)
+            
+            # Geplante Ausgaben basierend auf Budget (geschätzt)
+            total_daily_budget = sum(float(b.amount) for b in user_budgets if b.period == 'monthly') / 30
+            planned_hourly = total_daily_budget / 24 if total_daily_budget > 0 else 0
+            
+            trend_data.append({
+                'period_label': hour_start.strftime('%H:%M'),
+                'planned': round(planned_hourly, 2),
+                'actual': float(actual_spending),
+                'variance': round(planned_hourly - float(actual_spending), 2),
+                'items_count': hour_items.count()
+            })
+    
+    elif period == '1W':
+        # Letzte 7 Tage
+        for i in range(7):
+            day = now.date() - timedelta(days=i)
+            
+            day_items = user_items.filter(
+                purchase_date=day,
+                purchase_price__isnull=False
+            )
+            
+            actual_spending = sum(item.purchase_price or 0 for item in day_items)
+            
+            # Geplante tägliche Ausgaben
+            total_daily_budget = sum(float(b.amount) for b in user_budgets if b.period == 'monthly') / 30
+            
+            trend_data.append({
+                'period_label': day.strftime('%a, %d.%m'),
+                'planned': round(total_daily_budget, 2),
+                'actual': float(actual_spending),
+                'variance': round(total_daily_budget - float(actual_spending), 2),
+                'items_count': day_items.count()
+            })
+    
+    elif period == '1M':
+        # Letzte 4 Wochen
+        for i in range(4):
+            week_start = now.date() - timedelta(weeks=i+1)
+            week_end = now.date() - timedelta(weeks=i)
+            
+            week_items = user_items.filter(
+                purchase_date__gte=week_start,
+                purchase_date__lt=week_end,
+                purchase_price__isnull=False
+            )
+            
+            actual_spending = sum(item.purchase_price or 0 for item in week_items)
+            
+            # Geplante wöchentliche Ausgaben
+            total_weekly_budget = sum(float(b.amount) for b in user_budgets if b.period == 'monthly') / 4
+            
+            week_number = week_start.isocalendar()[1]
+            
+            trend_data.append({
+                'period_label': f'KW {week_number}',
+                'planned': round(total_weekly_budget, 2),
+                'actual': float(actual_spending),
+                'variance': round(total_weekly_budget - float(actual_spending), 2),
+                'items_count': week_items.count()
+            })
+    
+    else:  # 3M, 6M, 12M
+        months = {'3M': 3, '6M': 6, '12M': 12}.get(period, 6)
+        
+        for i in range(months):
+            month_date = now - timedelta(days=30 * i)
+            month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)
+            
+            month_items = user_items.filter(
+                purchase_date__gte=month_start.date(),
+                purchase_date__lte=month_end.date(),
+                purchase_price__isnull=False
+            )
+            
+            actual_spending = sum(item.purchase_price or 0 for item in month_items)
+            
+            # Geplante monatliche Ausgaben
+            total_monthly_budget = sum(float(b.amount) for b in user_budgets if b.period == 'monthly')
+            
+            trend_data.append({
+                'period_label': month_start.strftime('%b %y'),
+                'planned': round(total_monthly_budget, 2),
+                'actual': float(actual_spending),
+                'variance': round(total_monthly_budget - float(actual_spending), 2),
+                'items_count': month_items.count()
+            })
+    
+    # Reverse für chronologische Reihenfolge
+    trend_data.reverse()
+    
+    # Kategorie-Analyse basierend auf echten Daten
+    categories_analysis = []
+    user_categories = Category.objects.filter(owner=request.user)
+    
+    # Zeitraum für Kategorien-Analyse
+    if period in ['1D', '1W']:
+        category_start = now.date() - timedelta(days=7)
+    elif period == '1M':
+        category_start = now.date() - timedelta(days=30)
+    else:
+        category_start = now.date() - timedelta(days=90)
+    
+    # 1. Erst Gesamtbudgets (category=null) behandeln
+    total_budgets = user_budgets.filter(category__isnull=True)
+    for total_budget in total_budgets:
+        # Alle Ausgaben für Gesamtbudget
+        all_items = user_items.filter(
+            purchase_date__gte=category_start,
+            purchase_price__isnull=False
+        )
+        
+        spent_amount = sum(item.purchase_price or 0 for item in all_items)
+        budgeted_amount = float(total_budget.amount)
+        
+        remaining = budgeted_amount - float(spent_amount)
+        percent_used = (float(spent_amount) / budgeted_amount * 100) if budgeted_amount > 0 else 0
+        
+        # Trend berechnen (Vergleich mit vorheriger Periode)
+        prev_start = category_start - (now.date() - category_start)
+        prev_items = user_items.filter(
+            purchase_date__gte=prev_start,
+            purchase_date__lt=category_start,
+            purchase_price__isnull=False
+        )
+        prev_spending = sum(item.purchase_price or 0 for item in prev_items)
+        
+        if prev_spending > 0:
+            trend = 'up' if spent_amount > float(prev_spending) else 'down' if spent_amount < float(prev_spending) else 'stable'
+        else:
+            trend = 'up' if spent_amount > 0 else 'stable'
+        
+        categories_analysis.append({
+            'category': f'{total_budget.name} (Alle Kategorien)',
+            'budgeted': budgeted_amount,
+            'spent': float(spent_amount),
+            'remaining': remaining,
+            'percent_used': round(percent_used, 1),
+            'trend': trend,
+            'items_count': all_items.count()
+        })
+    
+    # 2. Dann kategorienspezifische Budgets
+    for category in user_categories:
+        # Budget für diese Kategorie
+        category_budget = user_budgets.filter(category=category).first()
+        budgeted_amount = float(category_budget.amount) if category_budget else 0
+        
+        # Tatsächliche Ausgaben in dieser Kategorie
+        category_items = user_items.filter(
+            category=category,
+            purchase_date__gte=category_start,
+            purchase_price__isnull=False
+        )
+        
+        spent_amount = sum(item.purchase_price or 0 for item in category_items)
+        
+        if budgeted_amount > 0 or spent_amount > 0:
+            remaining = budgeted_amount - float(spent_amount)
+            percent_used = (float(spent_amount) / budgeted_amount * 100) if budgeted_amount > 0 else 0
+            
+            # Trend berechnen (Vergleich mit vorheriger Periode)
+            prev_start = category_start - (now.date() - category_start)
+            prev_items = user_items.filter(
+                category=category,
+                purchase_date__gte=prev_start,
+                purchase_date__lt=category_start,
+                purchase_price__isnull=False
+            )
+            prev_spending = sum(item.purchase_price or 0 for item in prev_items)
+            
+            if prev_spending > 0:
+                trend = 'up' if spent_amount > float(prev_spending) else 'down' if spent_amount < float(prev_spending) else 'stable'
+            else:
+                trend = 'up' if spent_amount > 0 else 'stable'
+            
+            categories_analysis.append({
+                'category': category.name,
+                'budgeted': budgeted_amount,
+                'spent': float(spent_amount),
+                'remaining': remaining,
+                'percent_used': round(percent_used, 1),
+                'trend': trend,
+                'items_count': category_items.count()
+            })
+    
+    return Response({
+        'period': period,
+        'trend_data': trend_data,
+        'categories_analysis': categories_analysis,
+        'summary': {
+            'total_planned': sum(item['planned'] for item in trend_data),
+            'total_actual': sum(item['actual'] for item in trend_data),
+            'total_variance': sum(item['variance'] for item in trend_data),
+            'total_items': sum(item['items_count'] for item in trend_data)
+        }
+    })

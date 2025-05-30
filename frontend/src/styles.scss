@@ -48,6 +48,8 @@
   --surface: #ffffff;
   --surface-variant: #f8fafc;
   --surface-accent: #faf9ff;
+  --surface-hover: #f1f5f9;
+  --surface-form-field: #ffffff;
   --background: var(--gray-50);
   
   // Text Colors (Light Theme)
@@ -129,6 +131,8 @@
   --surface: #1a1a3a;
   --surface-variant: #252545;
   --surface-accent: #2d1b4e;
+  --surface-hover: #303050;
+  --surface-form-field: #3a3a5a;
   --background: var(--gray-50);
 
   // Text Colors (Dark Theme)
@@ -154,6 +158,501 @@
   --warning: #fbbf24;
   --error: #f87171;
   --info: #60a5fa;
+
+  // Material Card Dark Mode Overrides
+  .mat-mdc-card {
+    background: var(--surface) !important;
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-primary) !important;
+    
+    .mat-mdc-card-header {
+      background: var(--surface) !important;
+      background-color: var(--surface) !important;
+      color: var(--text-primary) !important;
+      
+      .mat-mdc-card-title {
+        color: var(--text-primary) !important;
+      }
+      
+      .mat-mdc-card-subtitle {
+        color: var(--text-secondary) !important;
+      }
+    }
+    
+    .mat-mdc-card-content {
+      background: var(--surface) !important;
+      background-color: var(--surface) !important;
+      color: var(--text-primary) !important;
+    }
+    
+    .mat-mdc-card-actions {
+      background: var(--surface) !important;
+      background-color: var(--surface) !important;
+    }
+  }
+
+  // Material Form Field Dark Mode Overrides
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background: var(--surface-form-field) !important;
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: var(--border-primary) !important;
+    }
+
+    &:hover .mdc-notched-outline__leading,
+    &:hover .mdc-notched-outline__notch,
+    &:hover .mdc-notched-outline__trailing {
+      border-color: var(--primary-400) !important;
+    }
+
+    &.mat-focused .mdc-notched-outline__leading,
+    &.mat-focused .mdc-notched-outline__notch,
+    &.mat-focused .mdc-notched-outline__trailing {
+      border-color: var(--primary-400) !important;
+    }
+
+    .mdc-floating-label {
+      color: var(--text-secondary) !important;
+
+      &.mdc-floating-label--float-above {
+        color: var(--primary-400) !important;
+      }
+    }
+
+    .mat-mdc-input-element {
+      color: var(--text-primary) !important;
+      background: var(--surface-form-field) !important;
+      caret-color: var(--primary-400) !important;
+
+      &::placeholder {
+        color: var(--text-muted) !important;
+      }
+    }
+
+    textarea.mat-mdc-input-element {
+      color: var(--text-primary) !important;
+      background: var(--surface-form-field) !important;
+    }
+
+    .mat-mdc-form-field-hint {
+      color: var(--text-secondary) !important;
+    }
+
+    .mat-mdc-form-field-error {
+      color: var(--error) !important;
+    }
+
+    .mat-mdc-form-field-icon-suffix {
+      color: var(--primary-400) !important;
+    }
+
+    .mat-mdc-form-field-text-prefix {
+      color: var(--text-secondary) !important;
+    }
+  }
+
+  // Material Datepicker Icon Dark Mode Overrides
+  .mat-datepicker-toggle {
+    color: var(--primary-400) !important;
+
+    .mat-mdc-icon-button {
+      color: var(--primary-400) !important;
+    }
+
+    .mat-datepicker-toggle-default-icon {
+      color: var(--primary-400) !important;
+      fill: var(--primary-400) !important;
+    }
+
+    &:hover {
+      .mat-mdc-icon-button {
+        background: rgba(124, 90, 192, 0.1) !important; // Leichter Hover-Effekt
+      }
+    }
+  }
+
+  // Material Select Dark Mode Overrides
+  .mat-mdc-select {
+    color: var(--text-primary) !important;
+
+    .mat-mdc-select-trigger {
+      color: var(--text-primary) !important;
+      background: var(--surface-form-field) !important;
+    }
+
+    .mat-mdc-select-value {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-mdc-select-value-text {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-mdc-select-arrow {
+      color: var(--text-secondary) !important;
+    }
+
+    .mat-mdc-select-placeholder {
+      color: var(--text-muted) !important;
+    }
+  }
+
+  // Additional Material Component Dark Mode Fixes
+  .mdc-select__selected-text {
+    color: var(--text-primary) !important;
+  }
+
+  .mdc-list-item__primary-text {
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-option .mdc-list-item__primary-text {
+    color: var(--text-primary) !important;
+  }
+
+  // All Angular Material Overlays in Dark Mode
+  .cdk-overlay-container {
+    // Menu-Panels (für alle Dropdown-Menüs)
+    .mat-mdc-menu-panel {
+      background: var(--surface) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      color: var(--text-primary) !important;
+      
+      .mat-mdc-menu-item {
+        color: var(--text-primary) !important;
+        background: var(--surface) !important;
+        
+        &:hover:not(:disabled) {
+          background: var(--surface-hover) !important;
+          color: var(--text-primary) !important;
+        }
+        
+        &:disabled {
+          color: var(--text-muted) !important;
+          opacity: 0.5 !important;
+        }
+        
+        .mat-mdc-menu-item-text {
+          color: inherit !important;
+        }
+        
+        mat-icon {
+          color: var(--text-secondary) !important;
+        }
+        
+        .coming-soon {
+          background: var(--surface-variant) !important;
+          color: var(--text-muted) !important;
+          border-color: var(--border-primary) !important;
+        }
+        
+        &.logout-item {
+          color: var(--error) !important;
+          
+          &:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+          }
+        }
+        
+        &.active {
+          background: var(--surface-accent) !important;
+          color: var(--primary-400) !important;
+        }
+      }
+      
+      .mat-mdc-menu-divider {
+        border-color: var(--border-primary) !important;
+        background: var(--border-primary) !important;
+      }
+    }
+    
+    // Select-Dropdowns
+    .mat-mdc-select-panel {
+      background: var(--surface) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      
+      .mat-mdc-option {
+        color: var(--text-primary) !important;
+        background: var(--surface) !important;
+        
+        &:hover:not(.mdc-list-item--disabled) {
+          background: var(--surface-hover) !important;
+        }
+        
+        &.mdc-list-item--selected {
+          background: var(--primary-900) !important;
+          color: var(--primary-300) !important;
+        }
+        
+        &.mat-mdc-option-active {
+          background: var(--surface-hover) !important;
+        }
+      }
+    }
+    
+    // Autocomplete-Dropdowns
+    .mat-mdc-autocomplete-panel {
+      background: var(--surface) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      
+      .mat-mdc-option {
+        color: var(--text-primary) !important;
+        background: var(--surface) !important;
+        
+        &:hover:not(.mdc-list-item--disabled) {
+          background: var(--surface-hover) !important;
+        }
+        
+        &.mdc-list-item--selected {
+          background: var(--primary-900) !important;
+          color: var(--primary-300) !important;
+        }
+      }
+    }
+    
+    // Tooltips
+    .mat-mdc-tooltip {
+      background: var(--surface-secondary) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-md) !important;
+    }
+    
+    // Dialog-Overlays
+    .mat-mdc-dialog-container {
+      background: var(--surface) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      
+      .mat-mdc-dialog-title {
+        color: var(--text-primary) !important;
+      }
+      
+      .mat-mdc-dialog-content {
+        color: var(--text-secondary) !important;
+      }
+    }
+    
+    // Snackbar-Overlays
+    .mat-mdc-snack-bar-container {
+      background: var(--surface-secondary) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-primary) !important;
+      
+      .mat-mdc-button {
+        color: var(--primary-400) !important;
+      }
+    }
+    
+    // Datepicker-Overlays
+    .mat-datepicker-popup {
+      background: var(--surface) !important;
+      border: 1px solid var(--border-primary) !important;
+      box-shadow: var(--shadow-xl) !important;
+      
+      .mat-calendar {
+        background: var(--surface) !important;
+        color: var(--text-primary) !important;
+
+        .mat-calendar-header {
+          background: var(--surface-variant) !important;
+          color: var(--text-primary) !important;
+
+          .mat-calendar-arrow {
+            border-top-color: var(--text-primary) !important;
+          }
+
+          .mat-calendar-controls {
+            .mat-mdc-button {
+              color: var(--text-primary) !important;
+            }
+          }
+
+          .mat-calendar-period-button {
+            color: var(--text-primary) !important;
+          }
+
+          .mat-calendar-next-button,
+          .mat-calendar-previous-button {
+            color: var(--text-primary) !important;
+          }
+        }
+
+        .mat-calendar-content {
+          background: var(--surface) !important;
+          color: var(--text-primary) !important;
+
+          .mat-calendar-table {
+            .mat-calendar-body-cell {
+              color: var(--text-primary) !important;
+
+              &:hover {
+                background: var(--surface-hover) !important;
+              }
+
+              &.mat-calendar-body-active {
+                background: var(--primary-600) !important;
+                color: white !important;
+              }
+
+              &.mat-calendar-body-selected {
+                background: var(--primary-600) !important;
+                color: white !important;
+              }
+
+              &.mat-calendar-body-comparison-identical {
+                background: var(--primary-800) !important;
+              }
+
+              &.mat-calendar-body-today {
+                border-color: var(--primary-400) !important;
+                color: var(--text-primary) !important;
+              }
+
+              &.mat-calendar-body-disabled {
+                color: var(--text-muted) !important;
+              }
+
+              // Spezifische Styles für Zellen-Inhalt
+              .mat-calendar-body-cell-content {
+                color: inherit !important;
+              }
+            }
+
+            .mat-calendar-body-label {
+              color: var(--text-secondary) !important;
+              font-weight: 500 !important;
+            }
+
+            // Wochentage Header
+            .mat-calendar-table-header {
+              th {
+                color: var(--text-secondary) !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // User Dropdown Dark Mode
+  .cdk-overlay-pane .user-dropdown {
+    .mat-mdc-menu-panel {
+      background: var(--surface) !important;
+      border-color: var(--border-primary) !important;
+    }
+    
+    .dropdown-name {
+      color: var(--text-primary) !important;
+    }
+    
+    .dropdown-email {
+      color: var(--text-secondary) !important;
+    }
+    
+    .mat-mdc-menu-item:hover:not(:disabled) {
+      background: var(--surface-hover) !important;
+    }
+    
+    .coming-soon {
+      background: var(--surface-variant) !important;
+      color: var(--text-muted) !important;
+      border-color: var(--border-primary) !important;
+    }
+    
+    .theme-indicator {
+      background: var(--surface-accent) !important;
+      color: var(--primary-400) !important;
+      border-color: var(--border-accent) !important;
+    }
+  }
+  
+  // Theme Menu Dark Mode
+  .cdk-overlay-pane .theme-menu {
+    .mat-mdc-menu-panel {
+      background: var(--surface) !important;
+      border-color: var(--border-primary) !important;
+    }
+    
+    .theme-menu-header {
+      background: var(--surface-accent) !important;
+      color: var(--primary-400) !important;
+      border-bottom-color: var(--border-primary) !important;
+    }
+    
+    .mat-mdc-menu-item {
+      color: var(--text-primary) !important;
+      
+      &:hover {
+        background: var(--surface-hover) !important;
+      }
+      
+      &.active {
+        background: var(--surface-accent) !important;
+        color: var(--primary-400) !important;
+      }
+      
+      .check-icon {
+        color: var(--primary-400) !important;
+      }
+    }
+  }
+
+  // Material Slide Toggle Dark Mode Overrides
+  .mat-mdc-slide-toggle {
+    color: var(--text-primary) !important;
+
+    .mdc-label {
+      color: var(--text-primary) !important;
+    }
+
+    .mdc-form-field {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-internal-form-field {
+      color: var(--text-primary) !important;
+    }
+
+    // Switch Track und Handle Styles
+    .mdc-switch {
+      &.mdc-switch--unselected {
+        .mdc-switch__track {
+          background: var(--gray-600) !important;
+          border-color: var(--gray-600) !important;
+        }
+
+        .mdc-switch__handle {
+          .mdc-switch__shadow {
+            background: var(--gray-700) !important;
+          }
+        }
+      }
+
+      &.mdc-switch--selected {
+        .mdc-switch__track {
+          background: var(--primary-600) !important;
+          border-color: var(--primary-600) !important;
+        }
+
+        .mdc-switch__handle {
+          .mdc-switch__shadow {
+            background: var(--primary-700) !important;
+          }
+        }
+      }
+    }
+  }
 }
 
 // Global styles
@@ -880,317 +1379,6 @@ html, body {
   border: 1px solid var(--border-accent) !important;
 }
 
-// === DARK MODE OVERLAY STYLES (GLOBAL) ===
-.dark-theme {
-  // All Angular Material Overlays in Dark Mode
-  .cdk-overlay-container {
-    // Menu-Panels (für alle Dropdown-Menüs)
-    .mat-mdc-menu-panel {
-      background: var(--surface) !important;
-      border: 1px solid var(--border-primary) !important;
-      box-shadow: var(--shadow-xl) !important;
-      color: var(--text-primary) !important;
-      
-      .mat-mdc-menu-item {
-        color: var(--text-primary) !important;
-        background: var(--surface) !important;
-        
-        &:hover:not(:disabled) {
-          background: var(--surface-hover) !important;
-          color: var(--text-primary) !important;
-        }
-        
-        &:disabled {
-          color: var(--text-muted) !important;
-          opacity: 0.5 !important;
-        }
-        
-        .mat-mdc-menu-item-text {
-          color: inherit !important;
-        }
-        
-        mat-icon {
-          color: var(--text-secondary) !important;
-        }
-        
-        .coming-soon {
-          background: var(--surface-variant) !important;
-          color: var(--text-muted) !important;
-          border-color: var(--border-primary) !important;
-        }
-        
-        &.logout-item {
-          color: var(--error) !important;
-          
-          &:hover {
-            background: rgba(239, 68, 68, 0.1) !important;
-          }
-        }
-        
-        &.active {
-          background: var(--surface-accent) !important;
-          color: var(--primary-400) !important;
-        }
-      }
-      
-      .mat-mdc-menu-divider {
-        border-color: var(--border-primary) !important;
-        background: var(--border-primary) !important;
-      }
-    }
-    
-    // Select-Dropdowns
-    .mat-mdc-select-panel {
-      background: var(--surface) !important;
-      border: 1px solid var(--border-primary) !important;
-      box-shadow: var(--shadow-xl) !important;
-      
-      .mat-mdc-option {
-        color: var(--text-primary) !important;
-        background: var(--surface) !important;
-        
-        &:hover:not(.mdc-list-item--disabled) {
-          background: var(--surface-hover) !important;
-        }
-        
-        &.mdc-list-item--selected {
-          background: var(--primary-900) !important;
-          color: var(--primary-300) !important;
-        }
-        
-        &.mat-mdc-option-active {
-          background: var(--surface-hover) !important;
-        }
-      }
-    }
-    
-    // Autocomplete-Dropdowns
-    .mat-mdc-autocomplete-panel {
-      background: var(--surface) !important;
-      border: 1px solid var(--border-primary) !important;
-      box-shadow: var(--shadow-xl) !important;
-      
-      .mat-mdc-option {
-        color: var(--text-primary) !important;
-        background: var(--surface) !important;
-        
-        &:hover:not(.mdc-list-item--disabled) {
-          background: var(--surface-hover) !important;
-        }
-        
-        &.mdc-list-item--selected {
-          background: var(--primary-900) !important;
-          color: var(--primary-300) !important;
-        }
-      }
-    }
-    
-    // Tooltips
-    .mat-mdc-tooltip {
-      background: var(--surface-secondary) !important;
-      color: var(--text-primary) !important;
-      border: 1px solid var(--border-primary) !important;
-      box-shadow: var(--shadow-md) !important;
-    }
-    
-    // Dialog-Overlays
-    .mat-mdc-dialog-container {
-      background: var(--surface) !important;
-      color: var(--text-primary) !important;
-      border: 1px solid var(--border-primary) !important;
-      box-shadow: var(--shadow-xl) !important;
-      
-      .mat-mdc-dialog-title {
-        color: var(--text-primary) !important;
-      }
-      
-      .mat-mdc-dialog-content {
-        color: var(--text-secondary) !important;
-      }
-    }
-    
-    // Snackbar-Overlays
-    .mat-mdc-snack-bar-container {
-      background: var(--surface-secondary) !important;
-      color: var(--text-primary) !important;
-      border: 1px solid var(--border-primary) !important;
-      
-      .mat-mdc-button {
-        color: var(--primary-400) !important;
-      }
-    }
-    
-    // Datepicker-Overlays
-    .mat-datepicker-popup {
-      background: var(--surface) !important;
-      border: 1px solid var(--border-primary) !important;
-      box-shadow: var(--shadow-xl) !important;
-      
-      .mat-calendar {
-        background: var(--surface) !important;
-        color: var(--text-primary) !important;
-      }
-      
-      .mat-calendar-header {
-        background: var(--surface-secondary) !important;
-        color: var(--text-primary) !important;
-      }
-      
-      .mat-calendar-body-cell {
-        color: var(--text-primary) !important;
-        
-        &:hover {
-          background: var(--surface-hover) !important;
-        }
-        
-        &.mat-calendar-body-active {
-          background: var(--primary-600) !important;
-          color: white !important;
-        }
-      }
-    }
-  }
-  
-  // User Dropdown Dark Mode
-  .cdk-overlay-pane .user-dropdown {
-    .mat-mdc-menu-panel {
-      background: var(--surface) !important;
-      border-color: var(--border-primary) !important;
-    }
-    
-    .dropdown-name {
-      color: var(--text-primary) !important;
-    }
-    
-    .dropdown-email {
-      color: var(--text-secondary) !important;
-    }
-    
-    .mat-mdc-menu-item:hover:not(:disabled) {
-      background: var(--surface-hover) !important;
-    }
-    
-    .coming-soon {
-      background: var(--surface-variant) !important;
-      color: var(--text-muted) !important;
-      border-color: var(--border-primary) !important;
-    }
-    
-    .theme-indicator {
-      background: var(--surface-accent) !important;
-      color: var(--primary-400) !important;
-      border-color: var(--border-accent) !important;
-    }
-  }
-  
-  // Theme Menu Dark Mode
-  .cdk-overlay-pane .theme-menu {
-    .mat-mdc-menu-panel {
-      background: var(--surface) !important;
-      border-color: var(--border-primary) !important;
-    }
-    
-    .theme-menu-header {
-      background: var(--surface-accent) !important;
-      color: var(--primary-400) !important;
-      border-bottom-color: var(--border-primary) !important;
-    }
-    
-    .mat-mdc-menu-item {
-      color: var(--text-primary) !important;
-      
-      &:hover {
-        background: var(--surface-hover) !important;
-      }
-      
-      &.active {
-        background: var(--surface-accent) !important;
-        color: var(--primary-400) !important;
-      }
-      
-      .check-icon {
-        color: var(--primary-400) !important;
-      }
-    }
-  }
-}
-
-// Sort-Header Dark Mode (falls später hinzugefügt)
-.dark-theme {
-  .mat-sort-header-button {
-    color: var(--text-primary) !important;
-    
-    &:hover {
-      color: var(--primary-400) !important;
-    }
-  }
-  
-  .mat-sort-header-arrow {
-    color: var(--primary-400) !important;
-  }
-  
-  .mat-sort-header-sorted {
-    color: var(--primary-400) !important;
-  }
-
-  // Material Tabs Dark Mode Fix
-  .mat-mdc-tab-group {
-    .mat-mdc-tab-label {
-      color: var(--text-primary) !important;
-      
-      &.mdc-tab--active {
-        color: var(--primary-500) !important;
-      }
-
-      .mdc-tab__text-label {
-        color: inherit !important;
-      }
-    }
-
-    .mat-mdc-tab-header {
-      border-bottom-color: var(--border-primary) !important;
-    }
-
-    .mdc-tab-indicator__content--underline {
-      border-color: var(--primary-500) !important;
-    }
-
-    .mat-mdc-tab-body {
-      color: var(--text-primary) !important;
-    }
-  }
-
-  // Spezifischer Fix für Scanner Tabs
-  .scanner-container .mat-mdc-tab-group {
-    .mat-mdc-tab-label {
-      color: var(--text-primary) !important;
-      
-      &.mdc-tab--active {
-        color: var(--primary-500) !important;
-      }
-
-      .mdc-tab__text-label {
-        color: inherit !important;
-      }
-    }
-  }
-
-  // Sehr spezifischer Fix für mdc-tab__text-label
-  .mdc-tab__text-label {
-    color: var(--text-primary) !important;
-  }
-
-  // Fallback für alle Tab-Text-Labels
-  span.mdc-tab__text-label {
-    color: var(--text-primary) !important;
-  }
-
-  // Zusätzlicher Fix für Material Tab-Ripple Effekte
-  .mat-mdc-tab .mat-ripple-element {
-    background: rgba(255, 255, 255, 0.1) !important;
-  }
-}
-
 // === GLOBAL MATERIAL TAB FIXES ===
 // Universal Fix für Tab-Text-Labels in allen Themes
 .mat-mdc-tab-group .mdc-tab__text-label {
@@ -1205,4 +1393,24 @@ html, body {
 // Fallback für alle mdc-tab__text-label Spans
 span.mdc-tab__text-label {
   color: var(--text-primary) !important;
+}
+
+// Material Datepicker Icon Styling (Light Mode)
+.mat-datepicker-toggle {
+  color: var(--primary-600) !important;
+
+  .mat-mdc-icon-button {
+    color: var(--primary-600) !important;
+  }
+
+  .mat-datepicker-toggle-default-icon {
+    color: var(--primary-600) !important;
+    fill: var(--primary-600) !important;
+  }
+
+  &:hover {
+    .mat-mdc-icon-button {
+      background: rgba(124, 58, 237, 0.1) !important; // Leichter Hover-Effekt
+    }
+  }
 }

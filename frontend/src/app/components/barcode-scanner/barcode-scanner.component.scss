@@ -3,6 +3,28 @@
   max-width: 800px;
   margin: 0 auto;
 
+  // Erweiterte Container-Breite für große Bildschirme
+  @media (min-width: 1200px) {
+    max-width: 1200px;
+    padding: 32px;
+  }
+
+  @media (min-width: 1600px) {
+    max-width: 1400px;
+    padding: 40px;
+  }
+
+  @media (min-width: 1920px) {
+    max-width: 1600px;
+    padding: 48px;
+  }
+
+  // Für Ultra-wide Displays
+  @media (min-width: 2560px) {
+    max-width: 1800px;
+    padding: 60px;
+  }
+
   .header {
     text-align: center;
     margin-bottom: 24px;
@@ -475,10 +497,13 @@
     animation: slideInUp 0.3s ease-out;
     max-width: 100%;
     overflow: hidden;
+    background: var(--surface) !important;
 
     mat-card-header {
       padding-bottom: 16px;
       border-bottom: 1px solid var(--border-primary);
+      max-width: 100%;
+      overflow: hidden;
 
       mat-card-title {
         display: flex;
@@ -506,6 +531,7 @@
       padding: 24px !important;
       max-width: 100%;
       overflow-x: hidden;
+      box-sizing: border-box;
     }
 
     .form-grid {
@@ -531,6 +557,20 @@
       @media (min-width: 1400px) {
         gap: 48px;
       }
+
+      // Extra Abstand für große Bildschirme (Vollbild)
+      @media (min-width: 1600px) {
+        gap: 56px;
+        grid-template-columns: repeat(3, minmax(280px, 1fr));
+        align-items: stretch;
+      }
+
+      // Für sehr breite Bildschirme: bleibe bei 3 Spalten aber mit mehr Platz
+      @media (min-width: 1920px) {
+        gap: 64px;
+        grid-template-columns: repeat(3, minmax(350px, 1fr));
+        max-width: none; // Nutze vollen verfügbaren Platz
+      }
     }
 
     .form-section {
@@ -540,6 +580,11 @@
       min-width: 0; // Verhindert Overflow
       width: 100%;
       min-height: fit-content;
+
+      // Extra vertikaler Abstand für große Bildschirme
+      @media (min-width: 1600px) {
+        gap: 28px;
+      }
 
       h3 {
         margin: 0 0 16px 0;
@@ -570,7 +615,44 @@
         width: 100%;
 
         mat-slide-toggle {
+          color: var(--text-primary);
           font-weight: 500;
+
+          .mdc-label {
+            color: var(--text-primary) !important;
+          }
+
+          .mdc-form-field {
+            color: var(--text-primary) !important;
+          }
+
+          .mat-internal-form-field {
+            color: var(--text-primary) !important;
+          }
+
+          .mdc-switch__track {
+            background: var(--gray-600);
+
+            &::before {
+              background: var(--gray-600);
+            }
+          }
+
+          &.mat-checked {
+            .mdc-switch__track {
+              background: var(--primary-600);
+
+              &::before {
+                background: var(--primary-600);
+              }
+            }
+
+            .mdc-switch__handle {
+              .mdc-switch__icon {
+                color: var(--primary-600);
+              }
+            }
+          }
         }
 
         .toggle-description {
@@ -640,7 +722,7 @@
     // Material form field overrides
     mat-form-field {
       width: 100%;
-      margin-bottom: 16px !important; // Extra Abstand zwischen Feldern
+      margin-bottom: 24px !important; // Erhöhter Abstand zwischen Feldern für Vollbildmodus
       
       &.mat-mdc-form-field {
         .mat-mdc-text-field-wrapper {
@@ -660,7 +742,7 @@
         .mat-mdc-form-field-error {
           color: var(--error);
           font-size: 0.85rem;
-          margin-top: 4px;
+          margin-top: 6px;
           position: relative;
           z-index: 10;
         }
@@ -668,20 +750,20 @@
         .mat-mdc-form-field-hint {
           color: var(--text-secondary);
           font-size: 0.85rem;
-          margin-top: 4px;
+          margin-top: 6px;
           position: relative;
           z-index: 10;
           line-height: 1.3;
-          padding-bottom: 2px;
+          padding-bottom: 4px;
         }
 
-        // Spezifische Styling für hint container
+        // Verbesserte Styling für hint container
         .mat-mdc-form-field-subscript-wrapper {
           position: relative;
-          min-height: 20px;
-          margin-top: 4px;
-          margin-bottom: 8px;
-          padding-bottom: 4px;
+          min-height: 28px; // Erhöhte min-height für mehr Platz
+          margin-top: 6px;
+          margin-bottom: 12px; // Erhöhtes margin-bottom
+          padding-bottom: 8px; // Erhöhtes padding-bottom
         }
 
         .mdc-notched-outline__leading,
@@ -709,6 +791,30 @@
           color: var(--text-primary);
           background: transparent;
         }
+
+        // Extra Abstand für Form Fields mit Hints
+        &:has(.mat-mdc-form-field-hint) {
+          margin-bottom: 32px !important;
+
+          @media (min-width: 1600px) {
+            margin-bottom: 40px !important;
+          }
+        }
+
+        // Fallback für Browser ohne :has() Support
+        &.mat-mdc-form-field:nth-child(n+2) {
+          margin-top: 8px !important;
+        }
+
+        // Spezifische Regeln für bekannte Felder mit Hints
+        &[ng-reflect-name="expiry_date"],
+        &[ng-reflect-name="expected_lifetime_days"] {
+          margin-bottom: 32px !important;
+
+          @media (min-width: 1600px) {
+            margin-bottom: 40px !important;
+          }
+        }
       }
     }
 
@@ -734,6 +840,26 @@
     // Datepicker styling
     .mat-mdc-form-field-icon-suffix {
       color: var(--primary-600);
+    }
+
+    // Datepicker Icon Styling (Light Mode)
+    .mat-datepicker-toggle {
+      color: var(--primary-600);
+
+      .mat-mdc-icon-button {
+        color: var(--primary-600);
+      }
+
+      .mat-datepicker-toggle-default-icon {
+        color: var(--primary-600);
+        fill: var(--primary-600);
+      }
+
+      &:hover {
+        .mat-mdc-icon-button {
+          background: rgba(124, 58, 237, 0.1);
+        }
+      }
     }
   }
 
@@ -862,7 +988,7 @@
 // === DARK MODE SUPPORT FOR ADD FORM ===
 .dark-theme .scanner-container {
   .add-form-card {
-    background: var(--surface);
+    background: var(--surface) !important;
     border-left-color: var(--success);
     border: 1px solid var(--border-primary);
 
@@ -895,6 +1021,19 @@
 
         mat-slide-toggle {
           color: var(--text-primary);
+          font-weight: 500;
+
+          .mdc-label {
+            color: var(--text-primary) !important;
+          }
+
+          .mdc-form-field {
+            color: var(--text-primary) !important;
+          }
+
+          .mat-internal-form-field {
+            color: var(--text-primary) !important;
+          }
 
           .mdc-switch__track {
             background: var(--gray-600);
@@ -922,7 +1061,10 @@
         }
 
         .toggle-description {
+          margin: 0;
+          font-size: 0.9rem;
           color: var(--text-secondary);
+          line-height: 1.4;
         }
       }
     }
@@ -953,7 +1095,7 @@
     mat-form-field {
       &.mat-mdc-form-field {
         .mat-mdc-text-field-wrapper {
-          background: var(--surface) !important;
+          background: var(--surface-form-field) !important;
         }
 
         .mdc-notched-outline__leading,
@@ -986,7 +1128,7 @@
         .mat-mdc-input-element {
           color: var(--text-primary) !important;
           caret-color: var(--primary-400) !important;
-          background: transparent !important;
+          background: var(--surface-form-field) !important;
 
           &::placeholder {
             color: var(--text-muted) !important;
@@ -995,20 +1137,27 @@
 
         textarea.mat-mdc-input-element {
           color: var(--text-primary) !important;
-          background: transparent !important;
+          background: var(--surface-form-field) !important;
         }
 
         .mat-mdc-form-field-error {
           color: var(--error) !important;
+          margin-top: 6px !important;
         }
 
         .mat-mdc-form-field-hint {
           color: var(--text-secondary) !important;
+          margin-top: 6px !important;
+          padding-bottom: 4px !important;
         }
 
         .mat-mdc-form-field-subscript-wrapper {
           color: var(--text-secondary) !important;
           background: transparent !important;
+          min-height: 28px !important;
+          margin-top: 6px !important;
+          margin-bottom: 12px !important;
+          padding-bottom: 8px !important;
         }
 
         .mat-mdc-form-field-icon-suffix {
@@ -1040,7 +1189,15 @@
 
       .mat-mdc-select-trigger {
         color: var(--text-primary) !important;
-        background: transparent !important;
+        background: var(--surface-form-field) !important;
+
+        .mat-mdc-select-value {
+          color: var(--text-primary) !important;
+        }
+
+        .mat-mdc-select-value-text {
+          color: var(--text-primary) !important;
+        }
       }
 
       .mat-mdc-select-arrow {
@@ -1056,11 +1213,31 @@
       .mat-mdc-select-placeholder {
         color: var(--text-muted) !important;
       }
+
+      // Explizite Styles für ausgewählten Text
+      .mdc-select__selected-text {
+        color: var(--text-primary) !important;
+      }
     }
 
     // Datepicker dark mode
     .mat-datepicker-toggle {
       color: var(--primary-400) !important;
+
+      .mat-mdc-icon-button {
+        color: var(--primary-400) !important;
+      }
+
+      .mat-datepicker-toggle-default-icon {
+        color: var(--primary-400) !important;
+        fill: var(--primary-400) !important;
+      }
+
+      &:hover {
+        .mat-mdc-icon-button {
+          background: rgba(124, 90, 192, 0.1) !important;
+        }
+      }
     }
 
     .mat-mdc-form-field-subscript-wrapper {
@@ -1330,6 +1507,66 @@
 
   .subtitle {
     color: var(--text-secondary);
+  }
+}
+
+// Sehr spezifische Dark Mode Regel für die mat-card
+.dark-theme mat-card.add-form-card,
+.dark-theme .mat-mdc-card.add-form-card {
+  background: var(--surface) !important;
+  background-color: var(--surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-primary) !important;
+  
+  .mat-mdc-card-header {
+    background: var(--surface) !important;
+    background-color: var(--surface) !important;
+  }
+
+  .mat-mdc-card-content {
+    background: var(--surface) !important;
+    background-color: var(--surface) !important;
+  }
+}
+
+// Nochmals spezifischer für Angular Material
+:host-context(.dark-theme) mat-card.add-form-card,
+:host-context(.dark-theme) .mat-mdc-card.add-form-card {
+  background: var(--surface) !important;
+  background-color: var(--surface) !important;
+  color: var(--text-primary) !important;
+}
+
+// Allgemeine mat-card Dark Mode Regel
+.dark-theme .mat-mdc-card {
+  background: var(--surface) !important;
+  background-color: var(--surface) !important;
+  color: var(--text-primary) !important;
+}
+
+// Datepicker Dark Mode Fixes
+.cdk-overlay-container .mat-datepicker-popup {
+  .mat-calendar {
+    .mat-calendar-body-cell {
+      color: var(--text-primary) !important;
+
+      .mat-calendar-body-cell-content {
+        color: var(--text-primary) !important;
+      }
+    }
+
+    .mat-calendar-table-header th {
+      color: var(--text-secondary) !important;
+    }
+
+    .mat-calendar-period-button {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-calendar-next-button,
+    .mat-calendar-previous-button {
+      color: var(--text-primary) !important;
+    }
   }
 }
 

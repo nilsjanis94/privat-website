@@ -208,13 +208,21 @@ def mark_item_consumed(request, pk):
     if item.consumed:
         return Response({'error': 'Gegenstand ist bereits als verbraucht markiert'}, status=status.HTTP_400_BAD_REQUEST)
     
-    # Als verbraucht markieren
-    item.consumed = True
-    item.consumed_at = timezone.now()
+    # Quantity um 1 reduzieren
+    if item.quantity > 1:
+        item.quantity -= 1
+        message = f'1x {item.name} verbraucht. Noch {item.quantity} Stück verfügbar.'
+    else:
+        # Letztes Stück - als vollständig verbraucht markieren
+        item.quantity = 0
+        item.consumed = True
+        item.consumed_at = timezone.now()
+        message = f'{item.name} vollständig verbraucht.'
+    
     item.save()
     
     return Response({
-        'message': f'{item.name} wurde als verbraucht markiert',
+        'message': message,
         'item': ItemSerializer(item).data
     }, status=status.HTTP_200_OK)
 
@@ -227,16 +235,25 @@ def unmark_item_consumed(request, pk):
     except Item.DoesNotExist:
         return Response({'error': 'Gegenstand nicht gefunden'}, status=status.HTTP_404_NOT_FOUND)
     
-    if not item.consumed:
+    if not item.consumed and item.quantity > 0:
         return Response({'error': 'Gegenstand ist nicht als verbraucht markiert'}, status=status.HTTP_400_BAD_REQUEST)
     
     # Verbrauch rückgängig machen
-    item.consumed = False
-    item.consumed_at = None
+    if item.consumed:
+        # Item war vollständig verbraucht - wieder verfügbar machen
+        item.consumed = False
+        item.consumed_at = None
+        item.quantity = 1
+        message = f'{item.name} ist wieder verfügbar (1 Stück)'
+    else:
+        # Quantity um 1 erhöhen (falls möglich rückgängig zu machen)
+        item.quantity += 1
+        message = f'Verbrauch rückgängig gemacht. {item.name} hat jetzt {item.quantity} Stück.'
+    
     item.save()
     
     return Response({
-        'message': f'{item.name} ist wieder verfügbar',
+        'message': message,
         'item': ItemSerializer(item).data
     }, status=status.HTTP_200_OK)
 

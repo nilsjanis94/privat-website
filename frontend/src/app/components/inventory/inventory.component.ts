@@ -65,7 +65,7 @@ export class InventoryComponent implements OnInit {
   }
 
   // Tabellen-Konfiguration (condition und current_value entfernt)
-  displayedColumns: string[] = ['name', 'category', 'location', 'purchase_price', 'created_at', 'actions'];
+  displayedColumns: string[] = ['name', 'quantity', 'category', 'location', 'purchase_price', 'created_at', 'actions'];
 
   // Loading States
   isLoading = true;

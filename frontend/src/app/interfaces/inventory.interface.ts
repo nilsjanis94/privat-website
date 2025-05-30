@@ -14,6 +14,7 @@ export interface Item {
   category_name: string;
   owner: number;
   owner_name: string;
+  quantity: number;
   purchase_date?: string;
   purchase_price?: number;
   location: string;

@@ -80,7 +80,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = [
             'id', 'name', 'description', 'category', 'category_name',
-            'owner', 'owner_name', 'purchase_date', 'purchase_price',
+            'owner', 'owner_name', 'quantity', 'purchase_date', 'purchase_price',
             'location', 'location_display', 'consumed', 'consumed_at',
             'expiry_date', 'expected_lifetime_days', 'reminder_enabled', 
             'reminder_days_before', 'barcode', 'days_until_expiry', 'needs_reminder',
@@ -108,6 +108,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
 class ItemCreateUpdateSerializer(serializers.ModelSerializer):
     # Explizit allow_null und allow_blank für optionale Felder entsprechend dem Model
+    quantity = serializers.IntegerField(min_value=1, required=False, default=1)
     purchase_date = serializers.DateField(allow_null=True, required=False)
     purchase_price = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True, required=False)
     location = serializers.CharField(max_length=50, allow_blank=True, required=False)
@@ -119,7 +120,7 @@ class ItemCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = [
-            'name', 'description', 'category', 'purchase_date',
+            'name', 'description', 'category', 'quantity', 'purchase_date',
             'purchase_price', 'location', 'expiry_date', 'expected_lifetime_days',
             'reminder_enabled', 'reminder_days_before', 'barcode'
         ]

@@ -62,6 +62,7 @@ export class ItemFormComponent {
         name: [data.item.name, Validators.required],
         description: [data.item.description],
         category: [data.item.category, Validators.required],
+        quantity: [data.item.quantity || 1, [Validators.required, Validators.min(1)]],
         location: [data.item.location],
         purchase_date: [data.item.purchase_date ? data.item.purchase_date.split('T')[0] : ''],
         purchase_price: [data.item.purchase_price ? data.item.purchase_price.toString() : '']
@@ -71,6 +72,7 @@ export class ItemFormComponent {
         name: ['', Validators.required],
         description: [''],
         category: ['', Validators.required],
+        quantity: [1, [Validators.required, Validators.min(1)]],
         location: [''],
         purchase_date: [''],
         purchase_price: ['']

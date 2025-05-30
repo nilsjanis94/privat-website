@@ -12,7 +12,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { InventoryService } from '../../services/inventory.service';
 import { AuthService } from '../../services/auth.service';
-import { DashboardStats, Item } from '../../interfaces/inventory.interface';
+import { BudgetService } from '../../services/budget.service';
+import { DashboardStats, Item, Budget, BudgetDashboard } from '../../interfaces/inventory.interface';
 import { User } from '../../interfaces/user.interface';
 import { Observable } from 'rxjs';
 import { BalanceUpdateComponent } from '../balance-update/balance-update.component';
@@ -38,11 +39,14 @@ import { ItemFormComponent } from '../item-form/item-form.component';
 })
 export class DashboardComponent implements OnInit {
   stats: DashboardStats | null = null;
+  budgetDashboard: BudgetDashboard | null = null;
   items: Item[] = [];
   currentUser$: Observable<User | null>;
   isLoading = true;
+  isLoadingBudgets = true;
   isLoadingItems = true;
   error: string | null = null;
+  budgetError: string | null = null;
   
   // Tabellen-Konfiguration
   displayedColumns: string[] = ['name', 'category', 'location', 'purchase_price', 'created_at'];
@@ -50,6 +54,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private inventoryService: InventoryService,
     private authService: AuthService,
+    private budgetService: BudgetService,
     private dialog: MatDialog
   ) {
     this.currentUser$ = this.authService.currentUser$;
@@ -57,6 +62,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDashboardStats();
+    this.loadBudgetDashboard();
   }
 
   loadDashboardStats(): void {
@@ -88,6 +94,21 @@ export class DashboardComponent implements OnInit {
           items_by_category: {},
           recent_items: []
         };
+      }
+    });
+  }
+
+  loadBudgetDashboard(): void {
+    this.budgetService.getBudgetDashboard().subscribe({
+      next: (budgetData) => {
+        this.budgetDashboard = budgetData;
+        this.isLoadingBudgets = false;
+        this.budgetError = null;
+      },
+      error: (error: any) => {
+        console.error('Fehler beim Laden der Budget-Daten:', error);
+        this.budgetError = 'Budget-Daten konnten nicht geladen werden';
+        this.isLoadingBudgets = false;
       }
     });
   }
@@ -194,5 +215,53 @@ export class DashboardComponent implements OnInit {
 
   getRecentItems(): Item[] {
     return this.stats?.recent_items || [];
+  }
+
+  // Budget-spezifische Hilfsmethoden
+  getBudgetsOverLimit(): Budget[] {
+    return this.budgetDashboard?.budgets?.filter(budget => budget.is_over_budget) || [];
+  }
+
+  getTotalBudgetUtilization(): number {
+    if (!this.budgetDashboard?.summary.total_budget || this.budgetDashboard.summary.total_budget === 0) {
+      return 0;
+    }
+    return (this.budgetDashboard.summary.total_spent / this.budgetDashboard.summary.total_budget) * 100;
+  }
+
+  getBudgetStatus(): 'good' | 'warning' | 'danger' {
+    const utilization = this.getTotalBudgetUtilization();
+    if (utilization < 80) return 'good';
+    if (utilization < 100) return 'warning';
+    return 'danger';
+  }
+
+  getBudgetStatusColor(): string {
+    const status = this.getBudgetStatus();
+    switch (status) {
+      case 'good': return 'primary';
+      case 'warning': return 'accent';
+      case 'danger': return 'warn';
+      default: return 'primary';
+    }
+  }
+
+  getBudgetStatusIcon(): string {
+    const status = this.getBudgetStatus();
+    switch (status) {
+      case 'good': return 'check_circle';
+      case 'warning': return 'warning';
+      case 'danger': return 'error';
+      default: return 'help';
+    }
+  }
+
+  // Navigation Hilfsmethoden
+  navigateToBudgets(): void {
+    // Wird im Template mit routerLink verwendet
+  }
+
+  hasBudgets(): boolean {
+    return !!(this.budgetDashboard?.budgets?.length);
   }
 }

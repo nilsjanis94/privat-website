@@ -43,15 +43,15 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="metric-card">
+      <mat-card class="metric-card today-expenses" *ngIf="stats.today_expenses !== undefined">
         <mat-card-content>
           <div class="metric-content">
             <div class="metric-icon">
-              <mat-icon>euro</mat-icon>
+              <mat-icon>today</mat-icon>
             </div>
             <div class="metric-info">
-              <h2>{{ stats.total_value | currency:'EUR':'symbol':'1.0-0' }}</h2>
-              <p>Gesamtwert</p>
+              <h2>{{ stats.today_expenses | currency:'EUR':'symbol':'1.0-0' }}</h2>
+              <p>Heute ausgegeben</p>
             </div>
           </div>
         </mat-card-content>
@@ -71,6 +71,27 @@
         </mat-card-content>
       </mat-card>
 
+      <!-- Budget-Übersicht -->
+      <mat-card class="metric-card budget" 
+                *ngIf="!isLoadingBudgets && budgetDashboard" 
+                [attr.data-status]="getBudgetStatus()"
+                routerLink="/budgets">
+        <mat-card-content>
+          <div class="metric-content">
+            <div class="metric-icon">
+              <mat-icon [color]="getBudgetStatusColor()">{{ getBudgetStatusIcon() }}</mat-icon>
+            </div>
+            <div class="metric-info">
+              <h2>{{ getTotalBudgetUtilization() | number:'1.1-1' }}%</h2>
+              <p>Budget-Auslastung</p>
+              <span class="budget-detail" *ngIf="getBudgetsOverLimit().length > 0">
+                {{ getBudgetsOverLimit().length }} überschritten
+              </span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
       <mat-card class="metric-card balance" (click)="openBalanceUpdateDialog()">
         <mat-card-content>
           <div class="metric-content">
@@ -79,11 +100,11 @@
             </div>
             <div class="metric-info">
               <h2>{{ stats.balance | currency:'EUR':'symbol':'1.0-0' }}</h2>
-              <p>Kontostand</p>
+              <p>Kontostand <span class="edit-indicator">• Klicken zum Bearbeiten</span></p>
             </div>
-            <button mat-icon-button class="edit-btn">
+            <div class="edit-btn-visible">
               <mat-icon>edit</mat-icon>
-            </button>
+            </div>
           </div>
         </mat-card-content>
       </mat-card>
@@ -98,6 +119,17 @@
             <mat-icon class="action-icon">add_circle</mat-icon>
             <h3>Gegenstand hinzufügen</h3>
             <p>Neues Item zum Inventar hinzufügen</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card manage-budgets" routerLink="/budgets">
+          <mat-card-content>
+            <mat-icon class="action-icon">account_balance_wallet</mat-icon>
+            <h3>Budgets verwalten</h3>
+            <p>Budgets erstellen und überwachen</p>
+            <span class="action-badge" *ngIf="getBudgetsOverLimit().length > 0">
+              {{ getBudgetsOverLimit().length }} Warnung(en)
+            </span>
           </mat-card-content>
         </mat-card>
 
@@ -119,6 +151,43 @@
       </div>
     </div>
 
+    <!-- Budget-Warnungen -->
+    <mat-card class="budget-warnings" *ngIf="getBudgetsOverLimit().length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon color="warn">warning</mat-icon>
+          Budget-Warnungen
+        </mat-card-title>
+        <mat-card-subtitle>{{ getBudgetsOverLimit().length }} Budget(s) überschritten</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="warnings-list">
+          <div *ngFor="let budget of getBudgetsOverLimit()" class="warning-item">
+            <div class="warning-info">
+              <h4>{{ budget.name }}</h4>
+              <p class="warning-detail">
+                {{ budget.spent_this_period | currency:'EUR':'symbol':'1.2-2':'de' }} / 
+                {{ budget.amount | currency:'EUR':'symbol':'1.2-2':'de' }}
+                ({{ ((budget.spent_this_period / budget.amount) * 100) | number:'1.0-0' }}%)
+              </p>
+            </div>
+            <div class="warning-amount">
+              <span class="overspent">
+                +{{ (budget.spent_this_period - budget.amount) | currency:'EUR':'symbol':'1.2-2':'de' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-footer">
+          <button mat-button color="primary" routerLink="/budgets">
+            Budgets verwalten
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Letzte Aktivitäten -->
     <mat-card class="recent-activity" *ngIf="getRecentItems().length > 0">
       <mat-card-header>
@@ -137,12 +206,21 @@
               <mat-icon>{{ getCategoryIcon(item.category_name) }}</mat-icon>
             </div>
             <div class="item-details">
-              <h4>{{ item.name }}</h4>
+              <h4>
+                {{ item.name }}
+                <span *ngIf="item.quantity > 1" class="quantity-badge">
+                  <mat-icon>format_list_numbered</mat-icon>
+                  {{ item.quantity }}x
+                </span>
+              </h4>
               <p class="item-meta">
                 {{ item.category_name || 'Unbekannt' }} • 
                 {{ item.created_at | date:'short' }}
                 <span *ngIf="item.purchase_price" class="price">
                   • {{ item.purchase_price | currency:'EUR':'symbol':'1.0-0' }}
+                  <span *ngIf="item.quantity > 1" class="price-per-unit">
+                    ({{ (item.purchase_price / item.quantity) | currency:'EUR':'symbol':'1.0-0' }}/Stk.)
+                  </span>
                 </span>
               </p>
             </div>

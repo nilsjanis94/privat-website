@@ -51,14 +51,14 @@ class ReminderAdmin(admin.ModelAdmin):
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'owner', 'purchase_price', 'expiry_date', 'barcode', 'created_at')
+    list_display = ('name', 'quantity', 'category', 'owner', 'purchase_price', 'expiry_date', 'barcode', 'created_at')
     list_filter = ('category', 'created_at', 'owner', 'consumed', 'reminder_enabled')
     search_fields = ('name', 'description', 'location', 'barcode')
     ordering = ('-created_at',)
     
     fieldsets = (
         ('Grundinformationen', {
-            'fields': ('name', 'description', 'category', 'owner')
+            'fields': ('name', 'description', 'category', 'owner', 'quantity')
         }),
         ('Kaufinformationen', {
             'fields': ('purchase_date', 'purchase_price', 'barcode')

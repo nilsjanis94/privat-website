@@ -1,6 +1,6 @@
 # 🏠 Haushalts-Inventar-System
 
-Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich mit erweiterten Features wie Touch-optimierter Bedienung, Purple Design System, umfassendem Kategorie-Management und automatisiertem Deployment.
+Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungssystem für den Haushaltsbereich mit erweiterten Features wie Touch-optimierter Bedienung, Purple Design System, umfassendem Kategorie-Management, vollständigem Budget-Management und automatisiertem Deployment.
 
 ## 🚀 Hauptfeatures
 
@@ -13,15 +13,26 @@ Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungss
 - **Kategorien**: Vollständige CRUD-Operationen (Create/Read/Update/Delete) mit intelligenter Kategorie-Verwaltung
 - **Kategorie-Schutz**: Kategorien mit Items können nicht gelöscht werden (Smart Protection)
 - **Gegenstände**: Vereinfachte Item-Verwaltung mit Fokus auf Kern-Features
+- **Barcode-Scanner**: Erweiterte Barcode-Funktionalität mit verbesserter QR-Code-Unterstützung
 - **Erweiterte Suche**: Multi-Filter-System (Name, Kategorie, Ort) mit responsiver Paginierung
 - **Mobile Card-Layout**: Touch-optimierte Item-Darstellung auf mobilen Geräten (Cards statt Tabellen)
 - **Bearbeitung & Löschung**: Vollständige Edit-Funktionalität mit sicheren Bestätigungsdialogen
 - **Korrekte Datumsverarbeitung**: Lokale Datumskonvertierung ohne UTC-Zeitzonenfehler
 
-### 💰 Finanz-Management
-- **Kontostand-Verwaltung**: Persönlicher Kontostand mit manueller Anpassung
-- **Automatische Ausgaben**: Kaufpreis wird automatisch vom Kontostand abgezogen
-- **Tages-Ausgaben-Tracking**: Echtzeit-Verfolgung der heutigen Ausgaben
+### 💰 Finanz-Management & Budget-System
+- **Vollständiges Budget-System**: 
+  - **Budget-Erstellung**: Kategoriebasierte oder "Alle Kategorien"-Budgets
+  - **Budget-Bearbeitung**: Vollständige Edit-Funktionalität für alle Budget-Parameter
+  - **Echtzeit-Tracking**: Live-Verfolgung der Budget-Auslastung mit Farbkodierung
+  - **Intelligente Warnungen**: Automatische Benachrichtigungen bei Budget-Überschreitungen
+- **Budget-Analytics**: 
+  - **Echte Daten**: Budget-Analysen basieren auf tatsächlichen Ausgaben statt simulierten Daten
+  - **Kategorien-übergreifend**: Unterstützung für "Alle Kategorien"-Budgets
+  - **Detaillierte Auswertungen**: Umfassende Budget-Performance-Statistiken
+- **Kontostand-Verwaltung**: 
+  - **Editierbare Balance**: Klickbarer Kontostand mit visuellen Edit-Indikatoren
+  - **Automatische Ausgaben**: Kaufpreis wird automatisch vom Kontostand abgezogen
+  - **Tages-Ausgaben-Tracking**: Echtzeit-Verfolgung der heutigen Ausgaben prominenter auf dem Dashboard
 - **Ausgaben-Historie**: Interaktive Charts mit verschiedenen Zeiträumen
 
 ### 🍽️ Verbrauchs-Management
@@ -30,6 +41,15 @@ Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungss
 - **Erhaltung der Finanzdaten**: Ausgaben und Kontostand bleiben bei Verbrauch erhalten
 
 ### 📊 Dashboard & Analytics
+- **Intelligentes Dashboard**: 
+  - **Budget-Integration**: Zentrale Budget-Übersicht mit Status-Indikatoren
+  - **Budget-Warnungen**: Automatische Anzeige überschrittener Budgets mit Überschreitungsbeträgen
+  - **Schnelle Budget-Navigation**: Direkte Verlinkung zum Budget-Management
+  - **Heute-Ausgaben prominent**: Hervorgehobene Darstellung der heutigen Ausgaben
+- **Budget-Utilization**: 
+  - **Präzise Anzeige**: Budget-Auslastung mit einer Dezimalstelle (z.B. 85.3%)
+  - **Farbkodierung**: Grün (<80%), Gelb (80-100%), Rot (>100%)
+  - **Live-Updates**: Echtzeit-Aktualisierung bei Ausgaben-Änderungen
 - **Optimiertes Dashboard**: Korrekte Sortierung für letzte Aktivitäten (neueste zuerst)
 - **Einheitliches Design**: Konsistente weiße Card-Darstellung für alle Kennzahlen
 - **Top-Kategorien-Ranking**: Kategorien sortiert nach Anzahl der Items
@@ -51,12 +71,17 @@ Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungss
   - **Persistente Speicherung**: Theme-Wahl wird lokal gespeichert
   - **Theme-aware Charts**: Chart.js Integration mit dynamischen Farbanpassungen
   - **Mobile & Desktop**: Dedizierte Theme-Toggles in Navigation und Mobile-Menu
+  - **Umfassende Komponenten-Unterstützung**: Alle Komponenten (Budgets, Reminders, etc.) vollständig dark-mode-kompatibel
 - **Mobile-First Responsive**: Vollständig optimiert für alle Geräte (320px - 1920px+)
 - **Touch-Optimierung**: 44-48px Touch-Targets für perfekte mobile Bedienung
 - **Adaptive Layouts**: 
   - Desktop/Tablet: Klassische Tabellendarstellung
   - Mobile: Card-basierte Layouts ohne horizontales Scrollen
 - **Smart Navigation**: Klickbares Brand-Logo für schnelle Dashboard-Navigation
+- **Enhanced Interactivity**: 
+  - **Editierbare Balance**: Visuell hervorgehobene Edit-Funktionalität mit permanenten Edit-Icons
+  - **Budget-Status-Farben**: Intuitive Farbkodierung für Budget-Performance
+  - **Hover-Effekte**: Verbesserte User-Experience mit klaren visuellen Rückmeldungen
 - **Responsive Pagination**: Intelligente Seitengrößen (5 mobile, 8 tablet, 25 desktop)
 - **Dialog-Optimierung**: Perfekt positionierte und isolierte CSS-Dialogs
 - **Angular Material**: Moderne, konsistente UI-Komponenten mit harmonisierten Button-Styles
@@ -163,9 +188,38 @@ RewriteRule ^.*$ /index.html [L]
 | `/api/inventory/dashboard/` | GET | Dashboard-Statistiken |
 | `/api/inventory/expenses-chart/` | GET | Chart-Daten mit Zeitraumfilter |
 
+### Budget-Management
+| Endpoint | Methode | Beschreibung |
+|----------|---------|--------------|
+| `/api/budgets/` | GET/POST | Budgets verwalten |
+| `/api/budgets/{id}/` | PUT/DELETE | Budget bearbeiten/löschen |
+| `/api/budgets/analytics-data/` | GET | Budget-Analytics mit echten Daten |
+
 ## 📝 Changelog
 
-### Version 3.0.0 (Aktuell - Mai 2025)
+### Version 4.0.0 (Aktuell - 30.05.2025) - Phase 1 Abgeschlossen
+- 💰 **Vollständiges Budget-System**: 
+  - **Budget-Erstellung & -Bearbeitung**: Komplette CRUD-Operationen für kategoriebasierte und "Alle Kategorien"-Budgets
+  - **Echte Budget-Analytics**: Ersetzte simulierte Daten durch tatsächliche Ausgaben-basierte Analysen
+  - **"Alle Kategorien"-Support**: Backend und Frontend-Unterstützung für kategorienübergreifende Budgets
+  - **Budget-Status-Tracking**: Echtzeit-Auslastung mit präziser Dezimalanzeige (85.3% statt 85%)
+- 🎯 **Dashboard-Revolution**: 
+  - **Budget-Integration**: Zentrale Budget-Übersicht mit Live-Status und Farbkodierung
+  - **Intelligente Warnungen**: Automatische Anzeige überschrittener Budgets mit Überschreitungsbeträgen
+  - **Heute-Ausgaben prominent**: Hervorgehobene Darstellung der heutigen Ausgaben als Hauptmetrik
+  - **Smart Budget-Navigation**: Direkte Verlinkung zu Budget-Management mit Warning-Badges
+- 🖥️ **UI/UX-Verbesserungen**: 
+  - **Editierbare Balance**: Klare visuelle Indikatoren für editierbare Kontostand-Funktion
+  - **Dark Mode Fixes**: Vollständige Theme-Unterstützung für alle Komponenten (Budgets, Reminders)
+  - **Farbkodierte Budget-Status**: Grün/Gelb/Rot System für intuitive Budget-Performance-Anzeige
+  - **Enhanced Interactivity**: Permanente Edit-Icons und verbesserte Hover-Effekte
+- 🔧 **Technische Verbesserungen**: 
+  - **Budget Service Integration**: Reaktive Budget-Daten-Verwaltung im Frontend
+  - **API-Erweiterungen**: Umfassende Budget-Analytics-Endpunkte mit echten Daten
+  - **Error Handling**: Separate Loading-States für Budget- vs. Inventar-Daten
+  - **Performance-Optimierung**: Effiziente Datenabfrage und -caching für Budget-Operationen
+
+### Version 3.0.0 (Mai 2025)
 - 🎨 **Purple Design System**: Vollständig implementiertes kohärentes Design-System
 - 🌗 **Dark Mode Support**: Vollständiges Theme-System mit Light/Dark/Auto-Modi
   - **Theme Service**: Reactive Theme-Management mit LocalStorage-Persistierung  
@@ -189,20 +243,6 @@ RewriteRule ^.*$ /index.html [L]
   - Mobile-responsive Dialog-Layouts
 - 📊 **Dashboard-Einheitlichkeit**: Konsistente weiße Card-Darstellung
 - 🛠️ **Build-Optimierung**: Angepasste Angular Budgets für umfangreiche Features
-
-### Version 2.7.0 (Mai 2025)
-- ✅ **Ausgaben-Chart mit Zeiträumen**: Stock-Chart-Style mit 1W, 1M, 1Y, Max Buttons
-  - Backend: Neue `/expenses-chart/` API mit period-Parameter für verschiedene Aggregationen
-  - Frontend: Neue `ExpensesChartComponent` mit Chart.js Line-Chart
-  - Features: Hover-Effekte, Echtzeit-Statistiken (Durchschnitt, Maximum), responsive Design
-- ✅ **Toast-Benachrichtigungen verbessert**: Korrigiertes Layout ohne doppelte Icons
-- ✅ **Debug-Bereinigung**: Entfernung aller Backend-Debug-Ausgaben für sauberen Code
-
-### Version 2.6.0 (Mai 2025)
-- ✅ **Datum-Fix**: Korrigierte Datumsverarbeitung ohne UTC-Zeitzonenfehler
-- ✅ **Dashboard-Sortierung**: Neueste Items zuerst, Top-Kategorien nach Anzahl
-- ✅ **Statistiken-Optimierung**: "Heute ausgegeben" Feature hinzugefügt
-- ✅ **Button-Styling-Harmonisierung**: Einheitliche Button-Designs zwischen allen Formularen
 
 ## 🎯 Mobile-First Features
 
@@ -250,11 +290,22 @@ ps aux | grep python
 **Features**: Touch-optimiert, Purple Design System, responsive Pagination, Card-Layouts
 
 ### Test-Features (Mobile & Desktop)
+- **💰 Budget-System**: 
+  - **Budget-Erstellung**: Teste kategoriebasierte und "Alle Kategorien"-Budgets
+  - **Budget-Bearbeitung**: Vollständige Edit-Funktionalität für alle Parameter
+  - **Budget-Analytics**: Echte Daten-basierte Budget-Performance-Analysen
+  - **Dashboard-Integration**: Budget-Status und Warnungen im Dashboard
+- **🎯 Dashboard-Features**: 
+  - **Budget-Übersicht**: Live Budget-Auslastung mit Farbkodierung
+  - **Heute-Ausgaben**: Prominente Darstellung der heutigen Ausgaben
+  - **Budget-Warnungen**: Automatische Anzeige überschrittener Budgets
+  - **Editierbare Balance**: Klicke auf Kontostand für sofortige Bearbeitung
 - **Mobile Navigation**: Teste die Touch-Gesten und Card-Layouts auf dem Smartphone
 - **🌗 Dark Mode**: Teste den Theme-Wechsel über Navbar (Desktop) oder Mobile-Menu
   - **Auto-Modus**: Synchronisierung mit Systemeinstellungen testen
   - **Charts Dark Mode**: Alle Charts (Donut, Bar, Line) im Dark Mode prüfen
   - **Theme-Persistierung**: Reload der Seite - Theme-Wahl bleibt erhalten
+  - **Budget-Components**: Teste Dark Mode in Budget-Formularen und Analytics
 - **Kategorie-Management**: Teste Edit/Delete-Funktionalität in den Kategorie-Chips
 - **Brand-Navigation**: Klicke auf das Inventar-Logo für Dashboard-Navigation
 - **Responsive Pagination**: Teste verschiedene Seitengrößen auf verschiedenen Geräten
@@ -275,4 +326,4 @@ ps aux | grep python
 
 ---
 
-**Version**: 3.0.0 | **Letztes Update**: Dezember 2024 | **Status**: ✅ Production Ready + Mobile-First
+**Version**: 4.0.0 | **Letztes Update**: 30.05.2025 | **Status**: ✅ Production Ready + Budget-System Vollständig

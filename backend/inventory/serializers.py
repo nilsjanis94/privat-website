@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Item
+from .models import Category, Item, Budget, Reminder
 
 class CategorySerializer(serializers.ModelSerializer):
     items_count = serializers.SerializerMethodField()
@@ -13,10 +13,68 @@ class CategorySerializer(serializers.ModelSerializer):
         # Nur aktive (nicht verbrauchte) Items zählen
         return obj.items.filter(consumed=False).count()
 
+class BudgetSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    spent_this_period = serializers.SerializerMethodField()
+    remaining_budget = serializers.SerializerMethodField()
+    is_over_budget = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Budget
+        fields = [
+            'id', 'name', 'amount', 'period', 'category', 'category_name', 
+            'is_active', 'spent_this_period', 'remaining_budget', 'is_over_budget',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_spent_this_period(self, obj):
+        from django.utils import timezone
+        from datetime import datetime, timedelta
+        from django.db.models import Sum
+        
+        now = timezone.now()
+        if obj.period == 'monthly':
+            start_date = now.replace(day=1).date()
+        else:  # yearly
+            start_date = now.replace(month=1, day=1).date()
+        
+        items_query = Item.objects.filter(
+            owner=obj.owner,
+            purchase_date__gte=start_date,
+            purchase_price__isnull=False
+        )
+        
+        if obj.category:
+            items_query = items_query.filter(category=obj.category)
+        
+        spent = items_query.aggregate(total=Sum('purchase_price'))['total'] or 0
+        return float(spent)
+    
+    def get_remaining_budget(self, obj):
+        spent = self.get_spent_this_period(obj)
+        return float(obj.amount) - spent
+    
+    def get_is_over_budget(self, obj):
+        return self.get_remaining_budget(obj) < 0
+
+class ReminderSerializer(serializers.ModelSerializer):
+    item_name = serializers.CharField(source='item.name', read_only=True)
+    
+    class Meta:
+        model = Reminder
+        fields = [
+            'id', 'item', 'item_name', 'reminder_type', 'message',
+            'reminder_date', 'is_sent', 'is_dismissed', 'created_at'
+        ]
+        read_only_fields = ['id', 'created_at']
+
 class ItemSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     owner_name = serializers.CharField(source='owner.get_full_name', read_only=True)
     location_display = serializers.CharField(source='get_location_display', read_only=True)
+    days_until_expiry = serializers.SerializerMethodField()
+    needs_reminder = serializers.SerializerMethodField()
     
     class Meta:
         model = Item
@@ -24,9 +82,25 @@ class ItemSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'category', 'category_name',
             'owner', 'owner_name', 'purchase_date', 'purchase_price',
             'location', 'location_display', 'consumed', 'consumed_at',
+            'expiry_date', 'expected_lifetime_days', 'reminder_enabled', 
+            'reminder_days_before', 'barcode', 'days_until_expiry', 'needs_reminder',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'owner', 'consumed_at', 'created_at', 'updated_at']
+    
+    def get_days_until_expiry(self, obj):
+        if obj.expiry_date:
+            from django.utils import timezone
+            delta = obj.expiry_date - timezone.now().date()
+            return delta.days
+        return None
+    
+    def get_needs_reminder(self, obj):
+        if obj.expiry_date and obj.reminder_enabled:
+            days_until = self.get_days_until_expiry(obj)
+            if days_until is not None:
+                return days_until <= obj.reminder_days_before
+        return False
     
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user
@@ -38,12 +112,16 @@ class ItemCreateUpdateSerializer(serializers.ModelSerializer):
     purchase_price = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True, required=False)
     location = serializers.CharField(max_length=50, allow_blank=True, required=False)
     description = serializers.CharField(max_length=200, allow_blank=True, required=False)
+    expiry_date = serializers.DateField(allow_null=True, required=False)
+    expected_lifetime_days = serializers.IntegerField(allow_null=True, required=False)
+    barcode = serializers.CharField(max_length=50, allow_blank=True, required=False)
     
     class Meta:
         model = Item
         fields = [
             'name', 'description', 'category', 'purchase_date',
-            'purchase_price', 'location'
+            'purchase_price', 'location', 'expiry_date', 'expected_lifetime_days',
+            'reminder_enabled', 'reminder_days_before', 'barcode'
         ]
     
     def validate_category(self, value):

@@ -1,0 +1,397 @@
+.reminders-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0 0 8px 0;
+      color: var(--primary-color);
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      margin: 0;
+      font-size: 1rem;
+    }
+  }
+
+  .reminder-tabs {
+    .tab-content {
+      padding: 24px 16px;
+    }
+  }
+
+  // Ablaufende Items
+  .expiring-items {
+    display: grid;
+    gap: 16px;
+
+    .expiry-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid var(--primary-color);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      // Status-spezifische Farben
+      &.expired {
+        border-left-color: #f44336;
+        background: linear-gradient(90deg, #f4433610, white);
+
+        .status-text {
+          color: #f44336;
+          font-weight: 600;
+        }
+      }
+
+      &.today {
+        border-left-color: #ff9800;
+        background: linear-gradient(90deg, #ff980010, white);
+
+        .status-text {
+          color: #ff9800;
+          font-weight: 600;
+        }
+      }
+
+      &.urgent {
+        border-left-color: #ff5722;
+        background: linear-gradient(90deg, #ff572210, white);
+
+        .status-text {
+          color: #ff5722;
+          font-weight: 600;
+        }
+      }
+
+      &.warning {
+        border-left-color: #ffc107;
+        background: linear-gradient(90deg, #ffc10710, white);
+
+        .status-text {
+          color: #f57c00;
+          font-weight: 600;
+        }
+      }
+
+      .expiry-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+
+        .item-info {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          flex: 1;
+
+          .expiry-icon {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-top: 4px;
+          }
+
+          .item-details {
+            h3 {
+              margin: 0 0 4px 0;
+              color: var(--text-primary);
+              font-size: 1.1rem;
+            }
+
+            .category {
+              margin: 0 0 2px 0;
+              color: var(--primary-color);
+              font-size: 0.9rem;
+              font-weight: 500;
+            }
+
+            .location {
+              margin: 0;
+              color: var(--text-secondary);
+              font-size: 0.8rem;
+            }
+          }
+        }
+
+        .expiry-status {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          text-align: right;
+
+          .status-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+          }
+
+          .expiry-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+          }
+        }
+      }
+
+      .expiry-actions {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color);
+
+        .description {
+          margin: 0;
+          color: var(--text-secondary);
+          font-size: 0.9rem;
+          font-style: italic;
+        }
+      }
+    }
+  }
+
+  // Aktive Erinnerungen
+  .active-reminders {
+    display: grid;
+    gap: 16px;
+
+    .reminder-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid var(--accent-color);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .reminder-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+
+        .reminder-type-icon {
+          color: var(--accent-color);
+          font-size: 24px;
+          margin-top: 4px;
+        }
+
+        .reminder-info {
+          flex: 1;
+
+          h3 {
+            margin: 0 0 4px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+          }
+
+          .reminder-type {
+            margin: 0 0 2px 0;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+          }
+
+          .reminder-date {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+          }
+        }
+
+        button {
+          margin-top: -8px;
+          margin-right: -8px;
+        }
+      }
+
+      .reminder-content {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color);
+
+        .reminder-message {
+          margin: 0;
+          color: var(--text-primary);
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+
+  // Empty States
+  .no-items,
+  .no-reminders {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: var(--primary-color);
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      margin: 16px 0 8px 0;
+      color: var(--text-primary);
+      font-size: 1.2rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  }
+
+  // Settings Card
+  .settings-card {
+    .settings-info,
+    .settings-tip {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 16px;
+      border-radius: 8px;
+
+      mat-icon {
+        color: var(--primary-color);
+        font-size: 24px;
+        margin-top: 4px;
+      }
+
+      h4 {
+        margin: 0 0 8px 0;
+        color: var(--text-primary);
+        font-size: 1rem;
+      }
+
+      p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+    }
+
+    .settings-info {
+      background: linear-gradient(135deg, var(--primary-color)10, transparent);
+      border: 1px solid var(--primary-color)20;
+    }
+
+    .settings-tip {
+      background: linear-gradient(135deg, var(--accent-color)10, transparent);
+      border: 1px solid var(--accent-color)20;
+
+      mat-icon {
+        color: var(--accent-color);
+      }
+    }
+
+    .settings-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+  }
+
+  // Loading
+  .loading {
+    text-align: center;
+    padding: 40px 20px;
+
+    mat-progress-bar {
+      margin-bottom: 16px;
+    }
+
+    p {
+      color: var(--text-secondary);
+      margin: 0;
+    }
+  }
+}
+
+// Mobile Optimierungen
+@media (max-width: 768px) {
+  .reminders-container {
+    padding: 16px;
+
+    .header {
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .reminder-tabs .tab-content {
+      padding: 16px 8px;
+    }
+
+    .expiry-card,
+    .reminder-card {
+      padding: 16px;
+
+      .expiry-header,
+      .reminder-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+
+        .expiry-status {
+          align-items: flex-start;
+          text-align: left;
+        }
+      }
+    }
+
+    .settings-info,
+    .settings-tip {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+}
+
+// Dark Mode Support
+@media (prefers-color-scheme: dark) {
+  .reminders-container {
+    .expiry-card,
+    .reminder-card,
+    .settings-card {
+      background: var(--surface-dark);
+      border-color: var(--border-dark);
+    }
+
+    .settings-info {
+      background: linear-gradient(135deg, var(--primary-color-dark)20, transparent);
+      border-color: var(--primary-color-dark)40;
+    }
+
+    .settings-tip {
+      background: linear-gradient(135deg, var(--accent-color-dark)20, transparent);
+      border-color: var(--accent-color-dark)40;
+    }
+  }
+}

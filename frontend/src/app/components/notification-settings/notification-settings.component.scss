@@ -1,0 +1,312 @@
+.notification-settings-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0 0 8px 0;
+      color: var(--primary-color);
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      margin: 0;
+      font-size: 1rem;
+    }
+  }
+
+  .warning-card,
+  .permission-card,
+  .push-card,
+  .settings-card,
+  .help-card {
+    margin-bottom: 24px;
+    border-left: 4px solid var(--primary-color);
+  }
+
+  .warning-card {
+    border-left-color: #ff9800;
+    background: linear-gradient(90deg, #ff980010, white);
+
+    mat-card-title {
+      color: #ff9800;
+    }
+
+    p {
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+
+  .permission-card {
+    border-left-color: var(--primary-color);
+
+    .permission-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+
+      .status-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+
+        .status-icon {
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+        }
+
+        .status-text {
+          h3 {
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+          }
+
+          p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+          }
+        }
+      }
+
+      .permission-actions {
+        display: flex;
+        gap: 12px;
+
+        button {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+      }
+    }
+  }
+
+  .push-card {
+    border-left-color: var(--accent-color);
+
+    .push-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+
+      .push-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+
+        .push-icon {
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+        }
+
+        .push-text {
+          h3 {
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+          }
+
+          p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+          }
+        }
+      }
+
+      .push-actions {
+        display: flex;
+        gap: 12px;
+
+        button {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+      }
+    }
+  }
+
+  .settings-card {
+    border-left-color: #4caf50;
+
+    .notification-types {
+      padding: 0;
+
+      mat-list-item {
+        padding: 16px 0;
+        
+        mat-icon {
+          color: var(--primary-color);
+        }
+
+        mat-slide-toggle {
+          transform: scale(0.9);
+        }
+      }
+
+      mat-divider {
+        margin: 0;
+        border-color: var(--border-color);
+      }
+    }
+  }
+
+  .help-card {
+    border-left-color: #ffc107;
+
+    .help-content {
+      .help-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding: 16px;
+        background: var(--surface-light);
+        border-radius: 8px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        mat-icon {
+          color: var(--accent-color);
+          font-size: 24px;
+          margin-top: 4px;
+        }
+
+        h4 {
+          margin: 0 0 8px 0;
+          color: var(--text-primary);
+          font-size: 1rem;
+        }
+
+        p {
+          margin: 0;
+          color: var(--text-secondary);
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+
+  .loading {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 24px;
+
+    mat-progress-bar {
+      margin-bottom: 16px;
+    }
+
+    p {
+      color: var(--text-secondary);
+      margin: 0;
+    }
+  }
+}
+
+// Mobile Optimierungen
+@media (max-width: 768px) {
+  .notification-settings-container {
+    padding: 16px;
+
+    .header {
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .permission-status,
+    .push-status {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+
+      .status-info,
+      .push-info {
+        width: 100%;
+      }
+
+      .permission-actions,
+      .push-actions {
+        width: 100%;
+        justify-content: stretch;
+
+        button {
+          flex: 1;
+          justify-content: center;
+        }
+      }
+    }
+
+    .help-item {
+      flex-direction: column !important;
+      text-align: center;
+    }
+
+    .notification-types {
+      mat-list-item {
+        flex-wrap: wrap;
+        height: auto !important;
+        padding: 16px 0 !important;
+
+        .mat-list-item-content {
+          flex-wrap: wrap;
+        }
+
+        mat-slide-toggle {
+          margin-top: 8px;
+          width: 100%;
+          justify-content: flex-start;
+        }
+      }
+    }
+  }
+}
+
+// Dark Mode Support
+@media (prefers-color-scheme: dark) {
+  .notification-settings-container {
+    .warning-card,
+    .permission-card,
+    .push-card,
+    .settings-card,
+    .help-card {
+      background: var(--surface-dark);
+    }
+
+    .warning-card {
+      background: linear-gradient(90deg, #ff980020, var(--surface-dark));
+    }
+
+    .help-item {
+      background: var(--surface-dark-light);
+    }
+
+    .notification-types {
+      mat-divider {
+        border-color: var(--border-dark);
+      }
+    }
+  }
+} 

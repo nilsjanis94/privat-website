@@ -20,15 +20,50 @@
     min-width: 0;
     overflow: hidden;
 
+    // Large Desktop (1400px+)
+    @media (max-width: 1399px) {
+      max-width: 1200px;
+      padding: 0 var(--space-5);
+      gap: var(--space-6);
+    }
+
+    // Medium Desktop (1200px - 1399px)
+    @media (max-width: 1199px) {
+      max-width: 1000px;
+      padding: 0 var(--space-4);
+      gap: var(--space-5);
+    }
+
+    // Small Desktop / Large Tablet (1024px - 1199px)
+    @media (max-width: 1023px) {
+      max-width: 900px;
+      padding: 0 var(--space-4);
+      gap: var(--space-4);
+    }
+
+    // Medium Tablet (768px - 1023px)
+    @media (max-width: 1023px) and (min-width: 769px) {
+      height: 60px;
+    }
+
+    // Small Tablet / Large Mobile (481px - 768px)
     @media (max-width: 768px) {
       padding: 0 var(--space-4);
       height: 56px;
-      gap: var(--space-4);
+      gap: var(--space-3);
     }
     
+    // Small Mobile (320px - 480px)
     @media (max-width: 480px) {
       padding: 0 var(--space-3);
       gap: var(--space-2);
+      height: 52px;
+    }
+
+    // Very Small Mobile (< 360px)
+    @media (max-width: 359px) {
+      padding: 0 var(--space-2);
+      gap: var(--space-1);
     }
   }
 
@@ -45,6 +80,7 @@
     padding: var(--space-2);
     border-radius: var(--radius-lg);
     transition: all 0.3s ease;
+    flex-shrink: 0;
     
     &:hover {
       background: var(--gray-50);
@@ -72,10 +108,32 @@
       box-shadow: var(--shadow);
       transition: all 0.3s ease;
 
+      @media (max-width: 480px) {
+        width: 36px;
+        height: 36px;
+      }
+
+      @media (max-width: 359px) {
+        width: 32px;
+        height: 32px;
+      }
+
       mat-icon {
         font-size: 24px;
         width: 24px;
         height: 24px;
+
+        @media (max-width: 480px) {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+
+        @media (max-width: 359px) {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
       }
     }
 
@@ -83,7 +141,7 @@
       display: flex;
       flex-direction: column;
       
-      @media (max-width: 480px) {
+      @media (max-width: 640px) {
         display: none;
       }
 
@@ -94,6 +152,10 @@
         color: var(--gray-900);
         line-height: 1.2;
         transition: color 0.3s ease;
+
+        @media (max-width: 1023px) {
+          font-size: var(--text-base);
+        }
       }
 
       .brand-subtitle {
@@ -103,6 +165,10 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         transition: color 0.3s ease;
+
+        @media (max-width: 1023px) {
+          font-size: 10px;
+        }
       }
     }
     
@@ -123,8 +189,12 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    flex: 1;
+    justify-content: center;
+    max-width: 600px;
 
-    @media (max-width: 768px) {
+    // Hide completely on tablet and mobile
+    @media (max-width: 1023px) {
       display: none;
     }
 
@@ -132,7 +202,7 @@
       display: flex;
       align-items: center;
       gap: var(--space-2);
-      padding: var(--space-2) var(--space-4);
+      padding: var(--space-2) var(--space-3);
       border-radius: var(--radius);
       text-decoration: none;
       color: var(--gray-700);
@@ -140,17 +210,32 @@
       font-size: var(--text-sm);
       transition: all 0.2s ease;
       position: relative;
+      white-space: nowrap;
 
-      @media (max-width: 768px) {
-        width: 100%;
-        padding: var(--space-3) var(--space-4);
-        justify-content: flex-start;
+      // Smaller padding on medium screens
+      @media (max-width: 1199px) {
+        padding: var(--space-2);
+        font-size: var(--text-xs);
+        gap: var(--space-1);
       }
 
       mat-icon {
         font-size: 20px;
         width: 20px;
         height: 20px;
+
+        @media (max-width: 1199px) {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      span {
+        // Hide text on smaller screens, show only icons
+        @media (max-width: 1399px) {
+          display: none;
+        }
       }
 
       &:hover {
@@ -174,14 +259,6 @@
           height: 2px;
           background: var(--primary-600);
           border-radius: 1px;
-
-          @media (max-width: 768px) {
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 20px;
-          }
         }
       }
     }
@@ -192,12 +269,55 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    flex-shrink: 0;
+
+    @media (max-width: 480px) {
+      gap: var(--space-1);
+    }
+
+    // Notification Button
+    .notification-btn {
+      position: relative;
+      flex-shrink: 0;
+      
+      &.has-notifications::after {
+        content: '';
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        background-color: #ff4444;
+        border-radius: 50%;
+        border: 2px solid white;
+      }
+      
+      mat-icon {
+        color: var(--text-primary);
+        transition: color 0.2s ease;
+        font-size: 24px;
+
+        @media (max-width: 480px) {
+          font-size: 22px;
+        }
+      }
+      
+      &:hover mat-icon {
+        color: var(--primary-color);
+      }
+
+      // Hide on very small screens, keep in mobile menu
+      @media (max-width: 359px) {
+        display: none;
+      }
+    }
 
     // Theme Toggle Button
     .theme-toggle-btn {
       color: var(--text-secondary);
       transition: all 0.2s ease;
       border-radius: var(--radius);
+      flex-shrink: 0;
       
       &:hover {
         background: var(--surface-variant);
@@ -205,15 +325,26 @@
         transform: translateY(-1px);
       }
 
-      @media (max-width: 768px) {
+      mat-icon {
+        font-size: 24px;
+
+        @media (max-width: 480px) {
+          font-size: 22px;
+        }
+      }
+
+      // Hide on tablet and mobile
+      @media (max-width: 1023px) {
         display: none;
       }
     }
 
     // User Menu
     .user-menu {
-      // Komplett ausblenden für mobile Geräte
-      @media (max-width: 768px) {
+      flex-shrink: 0;
+      
+      // Hide completely on tablet and mobile
+      @media (max-width: 1023px) {
         display: none;
       }
 
@@ -229,14 +360,18 @@
         min-width: 0;
         max-width: 280px;
 
-        @media (max-width: 1200px) {
-          max-width: 220px;
+        @media (max-width: 1399px) {
+          max-width: 240px;
+          gap: var(--space-2);
         }
 
-        @media (max-width: 1024px) {
-          gap: var(--space-2);
+        @media (max-width: 1199px) {
+          max-width: 200px;
           padding: var(--space-2);
-          max-width: 180px;
+        }
+
+        @media (max-width: 1099px) {
+          max-width: 160px;
         }
 
         &:hover {
@@ -257,11 +392,20 @@
           flex-shrink: 0;
           box-shadow: var(--shadow-sm);
 
+          @media (max-width: 1199px) {
+            width: 28px;
+            height: 28px;
+          }
+
           .avatar-initials {
             font-size: 14px;
             font-weight: 600;
             line-height: 1;
             text-transform: uppercase;
+
+            @media (max-width: 1199px) {
+              font-size: 12px;
+            }
           }
         }
 
@@ -272,6 +416,11 @@
           min-width: 0;
           flex: 1;
           overflow: hidden;
+
+          // Hide on smaller desktop screens
+          @media (max-width: 1099px) {
+            display: none;
+          }
 
           .user-name {
             font-size: var(--text-sm);
@@ -284,11 +433,12 @@
             width: 100%;
             max-width: 180px;
             
-            @media (max-width: 1200px) {
+            @media (max-width: 1399px) {
               max-width: 140px;
+              font-size: var(--text-xs);
             }
             
-            @media (max-width: 1024px) {
+            @media (max-width: 1199px) {
               max-width: 100px;
             }
           }
@@ -303,11 +453,12 @@
             width: 100%;
             max-width: 180px;
             
-            @media (max-width: 1200px) {
+            @media (max-width: 1399px) {
               max-width: 140px;
+              font-size: 10px;
             }
             
-            @media (max-width: 1024px) {
+            @media (max-width: 1199px) {
               max-width: 100px;
             }
           }
@@ -320,6 +471,12 @@
           color: var(--text-muted);
           transition: transform 0.2s ease;
           flex-shrink: 0;
+
+          @media (max-width: 1199px) {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
         }
 
         &[aria-expanded="true"] > mat-icon:last-child {
@@ -333,8 +490,9 @@
       display: none;
       color: var(--text-secondary);
       transition: all 0.2s ease;
+      flex-shrink: 0;
 
-      @media (max-width: 768px) {
+      @media (max-width: 1023px) {
         display: flex;
       }
 
@@ -347,9 +505,13 @@
         font-size: 24px;
         width: 24px;
         height: 24px;
+
+        @media (max-width: 480px) {
+          font-size: 22px;
+          width: 22px;
+          height: 22px;
+        }
       }
     }
   }
 }
-
-// Alle Dropdown-Styles wurden zu styles.scss verschoben

@@ -27,16 +27,52 @@
         <span>Inventar</span>
       </a>
       
-      <a routerLink="/statistics" 
+      <a routerLink="/budgets" 
+         routerLinkActive="active"
+         class="nav-link">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <span>Budgets</span>
+      </a>
+      
+      <a routerLink="/budget-analytics" 
          routerLinkActive="active"
          class="nav-link">
         <mat-icon>analytics</mat-icon>
+        <span>Budget-Analysen</span>
+      </a>
+      
+      <a routerLink="/reminders" 
+         routerLinkActive="active"
+         class="nav-link">
+        <mat-icon>notifications</mat-icon>
+        <span>Erinnerungen</span>
+      </a>
+      
+      <a routerLink="/scanner" 
+         routerLinkActive="active"
+         class="nav-link">
+        <mat-icon>qr_code_scanner</mat-icon>
+        <span>Scanner</span>
+      </a>
+      
+      <a routerLink="/statistics" 
+         routerLinkActive="active"
+         class="nav-link">
+        <mat-icon>bar_chart</mat-icon>
         <span>Statistiken</span>
       </a>
     </div>
 
     <!-- Right Side Actions -->
     <div class="navbar-actions">
+      <!-- Notifications Button -->
+      <button mat-icon-button 
+              routerLink="/notifications"
+              class="notification-btn"
+              title="Benachrichtigungen verwalten">
+        <mat-icon>notifications_active</mat-icon>
+      </button>
+
       <!-- Theme Toggle (Desktop) -->
       <button mat-icon-button 
               class="theme-toggle-btn"
@@ -85,6 +121,11 @@
           </div>
           
           <mat-divider></mat-divider>
+          
+          <button mat-menu-item routerLink="/notifications">
+            <mat-icon>notifications</mat-icon>
+            <span>Benachrichtigungen</span>
+          </button>
           
           <!-- Theme Options im User Menu -->
           <button mat-menu-item [matMenuTriggerFor]="themeSubmenu">

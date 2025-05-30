@@ -1,0 +1,227 @@
+<div class="budget-management-container">
+  <div class="header">
+    <h2>💰 Budget-Verwaltung</h2>
+    <button mat-raised-button 
+            color="primary" 
+            (click)="showCreateForm = !showCreateForm"
+            [disabled]="isLoading || hasError">
+      <mat-icon>{{ showCreateForm ? 'close' : 'add' }}</mat-icon>
+      {{ showCreateForm ? 'Abbrechen' : 'Neues Budget' }}
+    </button>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError && !isLoading" class="error-state">
+    <mat-icon>error</mat-icon>
+    <h3>Fehler beim Laden</h3>
+    <p>{{ errorMessage || 'Es ist ein unbekannter Fehler aufgetreten.' }}</p>
+    <button mat-raised-button color="primary" (click)="retryLoadData()">
+      <mat-icon>refresh</mat-icon>
+      Erneut versuchen
+    </button>
+  </div>
+
+  <!-- Budget-Übersicht -->
+  <div *ngIf="budgetDashboard && !hasError" class="budget-overview">
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>📊 Budget-Übersicht</mat-card-title>
+        <mat-card-subtitle>Aktuelle Periode: {{ budgetDashboard.budgets.length > 0 && budgetDashboard.budgets[0].period === 'monthly' ? 'Monatlich' : 'Jährlich' }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="summary-stats">
+          <div class="stat">
+            <span class="label">Gesamt-Budget:</span>
+            <span class="value">{{ budgetDashboard.summary.total_budget | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Ausgegeben:</span>
+            <span class="value">{{ budgetDashboard.summary.total_spent | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Verbleibendes Budget:</span>
+            <span class="value" [class.negative]="budgetDashboard.summary.remaining_total < 0">
+              {{ budgetDashboard.summary.remaining_total | currency:'EUR':'symbol':'1.2-2':'de' }}
+            </span>
+          </div>
+          <div class="stat" *ngIf="budgetDashboard.summary.budgets_over_limit > 0">
+            <span class="label">⚠️ Überschrittene Budgets:</span>
+            <span class="value warning">{{ budgetDashboard.summary.budgets_over_limit }}</span>
+          </div>
+          <div class="stat" *ngIf="budgetDashboard.summary.budgets_over_limit === 0 && budgetDashboard.budgets.length > 0">
+            <span class="label">✅ Status:</span>
+            <span class="value" style="color: #4caf50;">Alle Budgets im Rahmen</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Neues Budget erstellen -->
+  <mat-card *ngIf="showCreateForm && !hasError" class="create-form">
+    <mat-card-header>
+      <mat-card-title>➕ Neues Budget erstellen</mat-card-title>
+      <mat-card-subtitle>Legen Sie ein neues Budget für Ihre Ausgaben fest</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="createBudget()" #budgetForm="ngForm">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Budget-Name</mat-label>
+            <input matInput 
+                   [(ngModel)]="newBudget.name" 
+                   name="name" 
+                   required
+                   maxlength="100"
+                   [disabled]="isCreating"
+                   #nameInput="ngModel">
+            <mat-hint>z.B. "Lebensmittel Budget" oder "Elektronik Budget"</mat-hint>
+            <mat-error *ngIf="nameInput.invalid && nameInput.touched">
+              Budget-Name ist erforderlich
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Budget-Betrag</mat-label>
+            <input matInput 
+                   type="number" 
+                   [(ngModel)]="newBudget.amount" 
+                   name="amount" 
+                   required 
+                   min="0.01" 
+                   max="999999.99"
+                   step="0.01"
+                   [disabled]="isCreating"
+                   #amountInput="ngModel">
+            <span matSuffix>€</span>
+            <mat-hint>Geben Sie den gewünschten Budget-Betrag ein</mat-hint>
+            <mat-error *ngIf="amountInput.invalid && amountInput.touched">
+              <span *ngIf="amountInput.errors?.['required']">Budget-Betrag ist erforderlich</span>
+              <span *ngIf="amountInput.errors?.['min']">Mindestbetrag: 0,01 €</span>
+              <span *ngIf="amountInput.errors?.['max']">Maximalbetrag: 999.999,99 €</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Zeitraum</mat-label>
+            <mat-select [(ngModel)]="newBudget.period" 
+                        name="period" 
+                        required
+                        [disabled]="isCreating">
+              <mat-option value="monthly">Monatlich</mat-option>
+              <mat-option value="yearly">Jährlich</mat-option>
+            </mat-select>
+            <mat-hint>Wählen Sie den Zeitraum für Ihr Budget</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Kategorie (optional)</mat-label>
+            <mat-select [(ngModel)]="newBudget.category" 
+                        name="category"
+                        [disabled]="isCreating">
+              <mat-option [value]="undefined">Alle Kategorien</mat-option>
+              <mat-option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Leer lassen für kategorieübergreifendes Budget</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button 
+                  type="button" 
+                  (click)="resetForm()"
+                  [disabled]="isCreating">
+            <mat-icon>clear</mat-icon>
+            Abbrechen
+          </button>
+          <button mat-raised-button 
+                  color="primary" 
+                  type="submit" 
+                  [disabled]="!isFormValid || isCreating">
+            <mat-icon *ngIf="!isCreating">add</mat-icon>
+            <mat-progress-spinner *ngIf="isCreating" 
+                                  diameter="20" 
+                                  mode="indeterminate">
+            </mat-progress-spinner>
+            {{ isCreating ? 'Erstelle...' : 'Budget erstellen' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Budget-Liste -->
+  <div *ngIf="budgetDashboard && !hasError && !isLoading" class="budget-list">
+    <mat-card *ngFor="let budget of budgetDashboard.budgets; trackBy: trackByBudgetId" class="budget-card">
+      <mat-card-header>
+        <mat-card-title>
+          {{ budget.name }}
+          <mat-icon *ngIf="budget.is_over_budget" 
+                    class="warning-icon"
+                    title="Budget überschritten">warning</mat-icon>
+        </mat-card-title>
+        <mat-card-subtitle>
+          {{ getCategoryName(budget.category) }} • {{ budget.period === 'monthly' ? 'Monatlich' : 'Jährlich' }}
+          <span *ngIf="!budget.is_active" class="inactive-badge"> • Inaktiv</span>
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="budget-progress">
+          <div class="progress-info">
+            <span>{{ budget.spent_this_period | currency:'EUR':'symbol':'1.2-2':'de' }} von {{ budget.amount | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+            <span class="percentage">{{ getProgressPercentage(budget) | number:'1.0-0' }}%</span>
+          </div>
+          <mat-progress-bar 
+            [value]="getProgressPercentage(budget)" 
+            [color]="getBudgetStatusColor(budget)"
+            mode="determinate">
+          </mat-progress-bar>
+          <div class="remaining-budget" [class.negative]="budget.remaining_budget < 0">
+            {{ budget.remaining_budget >= 0 ? 'Verbleibendes Budget:' : 'Überschreitung:' }} 
+            {{ Math.abs(budget.remaining_budget) | currency:'EUR':'symbol':'1.2-2':'de' }}
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button 
+                color="warn" 
+                (click)="deleteBudget(budget)"
+                [disabled]="isLoading">
+          <mat-icon>delete</mat-icon>
+          Löschen
+        </button>
+        <button mat-button 
+                color="primary"
+                disabled
+                title="Funktion kommt bald">
+          <mat-icon>edit</mat-icon>
+          Bearbeiten
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <div *ngIf="!hasValidBudgets" class="no-budgets">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <h3>Noch keine Budgets erstellt</h3>
+      <p>Erstellen Sie Ihr erstes Budget, um Ihre Ausgaben zu verwalten und besser zu planen.</p>
+      <button mat-raised-button 
+              color="primary" 
+              (click)="showCreateForm = true">
+        <mat-icon>add</mat-icon>
+        Erstes Budget erstellen
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading && !hasError" class="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>{{ budgetDashboard ? 'Aktualisiere Budget-Daten...' : 'Lade Budget-Daten...' }}</p>
+  </div>
+</div>

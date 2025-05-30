@@ -15,4 +15,18 @@ urlpatterns = [
     # Dashboard
     path('dashboard/', views.dashboard_stats, name='dashboard-stats'),
     path('expenses-chart/', views.expenses_chart_data, name='expenses_chart_data'),
+    
+    # Budget Management
+    path('budgets/', views.budgets_list_create, name='budget-list-create'),
+    path('budgets/<int:pk>/', views.budget_detail, name='budget-detail'),
+    path('budget-dashboard/', views.budget_dashboard, name='budget-dashboard'),
+    
+    # Reminders
+    path('reminders/', views.reminders_list, name='reminders-list'),
+    path('reminders/<int:pk>/dismiss/', views.dismiss_reminder, name='dismiss-reminder'),
+    path('pending-reminders/', views.pending_reminders, name='pending-reminders'),
+    
+    # Barcode Scanner
+    path('barcode/<str:barcode>/search/', views.search_by_barcode, name='barcode-search'),
+    path('barcode/<str:barcode>/info/', views.product_info_by_barcode, name='barcode-info'),
 ]

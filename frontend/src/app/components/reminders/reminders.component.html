@@ -1,0 +1,130 @@
+<div class="reminders-container">
+  <div class="header">
+    <h2>🔔 Erinnerungen</h2>
+    <p class="subtitle">Behalten Sie den Überblick über ablaufende Items</p>
+  </div>
+
+  <!-- Tabs für verschiedene Reminder-Typen -->
+  <mat-tab-group class="reminder-tabs">
+    <mat-tab label="Ablaufende Items">
+      <ng-template matTabContent>
+        <!-- Ablaufende Items -->
+        <div class="tab-content">
+          <div *ngIf="pendingItems.length > 0" class="expiring-items">
+            <div *ngFor="let item of pendingItems" 
+                 class="expiry-card" 
+                 [class]="getExpiryStatusColor(item)">
+              <div class="expiry-header">
+                <div class="item-info">
+                  <mat-icon class="expiry-icon">{{ getExpiryIcon(item) }}</mat-icon>
+                  <div class="item-details">
+                    <h3>{{ item.name }}</h3>
+                    <p class="category">{{ item.category_name }}</p>
+                    <p class="location" *ngIf="item.location_display">{{ item.location_display }}</p>
+                  </div>
+                </div>
+                <div class="expiry-status">
+                  <span class="status-text">{{ getExpiryStatusText(item) }}</span>
+                  <span class="expiry-date" *ngIf="item.expiry_date">
+                    Ablauf: {{ formatDate(item.expiry_date) }}
+                  </span>
+                </div>
+              </div>
+              
+              <div class="expiry-actions" *ngIf="item.description">
+                <p class="description">{{ item.description }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="pendingItems.length === 0" class="no-items">
+            <mat-icon>check_circle_outline</mat-icon>
+            <h3>Keine ablaufenden Items</h3>
+            <p>Alle Ihre Items sind noch für längere Zeit haltbar.</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab label="Aktive Erinnerungen">
+      <ng-template matTabContent>
+        <!-- Aktive Erinnerungen -->
+        <div class="tab-content">
+          <div *ngIf="reminders.length > 0" class="active-reminders">
+            <div *ngFor="let reminder of reminders" class="reminder-card">
+              <div class="reminder-header">
+                <mat-icon class="reminder-type-icon">{{ getReminderTypeIcon(reminder.reminder_type) }}</mat-icon>
+                <div class="reminder-info">
+                  <h3>{{ reminder.item_name }}</h3>
+                  <p class="reminder-type">{{ getReminderTypeText(reminder.reminder_type) }}</p>
+                  <p class="reminder-date">{{ formatDate(reminder.reminder_date) }}</p>
+                </div>
+                <button mat-icon-button 
+                        color="accent" 
+                        (click)="dismissReminder(reminder)"
+                        title="Erinnerung verwerfen">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              
+              <div class="reminder-content">
+                <p class="reminder-message">{{ reminder.message }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="reminders.length === 0" class="no-reminders">
+            <mat-icon>notifications_off</mat-icon>
+            <h3>Keine aktiven Erinnerungen</h3>
+            <p>Sie haben momentan keine ausstehenden Erinnerungen.</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab label="Einstellungen">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <mat-card class="settings-card">
+            <mat-card-header>
+              <mat-card-title>⚙️ Erinnerungs-Einstellungen</mat-card-title>
+              <mat-card-subtitle>Konfigurieren Sie Ihre Benachrichtigungen</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="settings-info">
+                <mat-icon>info</mat-icon>
+                <div>
+                  <h4>Automatische Erinnerungen</h4>
+                  <p>Erinnerungen werden automatisch basierend auf den Ablaufdaten Ihrer Items erstellt. 
+                     Sie können für jedes Item individuelle Erinnerungseinstellungen vornehmen.</p>
+                </div>
+              </div>
+
+              <div class="settings-tip">
+                <mat-icon>lightbulb</mat-icon>
+                <div>
+                  <h4>Tipp</h4>
+                  <p>Beim Hinzufügen oder Bearbeiten von Items können Sie Ablaufdaten und 
+                     Erinnerungseinstellungen festlegen.</p>
+                </div>
+              </div>
+
+              <div class="settings-actions">
+                <button mat-raised-button color="primary" routerLink="/inventory">
+                  <mat-icon>inventory</mat-icon>
+                  Zu Inventar
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Lade Erinnerungen...</p>
+  </div>
+</div>

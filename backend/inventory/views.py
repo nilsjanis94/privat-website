@@ -8,6 +8,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from collections import defaultdict
 import calendar
+import requests
 from .models import Category, Item
 from .serializers import CategorySerializer, ItemSerializer, ItemCreateUpdateSerializer
 
@@ -427,4 +428,187 @@ def expenses_chart_data(request):
         'data_points': data_points,
         'total_amount': sum(point['amount'] for point in data_points),
         'total_items': sum(point['items_count'] for point in data_points)
+    })
+
+# Budget Management Views
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def budgets_list_create(request):
+    from .serializers import BudgetSerializer
+    from .models import Budget
+    
+    if request.method == 'POST':
+        serializer = BudgetSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        budgets = Budget.objects.filter(owner=request.user, is_active=True).order_by('-created_at')
+        serializer = BudgetSerializer(budgets, many=True)
+        return Response(serializer.data)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def budget_detail(request, pk):
+    from .serializers import BudgetSerializer
+    from .models import Budget
+    
+    try:
+        budget = Budget.objects.get(pk=pk, owner=request.user)
+    except Budget.DoesNotExist:
+        return Response({'error': 'Budget nicht gefunden'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serializer = BudgetSerializer(budget)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = BudgetSerializer(budget, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        budget.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# Reminder Management Views
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def reminders_list(request):
+    from .serializers import ReminderSerializer
+    from .models import Reminder
+    
+    reminders = Reminder.objects.filter(
+        owner=request.user, 
+        is_dismissed=False
+    ).order_by('reminder_date')
+    
+    # Filter für offene/alle Reminders
+    show_all = request.query_params.get('all', 'false').lower() == 'true'
+    if not show_all:
+        reminders = reminders.filter(is_sent=False)
+    
+    serializer = ReminderSerializer(reminders, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def dismiss_reminder(request, pk):
+    from .models import Reminder
+    
+    try:
+        reminder = Reminder.objects.get(pk=pk, owner=request.user)
+    except Reminder.DoesNotExist:
+        return Response({'error': 'Erinnerung nicht gefunden'}, status=status.HTTP_404_NOT_FOUND)
+    
+    reminder.is_dismissed = True
+    reminder.save()
+    
+    return Response({'message': 'Erinnerung verworfen'}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def pending_reminders(request):
+    """Zeigt Items an, die bald ablaufen oder Erinnerungen benötigen"""
+    from .serializers import ItemSerializer
+    
+    items = Item.objects.filter(
+        owner=request.user,
+        consumed=False,
+        reminder_enabled=True,
+        expiry_date__isnull=False
+    )
+    
+    # Berechne Items die in den nächsten X Tagen ablaufen
+    today = timezone.now().date()
+    items_needing_reminder = []
+    
+    for item in items:
+        days_until_expiry = (item.expiry_date - today).days
+        if days_until_expiry <= item.reminder_days_before:
+            items_needing_reminder.append(item)
+    
+    serializer = ItemSerializer(items_needing_reminder, many=True)
+    return Response(serializer.data)
+
+# Barcode Scanner Features
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search_by_barcode(request, barcode):
+    """Sucht Items nach Barcode"""
+    items = Item.objects.filter(
+        owner=request.user,
+        barcode=barcode
+    )
+    serializer = ItemSerializer(items, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def product_info_by_barcode(request, barcode):
+    """Holt Produktinformationen über externe API (z.B. OpenFoodFacts)"""
+    
+    try:
+        # OpenFoodFacts API für Produktinformationen
+        response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json')
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            if data.get('status') == 1:  # Produkt gefunden
+                product = data.get('product', {})
+                
+                return Response({
+                    'found': True,
+                    'name': product.get('product_name', ''),
+                    'brand': product.get('brands', ''),
+                    'category': product.get('categories', ''),
+                    'ingredients': product.get('ingredients_text', ''),
+                    'image_url': product.get('image_front_url', ''),
+                    'barcode': barcode
+                })
+            else:
+                return Response({
+                    'found': False,
+                    'message': 'Produkt nicht in der Datenbank gefunden'
+                })
+        else:
+            return Response({
+                'found': False,
+                'message': 'Fehler beim Abrufen der Produktdaten'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    except Exception as e:
+        return Response({
+            'found': False,
+            'message': f'Fehler: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Budget Dashboard View
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def budget_dashboard(request):
+    """Dashboard mit Budget-Übersicht und Warnungen"""
+    from .models import Budget
+    from .serializers import BudgetSerializer
+    from django.db.models import Sum
+    
+    budgets = Budget.objects.filter(owner=request.user, is_active=True)
+    budget_data = BudgetSerializer(budgets, many=True).data
+    
+    # Gesamtstatistiken
+    total_budget = sum(float(b['amount']) for b in budget_data)
+    total_spent = sum(float(b['spent_this_period']) for b in budget_data)
+    budgets_over_limit = [b for b in budget_data if b['is_over_budget']]
+    
+    return Response({
+        'budgets': budget_data,
+        'summary': {
+            'total_budget': total_budget,
+            'total_spent': total_spent,
+            'remaining_total': total_budget - total_spent,
+            'budgets_over_limit': len(budgets_over_limit),
+            'over_budget_details': budgets_over_limit
+        }
     })

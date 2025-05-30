@@ -1,0 +1,267 @@
+<div class="scanner-container">
+  <div class="header">
+    <h2>📱 Barcode Scanner</h2>
+    <p class="subtitle">Scannen Sie Barcodes mit der Kamera oder geben Sie sie manuell ein</p>
+  </div>
+
+  <!-- Scanner Tabs -->
+  <mat-tab-group class="scanner-tabs">
+    <!-- Kamera-Tab -->
+    <mat-tab label="📷 Kamera">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <mat-card class="camera-card">
+            <mat-card-header>
+              <mat-card-title>Kamera Scanner</mat-card-title>
+              <mat-card-subtitle>Halten Sie den Barcode vor die Kamera</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <!-- Camera Error -->
+              <div *ngIf="cameraError" class="camera-error">
+                <mat-icon>error</mat-icon>
+                <h3>Kamera nicht verfügbar</h3>
+                <p>{{ cameraError }}</p>
+              </div>
+
+              <!-- Camera Controls -->
+              <div *ngIf="!cameraError" class="camera-controls">
+                <button mat-raised-button 
+                        color="primary" 
+                        (click)="startCamera()"
+                        [disabled]="isCameraActive || isLoading"
+                        *ngIf="!isCameraActive">
+                  <mat-icon>camera_alt</mat-icon>
+                  Kamera starten
+                </button>
+
+                <button mat-raised-button 
+                        color="warn" 
+                        (click)="stopCamera()"
+                        *ngIf="isCameraActive">
+                  <mat-icon>camera_off</mat-icon>
+                  Kamera stoppen
+                </button>
+              </div>
+
+              <!-- Camera View -->
+              <div class="camera-view" *ngIf="isCameraActive">
+                <div class="video-container">
+                  <video #videoElement 
+                         autoplay 
+                         playsinline 
+                         muted
+                         class="camera-video">
+                  </video>
+                  
+                  <!-- Scanning Overlay -->
+                  <div class="scanning-overlay" *ngIf="isScanning">
+                    <div class="scan-frame">
+                      <div class="scan-corners">
+                        <div class="corner top-left"></div>
+                        <div class="corner top-right"></div>
+                        <div class="corner bottom-left"></div>
+                        <div class="corner bottom-right"></div>
+                      </div>
+                      <div class="scan-line"></div>
+                    </div>
+                    <p class="scan-instruction">Barcode in den Rahmen halten</p>
+                  </div>
+                </div>
+                
+                <!-- Hidden canvas for image processing -->
+                <canvas #canvasElement class="hidden-canvas"></canvas>
+              </div>
+
+              <!-- Camera Hints -->
+              <div class="camera-hints" *ngIf="isCameraActive">
+                <div class="hint">
+                  <mat-icon>info</mat-icon>
+                  <span>Halten Sie den Barcode ruhig vor die Kamera</span>
+                </div>
+                <div class="hint">
+                  <mat-icon>light_mode</mat-icon>
+                  <span>Sorgen Sie für ausreichend Licht</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Manueller Input Tab -->
+    <mat-tab label="⌨️ Manuell">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <mat-card class="scanner-card">
+            <mat-card-header>
+              <mat-card-title>Barcode eingeben</mat-card-title>
+              <mat-card-subtitle>EAN-13 oder UPC-A Codes werden unterstützt</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <form (ngSubmit)="searchByBarcode()" #barcodeForm="ngForm">
+                <div class="scanner-input">
+                  <mat-form-field appearance="outline" class="barcode-field">
+                    <mat-label>Barcode</mat-label>
+                    <input matInput 
+                           [(ngModel)]="barcode" 
+                           name="barcode" 
+                           placeholder="z.B. 4006381333934"
+                           maxlength="13"
+                           pattern="[0-9]{8,13}"
+                           #barcodeInput>
+                    <mat-icon matSuffix>qr_code</mat-icon>
+                    <mat-hint>Geben Sie einen 8-13 stelligen Barcode ein</mat-hint>
+                  </mat-form-field>
+                  
+                  <div class="scanner-actions">
+                    <button mat-raised-button 
+                            color="primary" 
+                            type="submit"
+                            [disabled]="isLoading || !barcode.trim()">
+                      <mat-icon>search</mat-icon>
+                      Suchen
+                    </button>
+                    
+                    <button mat-button 
+                            type="button" 
+                            (click)="resetSearch()"
+                            [disabled]="isLoading">
+                      <mat-icon>clear</mat-icon>
+                      Zurücksetzen
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>{{ isCameraActive ? 'Erkenne Barcode...' : 'Suche Produktinformationen...' }}</p>
+  </div>
+
+  <!-- Existing Items -->
+  <mat-card *ngIf="existingItems.length > 0" class="results-card">
+    <mat-card-header>
+      <mat-card-title>🔍 Gefundene Items in Ihrem Inventar</mat-card-title>
+      <mat-card-subtitle>{{ existingItems.length }} Item(s) mit diesem Barcode gefunden</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="existing-items">
+        <div *ngFor="let item of existingItems" class="existing-item">
+          <mat-icon class="item-icon">inventory</mat-icon>
+          <div class="item-details">
+            <h4>{{ item.name }}</h4>
+            <p class="category">{{ item.category_name }}</p>
+            <p class="location" *ngIf="item.location_display">{{ item.location_display }}</p>
+            <p class="status" [class.consumed]="item.consumed">
+              {{ item.consumed ? 'Verbraucht' : 'Verfügbar' }}
+            </p>
+          </div>
+          <div class="item-price" *ngIf="item.purchase_price">
+            {{ item.purchase_price | currency:'EUR':'symbol':'1.2-2':'de' }}
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Product Info -->
+  <mat-card *ngIf="productInfo" class="product-card">
+    <mat-card-header>
+      <mat-card-title>
+        {{ productInfo.found ? '✅ Produktinformationen' : '❌ Produkt nicht gefunden' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ productInfo.found ? 'Daten von OpenFoodFacts' : productInfo.message }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content *ngIf="productInfo.found">
+      <div class="product-info">
+        <div class="product-image" *ngIf="productInfo.image_url">
+          <img [src]="productInfo.image_url" [alt]="productInfo.name" loading="lazy">
+        </div>
+        
+        <div class="product-details">
+          <div class="product-field" *ngIf="productInfo.name">
+            <strong>Name:</strong> {{ productInfo.name }}
+          </div>
+          
+          <div class="product-field" *ngIf="productInfo.brand">
+            <strong>Marke:</strong> {{ productInfo.brand }}
+          </div>
+          
+          <div class="product-field" *ngIf="productInfo.category">
+            <strong>Kategorie:</strong> {{ productInfo.category }}
+          </div>
+          
+          <div class="product-field" *ngIf="productInfo.barcode">
+            <strong>Barcode:</strong> {{ productInfo.barcode }}
+          </div>
+          
+          <div class="product-field" *ngIf="productInfo.ingredients">
+            <strong>Zutaten:</strong> 
+            <p class="ingredients">{{ productInfo.ingredients }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="product-actions">
+        <button mat-raised-button 
+                color="primary" 
+                (click)="addToInventory()">
+          <mat-icon>add</mat-icon>
+          Zum Inventar hinzufügen
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Help Section -->
+  <mat-card class="help-card">
+    <mat-card-header>
+      <mat-card-title>💡 Tipps</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="help-content">
+        <div class="tip">
+          <mat-icon>camera_alt</mat-icon>
+          <div>
+            <h4>Kamera-Scanner</h4>
+            <p>Verwenden Sie den Kamera-Tab für schnelles Scannen. Halten Sie den Barcode ruhig vor die Kamera.</p>
+          </div>
+        </div>
+        
+        <div class="tip">
+          <mat-icon>edit</mat-icon>
+          <div>
+            <h4>Manuelle Eingabe</h4>
+            <p>Geben Sie Barcodes manuell ein, wenn die Kamera nicht verfügbar ist oder nicht funktioniert.</p>
+          </div>
+        </div>
+        
+        <div class="tip">
+          <mat-icon>search</mat-icon>
+          <div>
+            <h4>Produktsuche</h4>
+            <p>Die Produktdaten werden von OpenFoodFacts abgerufen. Nicht alle Produkte sind verfügbar.</p>
+          </div>
+        </div>
+        
+        <div class="tip">
+          <mat-icon>inventory</mat-icon>
+          <div>
+            <h4>Inventar-Verknüpfung</h4>
+            <p>Bereits vorhandene Items mit dem gleichen Barcode werden automatisch angezeigt.</p>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,216 @@
+<div class="notification-settings-container">
+  <div class="header">
+    <h2>🔔 Benachrichtigungen</h2>
+    <p class="subtitle">Verwalten Sie Ihre Benachrichtigungseinstellungen</p>
+  </div>
+
+  <!-- Browser Support Check -->
+  <mat-card *ngIf="!isSupported" class="warning-card">
+    <mat-card-header>
+      <mat-card-title>⚠️ Nicht unterstützt</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Ihr Browser unterstützt keine Push-Benachrichtigungen. Bitte verwenden Sie einen modernen Browser wie Chrome, Firefox oder Safari.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Permission Status -->
+  <mat-card class="permission-card">
+    <mat-card-header>
+      <mat-card-title>🔐 Berechtigung</mat-card-title>
+      <mat-card-subtitle>Status der Benachrichtigungsberechtigung</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="permission-status">
+        <div class="status-info">
+          <mat-icon [color]="getPermissionColor()" class="status-icon">{{ getPermissionIcon() }}</mat-icon>
+          <div class="status-text">
+            <h3>{{ getPermissionText() }}</h3>
+            <p *ngIf="isPermissionDefault()">
+              Klicken Sie auf "Aktivieren", um Benachrichtigungen zu erlauben.
+            </p>
+            <p *ngIf="isPermissionDenied()">
+              Benachrichtigungen wurden blockiert. Sie können diese in den Browser-Einstellungen aktivieren.
+            </p>
+            <p *ngIf="isPermissionGranted()">
+              Sie erhalten Benachrichtigungen von dieser Website.
+            </p>
+          </div>
+        </div>
+
+        <div class="permission-actions">
+          <button mat-raised-button 
+                  [color]="getPermissionColor()"
+                  (click)="requestPermission()"
+                  [disabled]="isLoading || isPermissionGranted() || !isSupported"
+                  *ngIf="!isPermissionGranted()">
+            <mat-icon>notifications</mat-icon>
+            Aktivieren
+          </button>
+
+          <button mat-button 
+                  (click)="sendTestNotification()"
+                  [disabled]="isLoading || !isPermissionGranted()"
+                  *ngIf="isPermissionGranted()">
+            <mat-icon>notifications_active</mat-icon>
+            Test senden
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Push Notifications -->
+  <mat-card class="push-card" *ngIf="isPermissionGranted()">
+    <mat-card-header>
+      <mat-card-title>📱 Push-Benachrichtigungen</mat-card-title>
+      <mat-card-subtitle>Benachrichtigungen auch wenn die App geschlossen ist</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="push-status">
+        <div class="push-info">
+          <mat-icon [color]="isSubscribed ? 'primary' : 'accent'" class="push-icon">
+            {{ isSubscribed ? 'smartphone' : 'smartphone_off' }}
+          </mat-icon>
+          <div class="push-text">
+            <h3>{{ isSubscribed ? 'Push-Benachrichtigungen aktiv' : 'Push-Benachrichtigungen inaktiv' }}</h3>
+            <p>{{ isSubscribed ? 'Sie erhalten Benachrichtigungen auch wenn die App geschlossen ist.' : 'Aktivieren Sie Push-Benachrichtigungen für bessere Erreichbarkeit.' }}</p>
+          </div>
+        </div>
+
+        <div class="push-actions">
+          <button mat-raised-button 
+                  color="primary"
+                  (click)="subscribeToPush()"
+                  [disabled]="isLoading || isSubscribed"
+                  *ngIf="!isSubscribed">
+            <mat-icon>add_alert</mat-icon>
+            Aktivieren
+          </button>
+
+          <button mat-button 
+                  color="warn"
+                  (click)="unsubscribeFromPush()"
+                  [disabled]="isLoading"
+                  *ngIf="isSubscribed">
+            <mat-icon>notifications_off</mat-icon>
+            Deaktivieren
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Notification Types -->
+  <mat-card class="settings-card" *ngIf="isPermissionGranted()">
+    <mat-card-header>
+      <mat-card-title>⚙️ Benachrichtigungstypen</mat-card-title>
+      <mat-card-subtitle>Wählen Sie, für welche Ereignisse Sie benachrichtigt werden möchten</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-list class="notification-types">
+        <mat-list-item>
+          <mat-icon matListItemIcon>access_time</mat-icon>
+          <div matListItemTitle>Erinnerungen</div>
+          <div matListItemLine>Benachrichtigungen für ablaufende Items</div>
+          <mat-slide-toggle 
+            [(ngModel)]="reminderNotifications" 
+            (change)="onNotificationSettingChange()"
+            color="primary"
+            matListItemMeta>
+          </mat-slide-toggle>
+        </mat-list-item>
+
+        <mat-divider></mat-divider>
+
+        <mat-list-item>
+          <mat-icon matListItemIcon>account_balance_wallet</mat-icon>
+          <div matListItemTitle>Budget-Warnungen</div>
+          <div matListItemLine>Benachrichtigungen bei Budgetüberschreitungen</div>
+          <mat-slide-toggle 
+            [(ngModel)]="budgetNotifications" 
+            (change)="onNotificationSettingChange()"
+            color="primary"
+            matListItemMeta>
+          </mat-slide-toggle>
+        </mat-list-item>
+
+        <mat-divider></mat-divider>
+
+        <mat-list-item>
+          <mat-icon matListItemIcon>event_busy</mat-icon>
+          <div matListItemTitle>Ablaufdatum</div>
+          <div matListItemLine>Benachrichtigungen für bald ablaufende Produkte</div>
+          <mat-slide-toggle 
+            [(ngModel)]="expiryNotifications" 
+            (change)="onNotificationSettingChange()"
+            color="primary"
+            matListItemMeta>
+          </mat-slide-toggle>
+        </mat-list-item>
+
+        <mat-divider></mat-divider>
+
+        <mat-list-item>
+          <mat-icon matListItemIcon>notifications</mat-icon>
+          <div matListItemTitle>Allgemeine Benachrichtigungen</div>
+          <div matListItemLine>System-Updates und wichtige Mitteilungen</div>
+          <mat-slide-toggle 
+            [(ngModel)]="generalNotifications" 
+            (change)="onNotificationSettingChange()"
+            color="primary"
+            matListItemMeta>
+          </mat-slide-toggle>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Help & Information -->
+  <mat-card class="help-card">
+    <mat-card-header>
+      <mat-card-title>💡 Hinweise</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="help-content">
+        <div class="help-item">
+          <mat-icon>info</mat-icon>
+          <div>
+            <h4>Browser-Berechtigung</h4>
+            <p>Benachrichtigungen müssen in Ihrem Browser aktiviert werden. Sie werden einmalig nach der Berechtigung gefragt.</p>
+          </div>
+        </div>
+
+        <div class="help-item">
+          <mat-icon>smartphone</mat-icon>
+          <div>
+            <h4>Push-Benachrichtigungen</h4>
+            <p>Push-Benachrichtigungen funktionieren auch wenn die App geschlossen ist. Sie benötigen eine aktive Internetverbindung.</p>
+          </div>
+        </div>
+
+        <div class="help-item">
+          <mat-icon>privacy_tip</mat-icon>
+          <div>
+            <h4>Datenschutz</h4>
+            <p>Ihre Benachrichtigungseinstellungen werden lokal gespeichert. Wir senden nur die von Ihnen gewünschten Benachrichtigungen.</p>
+          </div>
+        </div>
+
+        <div class="help-item">
+          <mat-icon>settings</mat-icon>
+          <div>
+            <h4>Browser-Einstellungen</h4>
+            <p>Sie können Benachrichtigungen jederzeit in den Einstellungen Ihres Browsers deaktivieren oder aktivieren.</p>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Verarbeite Anfrage...</p>
+  </div>
+</div> 

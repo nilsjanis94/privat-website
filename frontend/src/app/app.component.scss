@@ -54,8 +54,22 @@ body {
   transform: translateY(-100%);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   
-  @media (min-width: 769px) {
+  // Hide on desktop completely
+  @media (min-width: 1024px) {
     display: none !important;
+  }
+
+  // Adjust top position based on navbar height
+  @media (max-width: 1023px) and (min-width: 769px) {
+    top: 60px;
+  }
+
+  @media (max-width: 768px) {
+    top: 56px;
+  }
+
+  @media (max-width: 480px) {
+    top: 52px;
   }
 
   &.active {
@@ -71,6 +85,17 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
+
+    // Adjust padding for smaller screens
+    @media (max-width: 480px) {
+      padding: var(--space-4) var(--space-3);
+      gap: var(--space-3);
+    }
+
+    @media (max-width: 359px) {
+      padding: var(--space-3) var(--space-2);
+      gap: var(--space-2);
+    }
   }
 
   .mobile-nav-link {
@@ -84,6 +109,18 @@ body {
     font-weight: 500;
     font-size: var(--text-sm);
     transition: all 0.2s ease;
+
+    // Smaller padding and text for mobile
+    @media (max-width: 480px) {
+      padding: var(--space-3);
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+    }
+
+    @media (max-width: 359px) {
+      padding: var(--space-2);
+      gap: var(--space-2);
+    }
 
     &:hover {
       background: var(--surface-variant);
@@ -100,6 +137,17 @@ body {
       font-size: 20px;
       width: 20px;
       height: 20px;
+      flex-shrink: 0;
+
+      @media (max-width: 480px) {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    span {
+      flex: 1;
     }
   }
 
@@ -110,6 +158,11 @@ body {
     border-top: 1px solid var(--border-primary);
     border-bottom: 1px solid var(--border-primary);
 
+    @media (max-width: 480px) {
+      margin: var(--space-3) 0;
+      padding: var(--space-3) 0;
+    }
+
     .mobile-section-header {
       display: flex;
       align-items: center;
@@ -118,6 +171,11 @@ body {
       color: var(--primary-700);
       font-weight: 600;
       font-size: var(--text-sm);
+
+      @media (max-width: 480px) {
+        padding: 0 var(--space-3) var(--space-2) var(--space-3);
+        font-size: var(--text-xs);
+      }
 
       .current-theme-indicator {
         margin-left: auto;
@@ -128,6 +186,11 @@ body {
         border-radius: var(--radius-sm);
         font-weight: 500;
         border: 1px solid var(--border-accent);
+
+        @media (max-width: 480px) {
+          font-size: 10px;
+          padding: 2px 6px;
+        }
       }
     }
 
@@ -152,6 +215,12 @@ body {
         cursor: pointer;
         width: 100%;
 
+        @media (max-width: 480px) {
+          padding: var(--space-2) var(--space-3);
+          gap: var(--space-2);
+          font-size: var(--text-xs);
+        }
+
         &:hover {
           background: var(--surface-variant);
           color: var(--primary-600);
@@ -168,6 +237,12 @@ body {
           width: 20px;
           height: 20px;
           flex-shrink: 0;
+
+          @media (max-width: 480px) {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
         }
 
         span {
@@ -181,6 +256,12 @@ body {
           width: 18px;
           height: 18px;
           flex-shrink: 0;
+
+          @media (max-width: 480px) {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
         }
       }
     }
@@ -191,6 +272,10 @@ body {
     padding-top: var(--space-6);
     border-top: 1px solid var(--border-primary);
 
+    @media (max-width: 480px) {
+      padding-top: var(--space-4);
+    }
+
     .mobile-user-info {
       display: flex;
       align-items: center;
@@ -199,6 +284,12 @@ body {
       background: var(--surface-variant);
       border-radius: var(--radius-lg);
       margin-bottom: var(--space-4);
+
+      @media (max-width: 480px) {
+        padding: var(--space-3);
+        gap: var(--space-2);
+        margin-bottom: var(--space-3);
+      }
 
       .mobile-user-avatar {
         display: flex;
@@ -211,10 +302,21 @@ body {
         color: var(--primary-600);
         flex-shrink: 0;
 
+        @media (max-width: 480px) {
+          width: 40px;
+          height: 40px;
+        }
+
         mat-icon {
           font-size: 32px;
           width: 32px;
           height: 32px;
+
+          @media (max-width: 480px) {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+          }
         }
       }
 
@@ -227,12 +329,26 @@ body {
           font-weight: 600;
           color: var(--text-primary);
           line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          @media (max-width: 480px) {
+            font-size: var(--text-sm);
+          }
         }
 
         .mobile-user-email {
           font-size: var(--text-sm);
           color: var(--text-muted);
           line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          @media (max-width: 480px) {
+            font-size: var(--text-xs);
+          }
         }
       }
     }
@@ -241,6 +357,10 @@ body {
       display: flex;
       flex-direction: column;
       gap: var(--space-2);
+
+      @media (max-width: 480px) {
+        gap: var(--space-1);
+      }
 
       .mobile-menu-item {
         display: flex;
@@ -258,6 +378,12 @@ body {
         cursor: pointer;
         width: 100%;
 
+        @media (max-width: 480px) {
+          padding: var(--space-2) var(--space-3);
+          gap: var(--space-2);
+          font-size: var(--text-xs);
+        }
+
         &:hover:not(:disabled) {
           background: var(--surface-variant);
           color: var(--primary-600);
@@ -274,6 +400,11 @@ body {
           border-top: 1px solid var(--border-primary);
           padding-top: var(--space-4);
 
+          @media (max-width: 480px) {
+            margin-top: var(--space-1);
+            padding-top: var(--space-3);
+          }
+
           &:hover {
             background: rgba(239, 68, 68, 0.05);
             color: var(--error);
@@ -285,6 +416,12 @@ body {
           width: 20px;
           height: 20px;
           flex-shrink: 0;
+
+          @media (max-width: 480px) {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
         }
 
         span {
@@ -299,6 +436,11 @@ body {
           padding: 2px 6px;
           border-radius: var(--radius-sm);
           flex-shrink: 0;
+
+          @media (max-width: 480px) {
+            font-size: 10px;
+            padding: 1px 4px;
+          }
         }
       }
     }

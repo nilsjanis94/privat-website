@@ -1,0 +1,303 @@
+<div class="budget-analytics-container">
+  <div class="header">
+    <h2>📊 Budget-Analysen</h2>
+    <p class="subtitle">Detaillierte Auswertungen Ihrer Budgetplanung und -verwendung</p>
+    
+    <div class="controls">
+      <mat-form-field appearance="outline">
+        <mat-label>Zeitraum</mat-label>
+        <mat-select [(value)]="selectedPeriod" (selectionChange)="onPeriodChange()">
+          <mat-option value="3M">3 Monate</mat-option>
+          <mat-option value="6M">6 Monate</mat-option>
+          <mat-option value="12M">12 Monate</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-button [matMenuTriggerFor]="actionsMenu">
+        <mat-icon>more_vert</mat-icon>
+        Aktionen
+      </button>
+
+      <mat-menu #actionsMenu="matMenu">
+        <button mat-menu-item (click)="exportData()">
+          <mat-icon>download</mat-icon>
+          Daten exportieren
+        </button>
+        <button mat-menu-item (click)="loadAnalyticsData()">
+          <mat-icon>refresh</mat-icon>
+          Aktualisieren
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- Summary Statistics -->
+  <div class="summary-grid">
+    <mat-card class="summary-card total-budget">
+      <mat-card-content>
+        <div class="summary-content">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <div class="summary-info">
+            <h3>{{ totalBudgeted | currency:'EUR':'symbol':'1.2-2':'de' }}</h3>
+            <p>Gesamt-Budget</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card total-spent">
+      <mat-card-content>
+        <div class="summary-content">
+          <mat-icon>shopping_cart</mat-icon>
+          <div class="summary-info">
+            <h3>{{ totalSpent | currency:'EUR':'symbol':'1.2-2':'de' }}</h3>
+            <p>Ausgegeben</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card variance" [class]="totalVariance >= 0 ? 'positive' : 'negative'">
+      <mat-card-content>
+        <div class="summary-content">
+          <mat-icon>{{ totalVariance >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+          <div class="summary-info">
+            <h3>{{ totalVariance | currency:'EUR':'symbol':'1.2-2':'de' }}</h3>
+            <p>Differenz ({{ totalVariancePercent | number:'1.1-1' }}%)</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card utilization">
+      <mat-card-content>
+        <div class="summary-content">
+          <mat-icon>pie_chart</mat-icon>
+          <div class="summary-info">
+            <h3>{{ averageUtilization | number:'1.1-1' }}%</h3>
+            <p>Ø Auslastung</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Main Analytics Tabs -->
+  <mat-tab-group class="analytics-tabs">
+    <!-- Trend Analysis -->
+    <mat-tab label="📈 Trends">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <mat-card class="chart-card">
+            <mat-card-header>
+              <mat-card-title>Budget vs. Tatsächliche Ausgaben</mat-card-title>
+              <mat-card-subtitle>Entwicklung über {{ selectedPeriod }}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="chart-container">
+                <canvas baseChart
+                        [data]="trendChartData"
+                        [options]="trendChartOptions"
+                        type="line">
+                </canvas>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Trend Details Table -->
+          <mat-card class="trend-details">
+            <mat-card-header>
+              <mat-card-title>Monatliche Details</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="trend-table">
+                <div class="trend-row header">
+                  <span>Monat</span>
+                  <span>Geplant</span>
+                  <span>Tatsächlich</span>
+                  <span>Differenz</span>
+                  <span>%</span>
+                </div>
+                <div *ngFor="let trend of budgetTrends" class="trend-row">
+                  <span class="month">{{ trend.month }}</span>
+                  <span class="planned">{{ trend.planned | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+                  <span class="actual">{{ trend.actual | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+                  <span class="variance" [class]="trend.variance >= 0 ? 'positive' : 'negative'">
+                    {{ trend.variance | currency:'EUR':'symbol':'1.2-2':'de' }}
+                  </span>
+                  <span class="percentage" [class]="trend.variancePercent >= 0 ? 'positive' : 'negative'">
+                    {{ trend.variancePercent | number:'1.1-1' }}%
+                  </span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Category Analysis -->
+    <mat-tab label="🎯 Kategorien">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <div class="category-grid">
+            <!-- Category Chart -->
+            <mat-card class="chart-card">
+              <mat-card-header>
+                <mat-card-title>Ausgaben nach Kategorien</mat-card-title>
+                <mat-card-subtitle>Verteilung der Ausgaben</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="chart-container">
+                  <canvas baseChart
+                          [data]="categoryChartData"
+                          [options]="categoryChartOptions"
+                          type="doughnut">
+                  </canvas>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Category Details -->
+            <mat-card class="category-details">
+              <mat-card-header>
+                <mat-card-title>Kategorien-Details</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="category-list">
+                  <div *ngFor="let category of categoryAnalysis" class="category-item">
+                    <div class="category-header">
+                      <h4>{{ category.category }}</h4>
+                      <mat-icon [color]="getTrendColor(category.trend)">
+                        {{ getTrendIcon(category.trend) }}
+                      </mat-icon>
+                    </div>
+                    
+                    <div class="category-progress">
+                      <div class="progress-info">
+                        <span>{{ category.spent | currency:'EUR':'symbol':'1.2-2':'de' }} / {{ category.budgeted | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+                        <span class="percentage">{{ category.percentUsed | number:'1.1-1' }}%</span>
+                      </div>
+                      <mat-progress-bar 
+                        [value]="category.percentUsed" 
+                        [color]="category.percentUsed > 100 ? 'warn' : category.percentUsed > 80 ? 'accent' : 'primary'">
+                      </mat-progress-bar>
+                    </div>
+                    
+                    <div class="category-remaining">
+                      <span [class]="category.remaining >= 0 ? 'positive' : 'negative'">
+                        {{ category.remaining >= 0 ? 'Verbleibt: ' : 'Überschreitung: ' }}
+                        {{ Math.abs(category.remaining) | currency:'EUR':'symbol':'1.2-2':'de' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Budget Utilization -->
+    <mat-tab label="📊 Auslastung">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <mat-card class="chart-card">
+            <mat-card-header>
+              <mat-card-title>Budget-Auslastung</mat-card-title>
+              <mat-card-subtitle>Prozentuale Nutzung der einzelnen Budgets</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="chart-container">
+                <canvas baseChart
+                        [data]="utilizationChartData"
+                        [options]="utilizationChartOptions"
+                        type="bar">
+                </canvas>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Utilization Alerts -->
+          <mat-card class="alerts-card" *ngIf="budgetsOverLimit > 0">
+            <mat-card-header>
+              <mat-card-title>⚠️ Warnungen</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="alert-item">
+                <mat-icon color="warn">warning</mat-icon>
+                <span>{{ budgetsOverLimit }} Budget(s) überschritten</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Forecast -->
+    <mat-tab label="🔮 Prognose">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <mat-card class="chart-card">
+            <mat-card-header>
+              <mat-card-title>Budget-Prognose</mat-card-title>
+              <mat-card-subtitle>Voraussichtliche Entwicklung der nächsten Monate</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="chart-container">
+                <canvas baseChart
+                        [data]="forecastChartData"
+                        [options]="forecastChartOptions"
+                        type="line">
+                </canvas>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Forecast Details -->
+          <mat-card class="forecast-details">
+            <mat-card-header>
+              <mat-card-title>Prognose-Details</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="forecast-list">
+                <div *ngFor="let forecast of budgetForecasts" 
+                     class="forecast-item" 
+                     [class.over-budget]="forecast.isOverBudget">
+                  <div class="forecast-header">
+                    <h4>{{ forecast.month }}</h4>
+                    <mat-chip [color]="forecast.isOverBudget ? 'warn' : 'primary'" selected>
+                      {{ forecast.isOverBudget ? 'Überschreitung' : 'Im Budget' }}
+                    </mat-chip>
+                  </div>
+                  
+                  <div class="forecast-amounts">
+                    <div class="amount-item">
+                      <span class="label">Prognostiziert:</span>
+                      <span class="value">{{ forecast.projectedSpending | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+                    </div>
+                    <div class="amount-item">
+                      <span class="label">Budget-Limit:</span>
+                      <span class="value">{{ forecast.budgetLimit | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+                    </div>
+                    <div class="amount-item" *ngIf="forecast.isOverBudget">
+                      <span class="label">Überschreitung:</span>
+                      <span class="value negative">{{ (forecast.projectedSpending - forecast.budgetLimit) | currency:'EUR':'symbol':'1.2-2':'de' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Lade Budget-Analysen...</p>
+  </div>
+</div> 

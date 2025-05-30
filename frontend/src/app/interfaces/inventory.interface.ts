@@ -20,8 +20,64 @@ export interface Item {
   location_display?: string;
   consumed: boolean;
   consumed_at?: string;
+  expiry_date?: string;
+  expected_lifetime_days?: number;
+  reminder_enabled: boolean;
+  reminder_days_before: number;
+  barcode?: string;
+  days_until_expiry?: number;
+  needs_reminder?: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface Budget {
+  id: number;
+  name: string;
+  amount: number;
+  period: 'monthly' | 'yearly';
+  category?: number;
+  category_name?: string;
+  is_active: boolean;
+  spent_this_period: number;
+  remaining_budget: number;
+  is_over_budget: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Reminder {
+  id: number;
+  item: number;
+  item_name: string;
+  reminder_type: 'expiry' | 'maintenance' | 'repurchase';
+  message: string;
+  reminder_date: string;
+  is_sent: boolean;
+  is_dismissed: boolean;
+  created_at: string;
+}
+
+export interface BarcodeProduct {
+  found: boolean;
+  name?: string;
+  brand?: string;
+  category?: string;
+  ingredients?: string;
+  image_url?: string;
+  barcode?: string;
+  message?: string;
+}
+
+export interface BudgetDashboard {
+  budgets: Budget[];
+  summary: {
+    total_budget: number;
+    total_spent: number;
+    remaining_total: number;
+    budgets_over_limit: number;
+    over_budget_details: Budget[];
+  };
 }
 
 export enum ItemCondition {

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,8 +9,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatStepperModule } from '@angular/material/stepper';
+import { Router } from '@angular/router';
 import { BarcodeService } from '../../services/barcode.service';
-import { BarcodeProduct, Item } from '../../interfaces/inventory.interface';
+import { InventoryService } from '../../services/inventory.service';
+import { BarcodeProduct, Item, Category, ItemLocation } from '../../interfaces/inventory.interface';
 
 @Component({
   selector: 'app-barcode-scanner',
@@ -18,6 +26,7 @@ import { BarcodeProduct, Item } from '../../interfaces/inventory.interface';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -25,7 +34,13 @@ import { BarcodeProduct, Item } from '../../interfaces/inventory.interface';
     MatIconModule,
     MatSnackBarModule,
     MatProgressBarModule,
-    MatTabsModule
+    MatTabsModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSlideToggleModule,
+    MatDialogModule,
+    MatStepperModule
   ],
   templateUrl: './barcode-scanner.component.html',
   styleUrl: './barcode-scanner.component.scss'
@@ -46,6 +61,13 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
   scanInterval: any = null;
   cameraError: string | null = null;
   
+  // Form properties
+  showAddForm = false;
+  isSubmitting = false;
+  addItemForm: FormGroup;
+  categories: Category[] = [];
+  locations = Object.values(ItemLocation);
+  
   // Camera constraints
   cameraConstraints = {
     video: {
@@ -57,15 +79,49 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
 
   constructor(
     private barcodeService: BarcodeService,
-    private snackBar: MatSnackBar
-  ) {}
+    private inventoryService: InventoryService,
+    private snackBar: MatSnackBar,
+    private fb: FormBuilder,
+    private router: Router
+  ) {
+    this.addItemForm = this.createItemForm();
+  }
 
   ngOnInit(): void {
     this.checkCameraSupport();
+    this.loadCategories();
   }
 
   ngOnDestroy(): void {
     this.stopCamera();
+  }
+
+  private createItemForm(): FormGroup {
+    return this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      description: [''],
+      category: ['', Validators.required],
+      purchase_price: [0, [Validators.min(0)]],
+      purchase_date: [new Date()],
+      location: ['', Validators.required],
+      expiry_date: [''],
+      expected_lifetime_days: [null, [Validators.min(1)]],
+      reminder_enabled: [false],
+      reminder_days_before: [7, [Validators.min(1)]],
+      barcode: ['']
+    });
+  }
+
+  private loadCategories(): void {
+    this.inventoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (error) => {
+        console.error('Fehler beim Laden der Kategorien:', error);
+        this.snackBar.open('Fehler beim Laden der Kategorien', 'Schließen', { duration: 3000 });
+      }
+    });
   }
 
   private checkCameraSupport(): void {
@@ -240,8 +296,279 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
 
   addToInventory(): void {
     if (this.productInfo?.found) {
-      // Hier würde später die Navigation zum Item-Formular mit vorausgefüllten Daten erfolgen
-      this.snackBar.open('Feature kommt bald: Automatisches Hinzufügen zum Inventar', 'Schließen', { duration: 4000 });
+      this.showAddForm = true;
+      this.prefillFormWithProductInfo();
+    } else {
+      this.snackBar.open('Keine Produktinformationen zum Hinzufügen verfügbar', 'Schließen', { duration: 3000 });
     }
+  }
+
+  private prefillFormWithProductInfo(): void {
+    if (this.productInfo?.found) {
+      // Formular mit Produktdaten vorausfüllen
+      this.addItemForm.patchValue({
+        name: this.productInfo.name || '',
+        description: this.generateDescription(),
+        barcode: this.productInfo.barcode || this.barcode,
+        purchase_date: new Date()
+      });
+
+      // Kategorie automatisch zuweisen basierend auf Produktkategorie
+      const matchedCategory = this.findMatchingCategory(this.productInfo.category);
+      if (matchedCategory) {
+        this.addItemForm.patchValue({ category: matchedCategory.id });
+      }
+    }
+  }
+
+  private generateDescription(): string {
+    if (!this.productInfo?.found) return '';
+    
+    const parts = [];
+    
+    if (this.productInfo.brand) {
+      parts.push(`Marke: ${this.productInfo.brand}`);
+    }
+    
+    if (this.productInfo.category) {
+      parts.push(`Kategorie: ${this.productInfo.category}`);
+    }
+
+    // Zutaten nur wenn noch Platz ist und stark gekürzt
+    if (this.productInfo.ingredients) {
+      const remainingLength = 200 - parts.join(' | ').length - 12; // -12 für " | Zutaten: "
+      if (remainingLength > 20) {
+        const shortIngredients = this.productInfo.ingredients.substring(0, Math.min(remainingLength - 3, 80));
+        parts.push(`Zutaten: ${shortIngredients}${shortIngredients.length < this.productInfo.ingredients.length ? '...' : ''}`);
+      }
+    }
+    
+    const description = parts.join(' | ');
+    
+    // Sicherheitscheck: Auf 200 Zeichen begrenzen
+    if (description.length > 200) {
+      return description.substring(0, 197) + '...';
+    }
+    
+    return description;
+  }
+
+  private findMatchingCategory(productCategory?: string): Category | null {
+    if (!productCategory || this.categories.length === 0) return null;
+    
+    const categoryLower = productCategory.toLowerCase();
+    
+    // Direkte Übereinstimmung
+    let match = this.categories.find(cat => 
+      cat.name.toLowerCase().includes(categoryLower) || 
+      categoryLower.includes(cat.name.toLowerCase())
+    );
+    
+    if (match) return match;
+    
+    // Kategorien-Mapping für bessere Zuordnung
+    const categoryMappings: { [key: string]: string[] } = {
+      'lebensmittel': ['food', 'getränke', 'snacks', 'beverages', 'dairy', 'meat', 'frozen'],
+      'elektronik': ['electronics', 'computer', 'phone', 'tech'],
+      'kosmetik': ['beauty', 'cosmetics', 'care', 'hygiene'],
+      'haushalt': ['household', 'cleaning', 'kitchen', 'home'],
+      'kleidung': ['clothing', 'fashion', 'shoes', 'accessories']
+    };
+    
+    for (const [germanCategory, englishTerms] of Object.entries(categoryMappings)) {
+      if (englishTerms.some(term => categoryLower.includes(term))) {
+        match = this.categories.find(cat => cat.name.toLowerCase().includes(germanCategory));
+        if (match) return match;
+      }
+    }
+    
+    // Fallback: erste Kategorie oder null
+    return this.categories.length > 0 ? this.categories[0] : null;
+  }
+
+  submitItem(): void {
+    if (this.addItemForm.valid) {
+      this.isSubmitting = true;
+      
+      const formData = { ...this.addItemForm.value };
+      
+      // Konsole-Log für Debugging
+      console.log('Form Data before processing:', formData);
+      
+      // Datum formatierung
+      if (formData.purchase_date) {
+        formData.purchase_date = this.formatDate(formData.purchase_date);
+      }
+      
+      if (formData.expiry_date) {
+        formData.expiry_date = this.formatDate(formData.expiry_date);
+      }
+      
+      // Numerische Werte korrekt formatieren
+      if (formData.purchase_price !== null && formData.purchase_price !== undefined && formData.purchase_price !== '') {
+        formData.purchase_price = parseFloat(formData.purchase_price);
+        if (isNaN(formData.purchase_price)) {
+          formData.purchase_price = null;
+        }
+      } else {
+        formData.purchase_price = null;
+      }
+      
+      if (formData.expected_lifetime_days !== null && formData.expected_lifetime_days !== undefined && formData.expected_lifetime_days !== '') {
+        formData.expected_lifetime_days = parseInt(formData.expected_lifetime_days);
+        if (isNaN(formData.expected_lifetime_days)) {
+          formData.expected_lifetime_days = null;
+        }
+      } else {
+        formData.expected_lifetime_days = null;
+      }
+      
+      if (formData.reminder_days_before !== null && formData.reminder_days_before !== undefined && formData.reminder_days_before !== '') {
+        formData.reminder_days_before = parseInt(formData.reminder_days_before);
+        if (isNaN(formData.reminder_days_before)) {
+          formData.reminder_days_before = 7; // Default-Wert
+        }
+      } else {
+        formData.reminder_days_before = 7; // Default-Wert
+      }
+      
+      // Boolean-Werte sicherstellen
+      formData.reminder_enabled = !!formData.reminder_enabled;
+      
+      // Kategorie muss eine Nummer sein
+      if (formData.category) {
+        formData.category = parseInt(formData.category);
+        if (isNaN(formData.category)) {
+          this.snackBar.open('Ungültige Kategorie ausgewählt', 'Schließen', { duration: 3000 });
+          this.isSubmitting = false;
+          return;
+        }
+      }
+      
+      // Leere Strings zu null für optionale Felder
+      ['description', 'barcode'].forEach(field => {
+        if (formData[field] === '') {
+          formData[field] = null;
+        }
+      });
+      
+      // Beschreibung auf 200 Zeichen begrenzen (Backend-Constraint)
+      if (formData.description && formData.description.length > 200) {
+        formData.description = formData.description.substring(0, 197) + '...';
+      }
+      
+      // Location sollte nicht null sein wenn leer, sondern leerer String
+      if (formData.location === '' || formData.location === null || formData.location === undefined) {
+        formData.location = '';
+      }
+      
+      // Felder entfernen die null sind und optional sind
+      Object.keys(formData).forEach(key => {
+        if (formData[key] === null && 
+            ['purchase_date', 'purchase_price', 'expiry_date', 'expected_lifetime_days', 'description', 'barcode'].includes(key)) {
+          delete formData[key];
+        }
+      });
+      
+      console.log('Form Data after processing:', formData);
+      
+      this.inventoryService.createItem(formData).subscribe({
+        next: (item) => {
+          this.snackBar.open('Gegenstand erfolgreich zum Inventar hinzugefügt!', 'Schließen', { 
+            duration: 4000,
+            panelClass: ['success-snackbar']
+          });
+          this.resetForm();
+          this.isSubmitting = false;
+        },
+        error: (error) => {
+          console.error('Fehler beim Hinzufügen:', error);
+          console.error('Error details:', error.error);
+          
+          let errorMessage = 'Fehler beim Hinzufügen des Gegenstands';
+          
+          if (error.error?.error) {
+            errorMessage = error.error.error;
+          } else if (error.error?.non_field_errors) {
+            errorMessage = error.error.non_field_errors[0];
+          } else if (error.error && typeof error.error === 'object') {
+            // Detaillierte Validierungsfehler anzeigen
+            const fieldErrors = [];
+            for (const [field, errors] of Object.entries(error.error)) {
+              if (Array.isArray(errors)) {
+                fieldErrors.push(`${field}: ${errors.join(', ')}`);
+              } else {
+                fieldErrors.push(`${field}: ${errors}`);
+              }
+            }
+            if (fieldErrors.length > 0) {
+              errorMessage = `Validierungsfehler: ${fieldErrors.join('; ')}`;
+            }
+          }
+          
+          this.snackBar.open(errorMessage, 'Schließen', { 
+            duration: 8000,
+            panelClass: ['error-snackbar']
+          });
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      this.markFormGroupTouched();
+      this.snackBar.open('Bitte füllen Sie alle Pflichtfelder aus', 'Schließen', { duration: 3000 });
+    }
+  }
+
+  private formatDate(date: Date | string): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toISOString().split('T')[0]; // YYYY-MM-DD format
+  }
+
+  private markFormGroupTouched(): void {
+    Object.keys(this.addItemForm.controls).forEach(key => {
+      const control = this.addItemForm.get(key);
+      if (control) {
+        control.markAsTouched();
+      }
+    });
+  }
+
+  cancelAddForm(): void {
+    this.showAddForm = false;
+    this.addItemForm.reset();
+    this.addItemForm = this.createItemForm();
+  }
+
+  private resetForm(): void {
+    this.showAddForm = false;
+    this.addItemForm.reset();
+    this.addItemForm = this.createItemForm();
+  }
+
+  goToInventory(): void {
+    this.router.navigate(['/inventory']);
+  }
+
+  getLocationDisplayName(location: string): string {
+    const locationMap: { [key: string]: string } = {
+      'wohnzimmer': 'Wohnzimmer',
+      'schlafzimmer': 'Schlafzimmer', 
+      'kueche': 'Küche',
+      'bad': 'Bad',
+      'buero': 'Büro',
+      'keller': 'Keller',
+      'dachboden': 'Dachboden',
+      'garage': 'Garage',
+      'balkon': 'Balkon',
+      'sonstiges': 'Sonstiges'
+    };
+    
+    return locationMap[location] || location;
+  }
+
+  // Getter für Template
+  get formControls() {
+    return this.addItemForm.controls;
   }
 }

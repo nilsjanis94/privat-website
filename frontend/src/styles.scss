@@ -1132,4 +1132,77 @@ html, body {
   .mat-sort-header-sorted {
     color: var(--primary-400) !important;
   }
+
+  // Material Tabs Dark Mode Fix
+  .mat-mdc-tab-group {
+    .mat-mdc-tab-label {
+      color: var(--text-primary) !important;
+      
+      &.mdc-tab--active {
+        color: var(--primary-500) !important;
+      }
+
+      .mdc-tab__text-label {
+        color: inherit !important;
+      }
+    }
+
+    .mat-mdc-tab-header {
+      border-bottom-color: var(--border-primary) !important;
+    }
+
+    .mdc-tab-indicator__content--underline {
+      border-color: var(--primary-500) !important;
+    }
+
+    .mat-mdc-tab-body {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Spezifischer Fix für Scanner Tabs
+  .scanner-container .mat-mdc-tab-group {
+    .mat-mdc-tab-label {
+      color: var(--text-primary) !important;
+      
+      &.mdc-tab--active {
+        color: var(--primary-500) !important;
+      }
+
+      .mdc-tab__text-label {
+        color: inherit !important;
+      }
+    }
+  }
+
+  // Sehr spezifischer Fix für mdc-tab__text-label
+  .mdc-tab__text-label {
+    color: var(--text-primary) !important;
+  }
+
+  // Fallback für alle Tab-Text-Labels
+  span.mdc-tab__text-label {
+    color: var(--text-primary) !important;
+  }
+
+  // Zusätzlicher Fix für Material Tab-Ripple Effekte
+  .mat-mdc-tab .mat-ripple-element {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+}
+
+// === GLOBAL MATERIAL TAB FIXES ===
+// Universal Fix für Tab-Text-Labels in allen Themes
+.mat-mdc-tab-group .mdc-tab__text-label {
+  color: var(--text-primary) !important;
+}
+
+// Spezifischer Fix für Scanner-Komponente
+.scanner-container .mat-mdc-tab-group .mdc-tab__text-label {
+  color: var(--text-primary) !important;
+}
+
+// Fallback für alle mdc-tab__text-label Spans
+span.mdc-tab__text-label {
+  color: var(--text-primary) !important;
 }

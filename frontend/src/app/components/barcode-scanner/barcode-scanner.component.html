@@ -215,11 +215,202 @@
       <div class="product-actions">
         <button mat-raised-button 
                 color="primary" 
-                (click)="addToInventory()">
+                (click)="addToInventory()"
+                [disabled]="showAddForm">
           <mat-icon>add</mat-icon>
           Zum Inventar hinzufügen
         </button>
       </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Add to Inventory Form -->
+  <mat-card *ngIf="showAddForm" class="add-form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>add_shopping_cart</mat-icon>
+        Gegenstand zum Inventar hinzufügen
+      </mat-card-title>
+      <mat-card-subtitle>
+        Vervollständigen Sie die Angaben für Ihr Inventar
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="addItemForm" (ngSubmit)="submitItem()">
+        <div class="form-grid">
+          <!-- Basis-Informationen -->
+          <div class="form-section">
+            <h3>📋 Basis-Informationen</h3>
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Name des Gegenstands *</mat-label>
+              <input matInput 
+                     formControlName="name"
+                     placeholder="z.B. iPhone 14 Pro"
+                     maxlength="200">
+              <mat-icon matSuffix>label</mat-icon>
+              <mat-error *ngIf="formControls['name'].hasError('required')">
+                Name ist erforderlich
+              </mat-error>
+              <mat-error *ngIf="formControls['name'].hasError('minlength')">
+                Name muss mindestens 2 Zeichen haben
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Beschreibung</mat-label>
+              <textarea matInput 
+                        formControlName="description"
+                        placeholder="Zusätzliche Details..."
+                        rows="3"
+                        maxlength="200"></textarea>
+              <mat-icon matSuffix>description</mat-icon>
+              <mat-hint align="end">{{formControls['description'].value?.length || 0}}/200 Zeichen</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Kategorie *</mat-label>
+              <mat-select formControlName="category">
+                <mat-option *ngFor="let category of categories" [value]="category.id">
+                  {{ category.name }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>category</mat-icon>
+              <mat-error *ngIf="formControls['category'].hasError('required')">
+                Kategorie ist erforderlich
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Kauf-Informationen -->
+          <div class="form-section">
+            <h3>💰 Kauf-Informationen</h3>
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Kaufpreis</mat-label>
+              <input matInput 
+                     type="number"
+                     formControlName="purchase_price"
+                     placeholder="0.00"
+                     min="0"
+                     step="0.01">
+              <span matTextPrefix>€&nbsp;</span>
+              <mat-icon matSuffix>euro</mat-icon>
+              <mat-error *ngIf="formControls['purchase_price'].hasError('min')">
+                Preis muss mindestens 0 sein
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Kaufdatum</mat-label>
+              <input matInput 
+                     [matDatepicker]="purchasePicker"
+                     formControlName="purchase_date"
+                     readonly>
+              <mat-datepicker-toggle matIconSuffix [for]="purchasePicker"></mat-datepicker-toggle>
+              <mat-datepicker #purchasePicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <!-- Standort & Verwaltung -->
+          <div class="form-section">
+            <h3>📍 Standort & Verwaltung</h3>
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Standort *</mat-label>
+              <mat-select formControlName="location">
+                <mat-option *ngFor="let location of locations" [value]="location">
+                  {{ getLocationDisplayName(location) }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>place</mat-icon>
+              <mat-error *ngIf="formControls['location'].hasError('required')">
+                Standort ist erforderlich
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Ablaufdatum</mat-label>
+              <input matInput 
+                     [matDatepicker]="expiryPicker"
+                     formControlName="expiry_date"
+                     readonly>
+              <mat-datepicker-toggle matIconSuffix [for]="expiryPicker"></mat-datepicker-toggle>
+              <mat-datepicker #expiryPicker></mat-datepicker>
+              <mat-hint>Optional für Lebensmittel oder zeitlich begrenzte Gegenstände</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Erwartete Lebensdauer (Tage)</mat-label>
+              <input matInput 
+                     type="number"
+                     formControlName="expected_lifetime_days"
+                     placeholder="z.B. 365"
+                     min="1">
+              <mat-icon matSuffix>schedule</mat-icon>
+              <mat-hint>Wie lange soll der Gegenstand voraussichtlich halten?</mat-hint>
+            </mat-form-field>
+          </div>
+
+          <!-- Erinnerungen -->
+          <div class="form-section">
+            <h3>🔔 Erinnerungen</h3>
+            
+            <div class="toggle-field">
+              <mat-slide-toggle formControlName="reminder_enabled">
+                Erinnerungen aktivieren
+              </mat-slide-toggle>
+              <p class="toggle-description">
+                Erhalten Sie Benachrichtigungen vor dem Ablauf
+              </p>
+            </div>
+
+            <mat-form-field appearance="outline" 
+                            class="full-width"
+                            *ngIf="formControls['reminder_enabled'].value">
+              <mat-label>Erinnerung (Tage vorher)</mat-label>
+              <input matInput 
+                     type="number"
+                     formControlName="reminder_days_before"
+                     min="1"
+                     max="365">
+              <mat-icon matSuffix>notifications</mat-icon>
+              <mat-hint>Wie viele Tage vor Ablauf sollen Sie erinnert werden?</mat-hint>
+            </mat-form-field>
+          </div>
+
+          <!-- Barcode (versteckt) -->
+          <input type="hidden" formControlName="barcode">
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button 
+                  type="button" 
+                  (click)="cancelAddForm()"
+                  [disabled]="isSubmitting">
+            <mat-icon>cancel</mat-icon>
+            Abbrechen
+          </button>
+          
+          <button mat-raised-button 
+                  color="primary" 
+                  type="submit"
+                  [disabled]="isSubmitting || !addItemForm.valid">
+            <mat-icon>save</mat-icon>
+            <span *ngIf="!isSubmitting">Zum Inventar hinzufügen</span>
+            <span *ngIf="isSubmitting">Wird hinzugefügt...</span>
+          </button>
+          
+          <button mat-button 
+                  type="button" 
+                  (click)="goToInventory()"
+                  [disabled]="isSubmitting">
+            <mat-icon>inventory</mat-icon>
+            Inventar anzeigen
+          </button>
+        </div>
+      </form>
     </mat-card-content>
   </mat-card>
 

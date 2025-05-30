@@ -65,7 +65,9 @@ export class ItemFormComponent {
         quantity: [data.item.quantity || 1, [Validators.required, Validators.min(1)]],
         location: [data.item.location],
         purchase_date: [data.item.purchase_date ? data.item.purchase_date.split('T')[0] : ''],
-        purchase_price: [data.item.purchase_price ? data.item.purchase_price.toString() : '']
+        purchase_price: [data.item.purchase_price ? data.item.purchase_price.toString() : ''],
+        barcode: [data.item.barcode || ''],
+        image_url: [data.item.image_url || '']
       });
     } else {
       this.itemForm = this.fb.group({
@@ -75,7 +77,9 @@ export class ItemFormComponent {
         quantity: [1, [Validators.required, Validators.min(1)]],
         location: [''],
         purchase_date: [''],
-        purchase_price: ['']
+        purchase_price: [''],
+        barcode: [''],
+        image_url: ['']
       });
     }
     

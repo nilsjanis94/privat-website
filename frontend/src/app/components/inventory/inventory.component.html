@@ -137,13 +137,23 @@
           <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef>Name</th>
             <td mat-cell *matCellDef="let item">
-              <div class="item-name">
-                <strong>{{ item.name }}</strong>
-                <small *ngIf="item.description">{{ item.description }}</small>
-                <span *ngIf="item.quantity > 1" class="quantity-badge">
-                  <mat-icon>format_list_numbered</mat-icon>
-                  {{ item.quantity }}x
-                </span>
+              <div class="item-name-container">
+                <div class="item-image-wrapper" *ngIf="item.image_url">
+                  <img [src]="item.image_url" 
+                       [alt]="item.name"
+                       class="item-image"
+                       (error)="onImageError($event)">
+                </div>
+                <div class="item-text-content">
+                  <div class="item-name">
+                    <strong>{{ item.name }}</strong>
+                    <small *ngIf="item.description">{{ item.description }}</small>
+                    <span *ngIf="item.quantity > 1" class="quantity-badge">
+                      <mat-icon>format_list_numbered</mat-icon>
+                      {{ item.quantity }}x
+                    </span>
+                  </div>
+                </div>
               </div>
             </td>
           </ng-container>
@@ -254,6 +264,14 @@
                   Verbraucht
                 </span>
               </div>
+            </div>
+
+            <!-- Produktbild -->
+            <div class="item-image-container" *ngIf="item.image_url">
+              <img [src]="item.image_url" 
+                   [alt]="item.name"
+                   class="mobile-item-image"
+                   (error)="onImageError($event)">
             </div>
 
             <!-- Beschreibung -->

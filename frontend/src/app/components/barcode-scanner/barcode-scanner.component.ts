@@ -108,7 +108,8 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
       expected_lifetime_days: [null, [Validators.min(1)]],
       reminder_enabled: [false],
       reminder_days_before: [7, [Validators.min(1)]],
-      barcode: ['']
+      barcode: [''],
+      image_url: ['']
     });
   }
 
@@ -320,6 +321,7 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
         name: this.productInfo.name || '',
         description: this.generateDescription(),
         barcode: this.productInfo.barcode || this.barcode,
+        image_url: this.productInfo.image_url || '',
         purchase_date: new Date()
       });
 

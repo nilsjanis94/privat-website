@@ -61,7 +61,7 @@ class ItemAdmin(admin.ModelAdmin):
             'fields': ('name', 'description', 'category', 'owner', 'quantity')
         }),
         ('Kaufinformationen', {
-            'fields': ('purchase_date', 'purchase_price', 'barcode')
+            'fields': ('purchase_date', 'purchase_price', 'barcode', 'image_url')
         }),
         ('Details', {
             'fields': ('location',)

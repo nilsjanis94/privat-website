@@ -83,8 +83,8 @@ class ItemSerializer(serializers.ModelSerializer):
             'owner', 'owner_name', 'quantity', 'purchase_date', 'purchase_price',
             'location', 'location_display', 'consumed', 'consumed_at',
             'expiry_date', 'expected_lifetime_days', 'reminder_enabled', 
-            'reminder_days_before', 'barcode', 'days_until_expiry', 'needs_reminder',
-            'created_at', 'updated_at'
+            'reminder_days_before', 'barcode', 'image_url', 'days_until_expiry', 
+            'needs_reminder', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'owner', 'consumed_at', 'created_at', 'updated_at']
     
@@ -116,13 +116,14 @@ class ItemCreateUpdateSerializer(serializers.ModelSerializer):
     expiry_date = serializers.DateField(allow_null=True, required=False)
     expected_lifetime_days = serializers.IntegerField(allow_null=True, required=False)
     barcode = serializers.CharField(max_length=50, allow_blank=True, required=False)
+    image_url = serializers.URLField(allow_blank=True, required=False)
     
     class Meta:
         model = Item
         fields = [
             'name', 'description', 'category', 'quantity', 'purchase_date',
             'purchase_price', 'location', 'expiry_date', 'expected_lifetime_days',
-            'reminder_enabled', 'reminder_days_before', 'barcode'
+            'reminder_enabled', 'reminder_days_before', 'barcode', 'image_url'
         ]
     
     def validate_category(self, value):

@@ -69,6 +69,7 @@ class Item(models.Model):
     
     # Barcode für Scanner-Feature
     barcode = models.CharField(max_length=50, blank=True, null=True, help_text="EAN/UPC Barcode")
+    image_url = models.URLField(blank=True, null=True, help_text="URL zum Produktbild")
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

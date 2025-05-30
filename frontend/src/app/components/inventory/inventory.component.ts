@@ -440,4 +440,13 @@ export class InventoryComponent implements OnInit {
     
     return 'category'; // Standard-Icon für unbekannte Kategorien
   }
+
+  // Fehlerbehandlung für Produktbilder
+  onImageError(event: any): void {
+    // Verstecke das Bild wenn es nicht geladen werden kann
+    const img = event.target as HTMLImageElement;
+    if (img && img.parentElement) {
+      img.parentElement.style.display = 'none';
+    }
+  }
 }

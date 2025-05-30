@@ -202,8 +202,14 @@
         
         <div *ngIf="!isLoading" class="activity-list">
           <div *ngFor="let item of getRecentItems()" class="activity-item">
-            <div class="item-avatar">
+            <div class="item-avatar" *ngIf="!item.image_url">
               <mat-icon>{{ getCategoryIcon(item.category_name) }}</mat-icon>
+            </div>
+            <div class="item-image-avatar" *ngIf="item.image_url">
+              <img [src]="item.image_url" 
+                   [alt]="item.name"
+                   class="dashboard-item-image"
+                   (error)="onImageError($event)">
             </div>
             <div class="item-details">
               <h4>

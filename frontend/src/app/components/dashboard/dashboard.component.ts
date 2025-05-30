@@ -199,15 +199,14 @@ export class DashboardComponent implements OnInit {
       'Elektronik': 'devices',
       'Möbel': 'chair',
       'Kleidung': 'checkroom',
-      'Bücher': 'book',
-      'Küche': 'kitchen',
+      'Bücher': 'menu_book',
       'Sport': 'fitness_center',
-      'Werkzeug': 'build',
+      'Küche': 'kitchen',
+      'Bad': 'bathroom',
       'Garten': 'yard',
       'Spielzeug': 'toys',
-      'Schmuck': 'diamond',
-      'Fahrzeug': 'directions_car',
-      'Haushalt': 'home'
+      'Werkzeug': 'handyman',
+      'Lebensmittel': 'restaurant'
     };
     
     return iconMap[categoryName] || 'category';
@@ -263,5 +262,22 @@ export class DashboardComponent implements OnInit {
 
   hasBudgets(): boolean {
     return !!(this.budgetDashboard?.budgets?.length);
+  }
+
+  // Fehlerbehandlung für Produktbilder
+  onImageError(event: any): void {
+    // Verstecke das Bild wenn es nicht geladen werden kann und zeige stattdessen das Icon
+    const img = event.target as HTMLImageElement;
+    if (img && img.parentElement) {
+      img.parentElement.style.display = 'none';
+      // Zeige das Standard-Avatar-Icon
+      const activityItem = img.parentElement.parentElement;
+      if (activityItem) {
+        const avatar = activityItem.querySelector('.item-avatar');
+        if (avatar) {
+          (avatar as HTMLElement).style.display = 'flex';
+        }
+      }
+    }
   }
 }

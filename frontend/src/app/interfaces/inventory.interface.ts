@@ -26,6 +26,7 @@ export interface Item {
   reminder_enabled: boolean;
   reminder_days_before: number;
   barcode?: string;
+  image_url?: string;
   days_until_expiry?: number;
   needs_reminder?: boolean;
   created_at: string;

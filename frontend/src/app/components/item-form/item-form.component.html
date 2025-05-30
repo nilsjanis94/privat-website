@@ -63,6 +63,19 @@
         <small class="help-text" *ngIf="categories?.length === 0">
           Keine Kategorien vorhanden. Klicke auf + um eine zu erstellen.
         </small>
+
+        <mat-form-field appearance="outline" class="form-field barcode-field">
+          <mat-label>Barcode (Optional)</mat-label>
+          <input matInput formControlName="barcode" placeholder="EAN/UPC Code">
+          <mat-icon matSuffix>qr_code_scanner</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Produktbild URL (Optional)</mat-label>
+          <input matInput formControlName="image_url" placeholder="https://beispiel.com/bild.jpg">
+          <mat-icon matSuffix>image</mat-icon>
+          <mat-hint>Wird automatisch aus Barcode-Scan befüllt</mat-hint>
+        </mat-form-field>
       </div>
 
       <!-- Kaufinformationen -->

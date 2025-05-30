@@ -176,10 +176,12 @@
   <mat-card *ngIf="productInfo" class="product-card">
     <mat-card-header>
       <mat-card-title>
-        {{ productInfo.found ? '✅ Produktinformationen' : '❌ Produkt nicht gefunden' }}
+        {{ productInfo.found ? '✅ Produktinformationen gefunden' : '❓ Produkt nicht gefunden' }}
       </mat-card-title>
       <mat-card-subtitle>
-        {{ productInfo.found ? 'Daten von OpenFoodFacts' : productInfo.message }}
+        {{ productInfo.found 
+            ? 'Daten von ' + (productInfo.source || 'OpenFoodFacts')
+            : 'Kein Problem! Sie können das Produkt trotzdem hinzufügen' }}
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content *ngIf="productInfo.found">
@@ -201,6 +203,10 @@
             <strong>Kategorie:</strong> {{ productInfo.category }}
           </div>
           
+          <div class="product-field" *ngIf="productInfo.description">
+            <strong>Beschreibung:</strong> {{ productInfo.description }}
+          </div>
+          
           <div class="product-field" *ngIf="productInfo.barcode">
             <strong>Barcode:</strong> {{ productInfo.barcode }}
           </div>
@@ -208,6 +214,10 @@
           <div class="product-field" *ngIf="productInfo.ingredients">
             <strong>Zutaten:</strong> 
             <p class="ingredients">{{ productInfo.ingredients }}</p>
+          </div>
+          
+          <div class="product-field source-info">
+            <strong>Datenquelle:</strong> {{ productInfo.source }}
           </div>
         </div>
       </div>
@@ -220,6 +230,52 @@
           <mat-icon>add</mat-icon>
           Zum Inventar hinzufügen
         </button>
+      </div>
+    </mat-card-content>
+    
+    <!-- Nicht gefundenes Produkt - Manuelle Eingabe anbieten -->
+    <mat-card-content *ngIf="!productInfo.found">
+      <div class="not-found-content">
+        <div class="not-found-info">
+          <mat-icon class="large-icon">info</mat-icon>
+          <h3>Produkt nicht in der Datenbank</h3>
+          <p>{{ productInfo.message }}</p>
+          <p><strong>Barcode:</strong> {{ barcode }}</p>
+          
+          <div class="tried-sources" *ngIf="productInfo.tried_sources && productInfo.tried_sources.length > 0">
+            <p><strong>Durchsuchte Datenbanken:</strong></p>
+            <ul class="sources-list">
+              <li *ngFor="let source of productInfo.tried_sources">{{ source }}</li>
+            </ul>
+          </div>
+          
+          <p class="hint">
+            Dies kann vorkommen bei:
+          </p>
+          <ul class="reasons-list">
+            <li>Elektronik-Artikeln</li>
+            <li>Kosmetik und Pflegeprodukten</li>
+            <li>Kleidung und Accessoires</li>
+            <li>Haushaltswaren</li>
+            <li>Regionalen oder sehr neuen Produkten</li>
+            <li>Produkten aus kleineren Herstellern</li>
+          </ul>
+        </div>
+        
+        <div class="manual-entry-section">
+          <h4>Kein Problem!</h4>
+          <p>Sie können das Produkt trotzdem zu Ihrem Inventar hinzufügen:</p>
+          
+          <div class="manual-actions">
+            <button mat-raised-button 
+                    color="primary" 
+                    (click)="addManualEntry()"
+                    [disabled]="showAddForm">
+              <mat-icon>edit</mat-icon>
+              Manuell hinzufügen
+            </button>
+          </div>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>
@@ -441,7 +497,7 @@
           <mat-icon>search</mat-icon>
           <div>
             <h4>Produktsuche</h4>
-            <p>Die Produktdaten werden von OpenFoodFacts abgerufen. Nicht alle Produkte sind verfügbar.</p>
+            <p>Die Produktdaten werden von mehreren Datenbanken abgerufen: UPC Database, OpenFoodFacts, UPC ItemDB und Go-UPC. Dadurch werden nicht nur Lebensmittel, sondern auch Elektronik, Kosmetik, Kleidung und viele andere Produktkategorien unterstützt.</p>
           </div>
         </div>
         

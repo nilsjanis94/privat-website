@@ -63,10 +63,14 @@ export interface BarcodeProduct {
   name?: string;
   brand?: string;
   category?: string;
+  description?: string;
   ingredients?: string;
   image_url?: string;
   barcode?: string;
   message?: string;
+  source?: string;
+  suggestion?: string;
+  tried_sources?: string[];
 }
 
 export interface BudgetDashboard {

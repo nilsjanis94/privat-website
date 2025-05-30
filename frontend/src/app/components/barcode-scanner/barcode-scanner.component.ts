@@ -303,6 +303,16 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
     }
   }
 
+  addManualEntry(): void {
+    this.showAddForm = true;
+    // Setze nur den Barcode, alles andere soll manuell eingegeben werden
+    this.addItemForm.patchValue({
+      barcode: this.barcode,
+      purchase_date: new Date()
+    });
+    this.snackBar.open('Geben Sie die Produktdaten manuell ein', 'Schließen', { duration: 3000 });
+  }
+
   private prefillFormWithProductInfo(): void {
     if (this.productInfo?.found) {
       // Formular mit Produktdaten vorausfüllen

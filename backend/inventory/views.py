@@ -12,6 +12,37 @@ import requests
 from .models import Category, Item
 from .serializers import CategorySerializer, ItemSerializer, ItemCreateUpdateSerializer
 
+# Helper function for food description generation
+def generate_food_description(product):
+    """Generiert Beschreibung für Lebensmittel aus OpenFoodFacts"""
+    parts = []
+    
+    if product.get('brands'):
+        parts.append(f"Marke: {product['brands']}")
+    
+    if product.get('categories'):
+        # Kategorien kürzen und bereinigen
+        categories = product['categories'].split(',')[:2]  # Nur erste 2 Kategorien
+        clean_categories = [cat.strip() for cat in categories if cat.strip()]
+        if clean_categories:
+            parts.append(f"Kategorie: {', '.join(clean_categories)}")
+    
+    if product.get('quantity'):
+        parts.append(f"Menge: {product['quantity']}")
+    
+    # Nährwerte falls verfügbar
+    if product.get('nutriments', {}).get('energy-kcal_100g'):
+        kcal = product['nutriments']['energy-kcal_100g']
+        parts.append(f"Energie: {kcal} kcal/100g")
+    
+    description = ' | '.join(parts)
+    
+    # Auf 200 Zeichen begrenzen
+    if len(description) > 200:
+        return description[:197] + '...'
+    
+    return description
+
 # Create your views here.
 
 # Category Views
@@ -547,42 +578,138 @@ def search_by_barcode(request, barcode):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def product_info_by_barcode(request, barcode):
-    """Holt Produktinformationen über externe API (z.B. OpenFoodFacts)"""
+    """Holt Produktinformationen über verschiedene APIs für umfassende Produktabdeckung"""
     
     try:
-        # OpenFoodFacts API für Produktinformationen
-        response = requests.get(f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json')
-        
-        if response.status_code == 200:
-            data = response.json()
+        # 1. UPC Database API - umfassende kostenlose Datenbank
+        try:
+            upc_response = requests.get(
+                f'https://api.upcdatabase.org/product/{barcode}',
+                headers={'Accept': 'application/json'},
+                timeout=10
+            )
             
-            if data.get('status') == 1:  # Produkt gefunden
-                product = data.get('product', {})
+            if upc_response.status_code == 200:
+                upc_data = upc_response.json()
                 
-                return Response({
-                    'found': True,
-                    'name': product.get('product_name', ''),
-                    'brand': product.get('brands', ''),
-                    'category': product.get('categories', ''),
-                    'ingredients': product.get('ingredients_text', ''),
-                    'image_url': product.get('image_front_url', ''),
-                    'barcode': barcode
-                })
-            else:
-                return Response({
-                    'found': False,
-                    'message': 'Produkt nicht in der Datenbank gefunden'
-                })
-        else:
-            return Response({
-                'found': False,
-                'message': 'Fehler beim Abrufen der Produktdaten'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                if upc_data.get('success') and upc_data.get('title'):
+                    return Response({
+                        'found': True,
+                        'name': upc_data.get('title', ''),
+                        'brand': upc_data.get('brand', ''),
+                        'category': upc_data.get('category', ''),
+                        'description': upc_data.get('description', ''),
+                        'image_url': upc_data.get('image', ''),
+                        'barcode': barcode,
+                        'source': 'UPC Database'
+                    })
+        except requests.exceptions.RequestException as e:
+            print(f"UPC Database API Fehler: {e}")
+        except Exception as e:
+            print(f"UPC Database API unerwarteter Fehler: {e}")
+        
+        # 2. OpenFoodFacts für Lebensmittel (bewährt und stabil)
+        try:
+            food_response = requests.get(
+                f'https://world.openfoodfacts.org/api/v0/product/{barcode}.json',
+                timeout=10
+            )
             
-    except Exception as e:
+            if food_response.status_code == 200:
+                food_data = food_response.json()
+                
+                if food_data.get('status') == 1:
+                    product = food_data.get('product', {})
+                    
+                    return Response({
+                        'found': True,
+                        'name': product.get('product_name', ''),
+                        'brand': product.get('brands', ''),
+                        'category': product.get('categories', 'Lebensmittel'),
+                        'description': generate_food_description(product),
+                        'ingredients': product.get('ingredients_text', ''),
+                        'image_url': product.get('image_front_url', ''),
+                        'barcode': barcode,
+                        'source': 'OpenFoodFacts'
+                    })
+        except requests.exceptions.RequestException as e:
+            print(f"OpenFoodFacts API Fehler: {e}")
+        except Exception as e:
+            print(f"OpenFoodFacts API unerwarteter Fehler: {e}")
+        
+        # 3. UPC Item DB als weitere Option
+        try:
+            item_db_response = requests.get(
+                f'https://api.upcitemdb.com/prod/trial/lookup?upc={barcode}',
+                timeout=10
+            )
+            
+            if item_db_response.status_code == 200:
+                item_data = item_db_response.json()
+                
+                if item_data.get('code') == 'OK' and item_data.get('items'):
+                    item = item_data['items'][0]
+                    
+                    return Response({
+                        'found': True,
+                        'name': item.get('title', ''),
+                        'brand': item.get('brand', ''),
+                        'category': item.get('category', ''),
+                        'description': item.get('description', ''),
+                        'image_url': '',  # UPC Item DB hat keine Bilder in der kostenlosen Version
+                        'barcode': barcode,
+                        'source': 'UPC ItemDB'
+                    })
+        except requests.exceptions.RequestException as e:
+            print(f"UPC ItemDB API Fehler: {e}")
+        except Exception as e:
+            print(f"UPC ItemDB API unerwarteter Fehler: {e}")
+        
+        # 4. Go-UPC API als Premium-Option (falls konfiguriert)
+        try:
+            # Diese API benötigt normalerweise einen API-Key, aber wir können es versuchen
+            go_upc_response = requests.get(
+                f'https://go-upc.com/api/v1/code/{barcode}',
+                headers={'Accept': 'application/json'},
+                timeout=10
+            )
+            
+            if go_upc_response.status_code == 200:
+                go_upc_data = go_upc_response.json()
+                
+                if go_upc_data.get('product') and go_upc_data['product'].get('name'):
+                    product = go_upc_data['product']
+                    return Response({
+                        'found': True,
+                        'name': product.get('name', ''),
+                        'brand': product.get('brand', ''),
+                        'category': product.get('category', ''),
+                        'description': product.get('description', ''),
+                        'image_url': product.get('imageUrl', ''),
+                        'barcode': barcode,
+                        'source': 'Go-UPC'
+                    })
+        except requests.exceptions.RequestException as e:
+            print(f"Go-UPC API Fehler: {e}")
+        except Exception as e:
+            print(f"Go-UPC API unerwarteter Fehler: {e}")
+        
+        # Wenn alle APIs fehlschlagen
         return Response({
             'found': False,
-            'message': f'Fehler: {str(e)}'
+            'message': 'Produkt nicht in verfügbaren Datenbanken gefunden. Sie können das Produkt trotzdem manuell hinzufügen.',
+            'suggestion': 'manual_entry',
+            'barcode': barcode,
+            'tried_sources': ['UPC Database', 'OpenFoodFacts', 'UPC ItemDB', 'Go-UPC']
+        })
+            
+    except Exception as e:
+        print(f"Allgemeiner API-Fehler: {e}")
+        return Response({
+            'found': False,
+            'message': f'Fehler beim Abrufen der Produktdaten: {str(e)}',
+            'suggestion': 'manual_entry',
+            'barcode': barcode
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Budget Dashboard View

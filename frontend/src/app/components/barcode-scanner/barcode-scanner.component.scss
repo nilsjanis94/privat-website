@@ -433,6 +433,18 @@
             max-height: 60px;
             overflow-y: auto;
           }
+
+          &.source-info {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-primary);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+
+            strong {
+              color: var(--primary-600);
+            }
+          }
         }
       }
     }
@@ -447,6 +459,114 @@
         display: flex;
         align-items: center;
         gap: 8px;
+      }
+    }
+
+    // Styles für "nicht gefunden" Sektion
+    .not-found-content {
+      text-align: center;
+      padding: 20px;
+
+      .not-found-info {
+        margin-bottom: 32px;
+
+        .large-icon {
+          font-size: 48px;
+          width: 48px;
+          height: 48px;
+          color: var(--info);
+          margin-bottom: 16px;
+        }
+
+        h3 {
+          margin: 0 0 16px 0;
+          color: var(--text-primary);
+          font-size: 1.3rem;
+          font-weight: 600;
+        }
+
+        p {
+          margin: 0 0 12px 0;
+          color: var(--text-secondary);
+          line-height: 1.6;
+
+          &.hint {
+            margin-top: 20px;
+            font-weight: 500;
+            color: var(--text-primary);
+          }
+        }
+
+        .reasons-list {
+          text-align: left;
+          max-width: 400px;
+          margin: 16px auto 0 auto;
+          padding: 16px 20px;
+          background: var(--surface-variant);
+          border-radius: 8px;
+          border-left: 3px solid var(--info);
+
+          li {
+            margin: 8px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+          }
+        }
+
+        .tried-sources {
+          margin: 20px 0;
+          padding: 16px;
+          background: var(--surface-variant);
+          border-radius: 8px;
+          border-left: 3px solid var(--warning);
+
+          p {
+            margin: 0 0 8px 0;
+            font-weight: 500;
+            color: var(--text-primary);
+          }
+
+          .sources-list {
+            margin: 0;
+            padding-left: 20px;
+            text-align: left;
+
+            li {
+              margin: 4px 0;
+              color: var(--text-secondary);
+              font-size: 0.85rem;
+            }
+          }
+        }
+      }
+
+      .manual-entry-section {
+        padding: 24px;
+        background: var(--surface-accent);
+        border-radius: 12px;
+        border: 1px solid var(--border-accent);
+
+        h4 {
+          margin: 0 0 12px 0;
+          color: var(--primary-600);
+          font-size: 1.2rem;
+          font-weight: 600;
+        }
+
+        p {
+          margin: 0 0 20px 0;
+          color: var(--text-secondary);
+          line-height: 1.5;
+        }
+
+        .manual-actions {
+          button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+          }
+        }
       }
     }
   }

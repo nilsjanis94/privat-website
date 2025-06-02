@@ -363,6 +363,28 @@
             <h3>💰 Kauf-Informationen</h3>
             
             <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Anzahl *</mat-label>
+              <input matInput 
+                     type="number"
+                     formControlName="quantity"
+                     placeholder="1"
+                     min="1"
+                     max="999"
+                     step="1">
+              <mat-icon matSuffix>inventory_2</mat-icon>
+              <mat-hint>Wie viele Stück möchten Sie hinzufügen?</mat-hint>
+              <mat-error *ngIf="formControls['quantity'].hasError('required')">
+                Anzahl ist erforderlich
+              </mat-error>
+              <mat-error *ngIf="formControls['quantity'].hasError('min')">
+                Mindestens 1 Stück erforderlich
+              </mat-error>
+              <mat-error *ngIf="formControls['quantity'].hasError('max')">
+                Maximal 999 Stück erlaubt
+              </mat-error>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="full-width">
               <mat-label>Kaufpreis</mat-label>
               <input matInput 
                      type="number"
@@ -372,6 +394,7 @@
                      step="0.01">
               <span matTextPrefix>€&nbsp;</span>
               <mat-icon matSuffix>euro</mat-icon>
+              <mat-hint>Gesamtpreis für {{formControls['quantity'].value || 1}} Stück</mat-hint>
               <mat-error *ngIf="formControls['purchase_price'].hasError('min')">
                 Preis muss mindestens 0 sein
               </mat-error>

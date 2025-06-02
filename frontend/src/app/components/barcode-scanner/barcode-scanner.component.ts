@@ -120,7 +120,7 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
       category: ['', Validators.required],
-      quantity: [1, [Validators.required, Validators.min(1)]],
+      quantity: [1, [Validators.required, Validators.min(1), Validators.max(999)]],
       purchase_price: [0, [Validators.min(0)]],
       purchase_date: [new Date()],
       location: ['', Validators.required],

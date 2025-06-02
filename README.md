@@ -219,7 +219,7 @@ RewriteRule ^.*$ /index.html [L]
 
 ## 📝 Changelog
 
-### Version 5.0.0 (AKTUELL - Januar 2025) - iOS Barcode-Scanner Revolution 📱
+### Version 5.0.0 (AKTUELL - Juni 2025) - iOS Barcode-Scanner Revolution 📱
 - **📱 Barcode-Scanner Komplett-Implementierung**: 
   - **Dual-Mode Interface**: Kamera-Scanner + Manuelle Eingabe mit Tab-Navigation
   - **Cross-Browser Kompatibilität**: Native BarcodeDetector (Chrome/Edge) + QuaggaJS (Safari/Firefox)
@@ -374,4 +374,4 @@ ps aux | grep python
 
 ---
 
-**Version**: 5.0.0 | **Letztes Update**: Januar 2025 | **Status**: ✅ Production Ready + iOS Barcode-Scanner Revolution
+**Version**: 5.0.0 | **Letztes Update**: Juni 2025 | **Status**: ✅ Production Ready + iOS Barcode-Scanner Revolution

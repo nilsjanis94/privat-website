@@ -13,7 +13,17 @@ Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungss
 - **Kategorien**: Vollständige CRUD-Operationen (Create/Read/Update/Delete) mit intelligenter Kategorie-Verwaltung
 - **Kategorie-Schutz**: Kategorien mit Items können nicht gelöscht werden (Smart Protection)
 - **Gegenstände**: Vereinfachte Item-Verwaltung mit Fokus auf Kern-Features
-- **Barcode-Scanner**: Erweiterte Barcode-Funktionalität mit verbesserter QR-Code-Unterstützung
+- **📱 Barcode-Scanner (NEU)**: 
+  - **Dual-Mode Scanning**: Kamera-basiert + Manuelle Eingabe mit Tab-Interface
+  - **Cross-Browser Support**: Native BarcodeDetector (Chrome/Edge) + QuaggaJS (Safari/Firefox)
+  - **iOS/Safari Optimiert**: Hardware-Beschleunigung, playsinline, touch-freundliche Controls
+  - **Confidence-Based Detection**: 5 konsistente Erkennungen für höchste Genauigkeit
+  - **Anti-Spam Protection**: 200ms Mindestabstand zwischen Erkennungen
+  - **Automatic Product Lookup**: Integration mit UPC Database, OpenFoodFacts, UPC ItemDB, Go-UPC
+  - **Smart Camera Management**: Automatisches Resource-Management und Error-Handling
+  - **Barcode-Formats**: EAN-13/8, UPC-A/E, Code 128, Code 39, QR-Codes
+  - **Visual Guidance**: Barcode-Ausrichtungshilfen und Scan-Frame-Overlay
+  - **Form Auto-Fill**: Automatische Produktinfo-Übernahme oder manuelle Eingabe
 - **Erweiterte Suche**: Multi-Filter-System (Name, Kategorie, Ort) mit responsiver Paginierung
 - **Mobile Card-Layout**: Touch-optimierte Item-Darstellung auf mobilen Geräten (Cards statt Tabellen)
 - **Bearbeitung & Löschung**: Vollständige Edit-Funktionalität mit sicheren Bestätigungsdialogen
@@ -30,7 +40,7 @@ Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungss
   - **Kategorien-übergreifend**: Unterstützung für "Alle Kategorien"-Budgets
   - **Detaillierte Auswertungen**: Umfassende Budget-Performance-Statistiken
 - **Kontostand-Verwaltung**: 
-  - **Editierbare Balance**: Klickbarer Kontostand mit visuellen Edit-Indikatoren
+  - **Editierbare Balance**: Klickarer Kontostand mit visuellen Edit-Indikatoren
   - **Automatische Ausgaben**: Kaufpreis wird automatisch vom Kontostand abgezogen
   - **Tages-Ausgaben-Tracking**: Echtzeit-Verfolgung der heutigen Ausgaben prominenter auf dem Dashboard
 - **Ausgaben-Historie**: Interaktive Charts mit verschiedenen Zeiträumen
@@ -100,6 +110,9 @@ Ein modernes, vollständig mobile-responsive Web-basiertes Inventar-Verwaltungss
 - **Angular Material** für umfassende UI-Komponenten mit Purple Theming
 - **TypeScript & RxJS** für typisierte, reactive Programmierung
 - **Responsive SCSS**: Mobile-First CSS mit CSS Custom Properties
+- **📱 Barcode Libraries**: 
+  - **@zxing/browser** + **@zxing/library**: Native Barcode-Erkennung für moderne Browser
+  - **QuaggaJS**: Safari/Firefox Fallback-Lösung für maximale Kompatibilität
 
 ### Deployment
 - **Apache2** Webserver mit mod_rewrite für SPA-Routing
@@ -136,6 +149,8 @@ python manage.py runserver  # Läuft auf http://localhost:8000
 # Dependencies installieren und Development Server starten
 cd frontend
 npm install
+# Neue Barcode-Scanner Dependencies
+npm install @zxing/browser@^0.1.5 @zxing/library@^0.21.3 quagga@^0.12.1
 cp src/environments/environment.prod.ts src/environments/environment.ts
 ng serve  # Läuft auf http://localhost:4200
 ```
@@ -185,6 +200,7 @@ RewriteRule ^.*$ /index.html [L]
 | `/api/inventory/items/` | GET/POST | Items verwalten |
 | `/api/inventory/items/{id}/` | PUT/DELETE | Items bearbeiten/löschen |
 | `/api/inventory/items/{id}/consume/` | POST | Als verbraucht markieren |
+| `/api/inventory/items/search-by-barcode/` | GET | **NEU**: Barcode-Suche in Inventar |
 | `/api/inventory/dashboard/` | GET | Dashboard-Statistiken |
 | `/api/inventory/expenses-chart/` | GET | Chart-Daten mit Zeitraumfilter |
 
@@ -195,9 +211,38 @@ RewriteRule ^.*$ /index.html [L]
 | `/api/budgets/{id}/` | PUT/DELETE | Budget bearbeiten/löschen |
 | `/api/budgets/analytics-data/` | GET | Budget-Analytics mit echten Daten |
 
+### Barcode-Services
+| Endpoint | Methode | Beschreibung |
+|----------|---------|--------------|
+| `/api/barcode/{barcode}/` | GET | **NEU**: Produktinfo von externen APIs |
+| **Externe APIs** | - | UPC Database, OpenFoodFacts, UPC ItemDB, Go-UPC |
+
 ## 📝 Changelog
 
-### Version 4.0.0 (Aktuell - 30.05.2025) - Phase 1 Abgeschlossen
+### Version 5.0.0 (AKTUELL - Januar 2025) - iOS Barcode-Scanner Revolution 📱
+- **📱 Barcode-Scanner Komplett-Implementierung**: 
+  - **Dual-Mode Interface**: Kamera-Scanner + Manuelle Eingabe mit Tab-Navigation
+  - **Cross-Browser Kompatibilität**: Native BarcodeDetector (Chrome/Edge) + QuaggaJS (Safari/Firefox)
+  - **iOS/Safari Volloptimierung**: Hardware-Beschleunigung, playsinline, webkit-spezifische Attribute
+  - **Confidence-Based Detection**: 5 konsistente Erkennungen für Anti-Flicker und höchste Genauigkeit
+  - **Anti-Spam Mechanismus**: 200ms Mindestabstand zwischen Erkennungen für Stabilität
+- **🔍 Produktdatenbank-Integration**: 
+  - **Multi-API-Support**: UPC Database, OpenFoodFacts, UPC ItemDB, Go-UPC für maximale Abdeckung
+  - **Automatisches Form Pre-Fill**: Produkt-Metadaten werden automatisch in Add-Form übernommen
+  - **Intelligenter Fallback**: Manuelle Eingabe bei unbekannten Barcodes mit Barcode-Übernahme
+  - **Format-Unterstützung**: EAN-13/8, UPC-A/E, Code 128, Code 39, QR-Codes
+- **🎯 Smart Camera Management**: 
+  - **Automatisches Resource-Management**: Kamera-Streams werden optimal verwaltet und freigegeben
+  - **Visual Guidance System**: Barcode-Ausrichtungshilfen, Scan-Frame-Overlay, Guide-Lines
+  - **Error-Handling & Recovery**: Umfassendes Fehler-Management mit benutzerfreundlichen Meldungen
+  - **Performance-Optimiert**: Optimierte Scan-Intervalle und Hardware-Beschleunigung
+- **🔧 Technische Innovationen**: 
+  - **Hybrid Scanning-Engine**: Beste verfügbare Library wird automatisch gewählt
+  - **TypeScript Integration**: Vollständig typisierte Barcode-Interfaces und Error-States
+  - **Mobile-First Design**: Touch-optimierte Kamera-Controls und responsive Video-Container
+  - **Live-Testing Bestätigt**: ✅ Erfolgreiche Tests auf iOS Safari und Android Chrome
+
+### Version 4.0.0 (30.05.2025) - Phase 1 Abgeschlossen
 - 💰 **Vollständiges Budget-System**: 
   - **Budget-Erstellung & -Bearbeitung**: Komplette CRUD-Operationen für kategoriebasierte und "Alle Kategorien"-Budgets
   - **Echte Budget-Analytics**: Ersetzte simulierte Daten durch tatsächliche Ausgaben-basierte Analysen
@@ -237,10 +282,6 @@ RewriteRule ^.*$ /index.html [L]
   - Inline Edit/Delete-Buttons in Kategorie-Chips
   - Erweiterte Backend-API für Kategorie-Management
 - 🧭 **Smart Navigation**: Klickbares Brand-Logo führt direkt zum Dashboard
-- 🎯 **Dialog-Verbesserungen**: 
-  - CSS-Isolation zwischen Item- und Kategorie-Dialogs
-  - Optimierte Positionierung und Padding
-  - Mobile-responsive Dialog-Layouts
 - 📊 **Dashboard-Einheitlichkeit**: Konsistente weiße Card-Darstellung
 - 🛠️ **Build-Optimierung**: Angepasste Angular Budgets für umfangreiche Features
 
@@ -290,6 +331,13 @@ ps aux | grep python
 **Features**: Touch-optimiert, Purple Design System, responsive Pagination, Card-Layouts
 
 ### Test-Features (Mobile & Desktop)
+- **📱 Barcode-Scanner (NEU)**: 
+  - **Kamera-Modus**: Teste den Live-Scanner mit echten Barcodes auf iOS Safari und Android Chrome
+  - **Produkterkennung**: Scanne Lebensmittel-Barcodes für automatische Produktinfo-Übernahme
+  - **Manueller Modus**: Teste Barcode-Eingabe für Produkte ohne Kamera
+  - **Cross-Browser**: Vergleiche Performance zwischen Chrome (nativ) und Safari (QuaggaJS)
+  - **Visual Guidance**: Prüfe Scan-Frame-Overlay und Barcode-Ausrichtungshilfen
+  - **Error-Recovery**: Teste Kamera-Berechtigungen und Fallback-Mechanismen
 - **💰 Budget-System**: 
   - **Budget-Erstellung**: Teste kategoriebasierte und "Alle Kategorien"-Budgets
   - **Budget-Bearbeitung**: Vollständige Edit-Funktionalität für alle Parameter
@@ -326,4 +374,4 @@ ps aux | grep python
 
 ---
 
-**Version**: 4.0.0 | **Letztes Update**: 30.05.2025 | **Status**: ✅ Production Ready + Budget-System Vollständig
+**Version**: 5.0.0 | **Letztes Update**: Januar 2025 | **Status**: ✅ Production Ready + iOS Barcode-Scanner Revolution

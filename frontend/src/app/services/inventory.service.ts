@@ -78,4 +78,17 @@ export class InventoryService {
   getExpensesChartData(period: string = '1M'): Observable<any> {
     return this.http.get(`${environment.apiUrl}/inventory/expenses-chart/?period=${period}`);
   }
+
+  // Barcode-Suche
+  searchByBarcode(barcode: string): Observable<Item[]> {
+    return this.http.get<any>(`${environment.apiUrl}/inventory/barcode/${barcode}/search/`)
+      .pipe(
+        map(response => response.results || response || [])
+      );
+  }
+
+  // Item hinzufügen (Alias für createItem)
+  addItem(item: any): Observable<any> {
+    return this.createItem(item);
+  }
 }

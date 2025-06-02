@@ -190,6 +190,41 @@
           height: 100%;
           object-fit: cover;
           display: block;
+          
+          // iOS-spezifische Optimierungen
+          appearance: none;
+          -webkit-appearance: none;
+          -webkit-transform: translateZ(0); // Hardware-Beschleunigung
+          transform: translateZ(0);
+          
+          // Safari-spezifische Video-Optimierungen
+          background-color: #000;
+          border: none;
+          outline: none;
+          
+          // iOS Safari Video-Fullscreen verhindern
+          &::-webkit-media-controls-fullscreen-button {
+            display: none !important;
+          }
+          
+          &::-webkit-media-controls {
+            display: none !important;
+          }
+          
+          // iOS-Video-Metadaten-Preload
+          &[preload="metadata"] {
+            background: #000;
+          }
+          
+          // Safari Video-Rendering Fix
+          &:focus {
+            outline: none;
+          }
+          
+          // Sicherstellen dass Video nicht versteckt wird
+          &:not([src]) {
+            background: #000;
+          }
         }
 
         .scanning-overlay {
@@ -206,8 +241,8 @@
 
           .scan-frame {
             position: relative;
-            width: 250px;
-            height: 150px;
+            width: 280px;
+            height: 160px;
             margin-bottom: 20px;
 
             .scan-corners {
@@ -253,6 +288,73 @@
               }
             }
 
+            // Barcode-Ausrichtungsanzeige
+            .barcode-guide {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 80%;
+              height: 60%;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+
+              .guide-lines {
+                position: relative;
+                width: 100%;
+                height: 100%;
+
+                .guide-line {
+                  position: absolute;
+                  left: 0;
+                  right: 0;
+                  height: 1px;
+                  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+                  animation: guideLinePulse 2s ease-in-out infinite;
+
+                  &.top {
+                    top: 25%;
+                    animation-delay: 0s;
+                  }
+
+                  &.center {
+                    top: 50%;
+                    background: linear-gradient(90deg, transparent, var(--accent-600), transparent);
+                    height: 2px;
+                    animation-delay: 0.3s;
+                  }
+
+                  &.bottom {
+                    top: 75%;
+                    animation-delay: 0.6s;
+                  }
+                }
+              }
+
+              .barcode-icon {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.7);
+                border-radius: 8px;
+                padding: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: iconPulse 3s ease-in-out infinite;
+
+                mat-icon {
+                  color: var(--accent-600);
+                  font-size: 24px;
+                  width: 24px;
+                  height: 24px;
+                }
+              }
+            }
+
             .scan-line {
               position: absolute;
               top: 50%;
@@ -261,17 +363,34 @@
               height: 2px;
               background: linear-gradient(90deg, transparent, var(--accent-600), transparent);
               animation: scanLine 2s ease-in-out infinite;
+              z-index: 10;
             }
           }
 
-          .scan-instruction {
-            color: white;
+          .scan-instructions {
             text-align: center;
             margin: 0;
-            padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 20px;
-            font-size: 0.9rem;
+
+            .scan-instruction {
+              margin: 0 0 8px 0;
+              padding: 4px 12px;
+              background: rgba(0, 0, 0, 0.7);
+              border-radius: 20px;
+              font-size: 0.8rem;
+              color: white;
+
+              &.primary {
+                background: rgba(124, 58, 237, 0.9);
+                font-weight: 500;
+                font-size: 0.85rem;
+              }
+
+              &.secondary {
+                background: rgba(0, 0, 0, 0.6);
+                font-size: 0.85rem;
+                color: rgba(255, 255, 255, 0.8);
+              }
+            }
           }
         }
       }
@@ -1028,6 +1147,30 @@
   100% {
     transform: translateY(20px);
     opacity: 0;
+  }
+}
+
+// Guide Line Animation
+@keyframes guideLinePulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scaleX(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+// Barcode Icon Animation
+@keyframes iconPulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
   }
 }
 

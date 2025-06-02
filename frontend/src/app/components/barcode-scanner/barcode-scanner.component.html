@@ -44,17 +44,24 @@
               </div>
 
               <!-- Camera View -->
-              <div class="camera-view" *ngIf="isCameraActive">
-                <div class="video-container">
+              <div class="camera-view">
+                <div class="video-container" [style.display]="isCameraActive ? 'block' : 'none'">
                   <video #videoElement 
                          autoplay 
                          playsinline 
                          muted
+                         preload="metadata"
+                         webkit-playsinline="true"
+                         controls="false"
+                         disablepictureinpicture
+                         (loadedmetadata)="onVideoLoaded()"
+                         (canplay)="onVideoCanPlay()"
+                         (click)="onVideoClick()"
                          class="camera-video">
                   </video>
                   
                   <!-- Scanning Overlay -->
-                  <div class="scanning-overlay" *ngIf="isScanning">
+                  <div class="scanning-overlay" *ngIf="isCameraActive">
                     <div class="scan-frame">
                       <div class="scan-corners">
                         <div class="corner top-left"></div>
@@ -62,14 +69,27 @@
                         <div class="corner bottom-left"></div>
                         <div class="corner bottom-right"></div>
                       </div>
-                      <div class="scan-line"></div>
+                      
+                      <!-- Barcode-Ausrichtungsanzeige -->
+                      <div class="barcode-guide">
+                        <div class="guide-lines">
+                          <div class="guide-line top"></div>
+                          <div class="guide-line center"></div>
+                          <div class="guide-line bottom"></div>
+                        </div>
+                        <div class="barcode-icon">
+                          <mat-icon>qr_code_scanner</mat-icon>
+                        </div>
+                      </div>
+                      
+                      <div class="scan-line" *ngIf="scanningActive"></div>
                     </div>
-                    <p class="scan-instruction">Barcode in den Rahmen halten</p>
+                    <div class="scan-instructions">
+                      <p class="scan-instruction primary">Barcode horizontal ausrichten</p>
+                      <p class="scan-instruction secondary">Halte das Gerät ruhig</p>
+                    </div>
                   </div>
                 </div>
-                
-                <!-- Hidden canvas for image processing -->
-                <canvas #canvasElement class="hidden-canvas"></canvas>
               </div>
 
               <!-- Camera Hints -->

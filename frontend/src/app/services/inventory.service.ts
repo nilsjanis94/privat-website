@@ -91,4 +91,16 @@ export class InventoryService {
   addItem(item: any): Observable<any> {
     return this.createItem(item);
   }
+
+  // Shopping List - Verbrauchte Items abrufen
+  getConsumedItems(days: number = 90): Observable<Item[]> {
+    let params = new HttpParams();
+    params = params.set('consumed', 'true');
+    params = params.set('days', days.toString());
+    
+    return this.http.get<any>(`${environment.apiUrl}/inventory/items/`, { params })
+      .pipe(
+        map(response => response.results || response || [])
+      );
+  }
 }

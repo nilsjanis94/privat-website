@@ -1,0 +1,1160 @@
+.shopping-list-container {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 120px);
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    min-height: calc(100vh - 80px);
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.25rem;
+  }
+}
+
+// Header Stats
+.header-stats {
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
+
+  .stats-card {
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+
+    // Light Mode (Standard)
+    background: linear-gradient(135deg, 
+      rgba(108, 99, 255, 0.9) 0%, 
+      rgba(255, 64, 129, 0.9) 100%);
+    color: white;
+
+    // Dark Mode
+    @media (prefers-color-scheme: dark) {
+      background: linear-gradient(135deg, 
+        var(--primary-color) 0%, 
+        var(--accent-color) 100%);
+      color: white;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+      @media (prefers-color-scheme: dark) {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    // Backup für Browser ohne prefers-color-scheme
+    &.dark-theme {
+      background: linear-gradient(135deg, 
+        var(--primary-color) 0%, 
+        var(--accent-color) 100%);
+      color: white;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    &.light-theme {
+      background: linear-gradient(135deg, 
+        rgba(108, 99, 255, 0.9) 0%, 
+        rgba(255, 64, 129, 0.9) 100%);
+      color: white;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1.5rem;
+      padding: 0.5rem;
+
+      @media (max-width: 768px) {
+        gap: 1rem;
+        padding: 1rem 0.75rem;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        text-align: center;
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-align: left;
+
+        @media (max-width: 480px) {
+          justify-content: center;
+          text-align: center;
+          gap: 0.5rem;
+        }
+
+        mat-icon {
+          font-size: 2rem;
+          width: 2rem;
+          height: 2rem;
+          opacity: 0.9;
+
+          @media (max-width: 768px) {
+            font-size: 1.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+          }
+        }
+
+        .stat-content {
+          display: flex;
+          flex-direction: column;
+
+          .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.2;
+
+            @media (max-width: 768px) {
+              font-size: 1.25rem;
+            }
+          }
+
+          .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            font-weight: 400;
+
+            @media (max-width: 768px) {
+              font-size: 0.75rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Tab Styling
+.shopping-tabs {
+  .mat-mdc-tab-group {
+    --mdc-tab-indicator-active-indicator-color: var(--accent-color);
+  }
+
+  .tab-content {
+    padding: 1.5rem 0;
+    min-height: 400px;
+
+    @media (max-width: 768px) {
+      padding: 1rem 0;
+      min-height: 300px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0.75rem 0;
+      min-height: 250px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    ::ng-deep .mat-mdc-tab {
+      min-width: 0;
+      padding: 0 8px;
+      
+      .mdc-tab__text-label {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+  }
+}
+
+// Smart Suggestions
+.suggestions-container {
+  .suggestions-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h3 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .suggestions-subtitle {
+      color: var(--text-secondary);
+      margin: 0;
+      font-size: 1rem;
+    }
+  }
+
+  .suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      gap: 0.75rem;
+    }
+
+    .suggestion-card {
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 2px solid transparent;
+
+      @media (max-width: 768px) {
+        border-radius: 8px;
+        min-height: 120px;
+      }
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+
+        @media (max-width: 768px) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      &.selected {
+        border-color: var(--accent-color);
+        background: rgba(var(--accent-color-rgb), 0.05);
+      }
+
+      .mat-mdc-card-header {
+        @media (max-width: 768px) {
+          padding: 12px 16px 8px 16px;
+        }
+
+        .item-avatar {
+          background: rgba(var(--primary-color-rgb), 0.1);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+
+          @media (max-width: 768px) {
+            width: 36px;
+            height: 36px;
+          }
+
+          mat-icon {
+            font-size: 1.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+
+            @media (max-width: 768px) {
+              font-size: 1.25rem;
+              width: 1.25rem;
+              height: 1.25rem;
+            }
+          }
+        }
+
+        .card-actions {
+          margin-left: auto;
+
+          @media (max-width: 768px) {
+            mat-checkbox {
+              ::ng-deep .mat-mdc-checkbox-touch-target {
+                width: 48px;
+                height: 48px;
+              }
+            }
+          }
+        }
+      }
+
+      .suggestion-details {
+        margin: 1rem 0;
+
+        @media (max-width: 768px) {
+          margin: 0.75rem 0;
+        }
+
+        .detail-row {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+          font-size: 0.875rem;
+          color: var(--text-secondary);
+
+          @media (max-width: 768px) {
+            font-size: 0.8rem;
+            margin-bottom: 0.4rem;
+          }
+
+          mat-icon {
+            font-size: 1rem;
+            width: 1rem;
+            height: 1rem;
+            opacity: 0.7;
+
+            @media (max-width: 768px) {
+              font-size: 0.9rem;
+              width: 0.9rem;
+              height: 0.9rem;
+            }
+          }
+        }
+      }
+
+      .priority-score {
+        margin-top: 1rem;
+
+        @media (max-width: 768px) {
+          margin-top: 0.75rem;
+        }
+
+        mat-chip-listbox {
+          display: flex;
+          justify-content: flex-end;
+
+          mat-chip {
+            @media (max-width: 768px) {
+              font-size: 0.75rem;
+              height: 24px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Manual Items
+.add-item-card {
+  margin-bottom: 2rem;
+  border-radius: 12px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+  }
+
+  .add-item-form {
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      @media (max-width: 600px) {
+        gap: 0.5rem;
+      }
+
+      .item-name-field {
+        flex: 2;
+
+        @media (max-width: 768px) {
+          flex: 1;
+        }
+      }
+
+      .quantity-field {
+        flex: 0 0 120px;
+
+        @media (max-width: 768px) {
+          flex: 1;
+        }
+      }
+
+      .category-field {
+        flex: 1;
+      }
+
+      .full-width {
+        width: 100%;
+      }
+
+      // Mobile-optimierte Input-Felder
+      @media (max-width: 768px) {
+        mat-form-field {
+          ::ng-deep .mat-mdc-form-field-wrapper {
+            min-height: 56px; // Touch-freundliche Höhe
+          }
+          
+          ::ng-deep .mat-mdc-text-field-wrapper {
+            border-radius: 8px;
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem;
+
+      @media (max-width: 768px) {
+        margin-top: 1rem;
+      }
+
+      button {
+        min-width: 140px;
+
+        @media (max-width: 768px) {
+          min-width: 120px;
+          width: 100%;
+          max-width: 200px;
+          height: 48px; // Touch-freundliche Button-Höhe
+          font-size: 1rem;
+        }
+
+        @media (max-width: 480px) {
+          width: 100%;
+          max-width: none;
+        }
+      }
+    }
+  }
+}
+
+.manual-items-container {
+  h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  .manual-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      gap: 0.75rem;
+    }
+
+    .manual-item-card {
+      border-radius: 8px;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: translateX(4px);
+
+        @media (max-width: 768px) {
+          // Weniger Hover-Effekt auf Touch-Devices
+          transform: translateX(2px);
+        }
+      }
+
+      .manual-item-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+
+        @media (max-width: 768px) {
+          gap: 0.75rem;
+          padding: 12px;
+        }
+
+        .item-info {
+          flex: 1;
+
+          .item-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+
+            @media (max-width: 768px) {
+              gap: 0.5rem;
+              margin-bottom: 0.25rem;
+              flex-wrap: wrap;
+            }
+
+            h4 {
+              margin: 0;
+              font-size: 1.1rem;
+              font-weight: 500;
+              color: var(--text-primary);
+
+              @media (max-width: 768px) {
+                font-size: 1rem;
+              }
+            }
+
+            mat-chip {
+              @media (max-width: 768px) {
+                font-size: 0.75rem;
+                height: 24px;
+              }
+            }
+          }
+
+          .item-details {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+
+            @media (max-width: 768px) {
+              font-size: 0.8rem;
+              gap: 0.75rem;
+              flex-wrap: wrap;
+            }
+
+            .category {
+              font-weight: 500;
+            }
+
+            .notes {
+              font-style: italic;
+
+              @media (max-width: 768px) {
+                // Notizen auf Mobile kürzen
+                max-width: 150px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+            }
+          }
+        }
+
+        .item-actions {
+          flex-shrink: 0;
+
+          button {
+            @media (max-width: 768px) {
+              width: 44px;
+              height: 44px; // Touch-freundliche Größe
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Shopping Mode
+.shopping-mode-container {
+  .shopping-summary {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+
+    @media (max-width: 768px) {
+      max-width: 100%;
+      margin: 0;
+      padding: 0 0.5rem;
+    }
+
+    h3 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+
+      @media (max-width: 768px) {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+      }
+    }
+
+    .selected-summary,
+    .manual-summary {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: rgba(var(--primary-color-rgb), 0.05);
+      border-radius: 12px;
+
+      @media (max-width: 768px) {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        border-radius: 8px;
+      }
+
+      @media (max-width: 480px) {
+        margin: 1rem 0;
+        padding: 0.75rem;
+      }
+
+      h4 {
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+
+        @media (max-width: 768px) {
+          font-size: 1rem;
+          margin-bottom: 0.75rem;
+        }
+      }
+
+      mat-chip-listbox {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+
+        @media (max-width: 768px) {
+          gap: 0.4rem;
+        }
+
+        mat-chip {
+          @media (max-width: 768px) {
+            font-size: 0.8rem;
+            height: 28px;
+          }
+
+          @media (max-width: 480px) {
+            font-size: 0.75rem;
+            height: 24px;
+          }
+        }
+      }
+    }
+
+    .shopping-actions {
+      margin-top: 2rem;
+
+      @media (max-width: 768px) {
+        margin-top: 1.5rem;
+      }
+
+      button {
+        min-width: 200px;
+        height: 48px;
+        font-size: 1.1rem;
+        border-radius: 24px;
+
+        @media (max-width: 768px) {
+          min-width: 160px;
+          width: 100%;
+          max-width: 280px;
+          height: 52px; // Etwas höher für Touch
+          font-size: 1rem;
+          border-radius: 16px;
+        }
+
+        @media (max-width: 480px) {
+          width: 100%;
+          max-width: none;
+          min-width: 0;
+        }
+
+        mat-icon {
+          margin-right: 0.5rem;
+
+          @media (max-width: 768px) {
+            margin-right: 0.4rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Empty States
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  min-height: 300px;
+
+  @media (max-width: 768px) {
+    padding: 2rem 1rem;
+    min-height: 200px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 1.5rem 0.5rem;
+    min-height: 150px;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    color: var(--text-disabled);
+    margin-bottom: 1rem;
+
+    @media (max-width: 768px) {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+      margin-bottom: 0.75rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 2.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+
+  h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1rem;
+    }
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    max-width: 400px;
+    line-height: 1.5;
+
+    @media (max-width: 768px) {
+      margin-bottom: 1.5rem;
+      max-width: 300px;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 480px) {
+      margin-bottom: 1rem;
+      max-width: 250px;
+      font-size: 0.85rem;
+    }
+  }
+
+  button {
+    @media (max-width: 768px) {
+      width: 100%;
+      max-width: 200px;
+      height: 44px;
+    }
+
+    @media (max-width: 480px) {
+      max-width: 180px;
+    }
+
+    mat-icon {
+      margin-right: 0.5rem;
+
+      @media (max-width: 768px) {
+        margin-right: 0.4rem;
+      }
+    }
+  }
+}
+
+// Dark Mode Support
+@media (prefers-color-scheme: dark) {
+  .suggestion-card {
+    background: var(--surface-color);
+    
+    &.selected {
+      background: rgba(var(--accent-color-rgb), 0.15);
+    }
+  }
+
+  .manual-item-card {
+    background: var(--surface-color);
+  }
+
+  .add-item-card {
+    background: var(--surface-color);
+  }
+
+  // Shopping Mode Dark Mode mit stärkerer Spezifität
+  .shopping-mode-container {
+    .selected-summary,
+    .manual-summary {
+      background: rgba(var(--primary-color-rgb), 0.1) !important;
+      border: 1px solid rgba(var(--primary-color-rgb), 0.2);
+      
+      ::ng-deep mat-chip-listbox {
+        mat-chip {
+          background-color: var(--primary-color) !important;
+          color: white !important;
+          border: 1px solid rgba(255, 255, 255, 0.3) !important;
+          
+          &:hover {
+            background-color: var(--accent-color) !important;
+            transform: translateY(-1px);
+          }
+
+          // Überschreibe Material Design spezifische Klassen
+          .mdc-evolution-chip,
+          .mat-mdc-chip {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+          }
+
+          &[color="primary"] {
+            background-color: #6c63ff !important;
+            color: white !important;
+            
+            .mdc-evolution-chip,
+            .mat-mdc-chip {
+              background-color: #6c63ff !important;
+              color: white !important;
+            }
+          }
+
+          &[color="accent"] {
+            background-color: #ff4081 !important;
+            color: white !important;
+            
+            .mdc-evolution-chip,
+            .mat-mdc-chip {
+              background-color: #ff4081 !important;
+              color: white !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Priority Score Chips mit stärkerer Spezifität
+  .priority-score {
+    ::ng-deep mat-chip-listbox {
+      mat-chip {
+        &[color="warn"] {
+          background-color: #f44336 !important;
+          color: white !important;
+          
+          .mdc-evolution-chip,
+          .mat-mdc-chip {
+            background-color: #f44336 !important;
+            color: white !important;
+          }
+        }
+        
+        &[color="accent"] {
+          background-color: var(--accent-color) !important;
+          color: white !important;
+          
+          .mdc-evolution-chip,
+          .mat-mdc-chip {
+            background-color: var(--accent-color) !important;
+            color: white !important;
+          }
+        }
+        
+        &[color="primary"] {
+          background-color: var(--primary-color) !important;
+          color: white !important;
+          
+          .mdc-evolution-chip,
+          .mat-mdc-chip {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+          }
+        }
+      }
+    }
+  }
+
+  // Manual Items Chips mit stärkerer Spezifität
+  .manual-item-card {
+    .item-header {
+      ::ng-deep mat-chip {
+        background-color: var(--accent-color) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        
+        .mdc-evolution-chip,
+        .mat-mdc-chip {
+          background-color: var(--accent-color) !important;
+          color: white !important;
+        }
+      }
+    }
+  }
+}
+
+// Light Mode - Standard Material Design Chips beibehalten (NACH Dark Mode!)
+@media (prefers-color-scheme: light) {
+  .shopping-list-container .shopping-mode-container {
+    .selected-summary,
+    .manual-summary {
+      ::ng-deep mat-chip-listbox {
+        mat-chip {
+          // Zurücksetzen aller Custom-Styles mit höchster Spezifität
+          background-color: transparent !important;
+          color: rgba(0, 0, 0, 0.87) !important;
+          border: 1px solid rgba(0, 0, 0, 0.12) !important;
+          
+          // Spezifische MDC-Klassen ansprechen
+          .mdc-evolution-chip,
+          .mat-mdc-chip,
+          .mdc-evolution-chip__text-label,
+          .mat-mdc-chip-action-label {
+            background-color: transparent !important;
+            color: rgba(0, 0, 0, 0.87) !important;
+          }
+
+          // Standard Material Design Farben im Light Mode
+          &[color="primary"] {
+            background-color: transparent !important;
+            color: #1976d2 !important;
+            border: 1px solid #1976d2 !important;
+            
+            .mdc-evolution-chip,
+            .mat-mdc-chip,
+            .mdc-evolution-chip__text-label,
+            .mat-mdc-chip-action-label {
+              background-color: transparent !important;
+              color: #1976d2 !important;
+            }
+
+            &:hover {
+              background-color: rgba(25, 118, 210, 0.08) !important;
+              transform: none !important;
+            }
+          }
+
+          &[color="accent"] {
+            background-color: transparent !important;
+            color: #e91e63 !important;
+            border: 1px solid #e91e63 !important;
+            
+            .mdc-evolution-chip,
+            .mat-mdc-chip,
+            .mdc-evolution-chip__text-label,
+            .mat-mdc-chip-action-label {
+              background-color: transparent !important;
+              color: #e91e63 !important;
+            }
+
+            &:hover {
+              background-color: rgba(233, 30, 99, 0.08) !important;
+              transform: none !important;
+            }
+          }
+
+          // Hover-Effekte überschreiben
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+            transform: none !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Light Theme Klasse (NACH Dark Mode!)
+.light-theme .shopping-list-container .shopping-mode-container {
+  .selected-summary,
+  .manual-summary {
+    ::ng-deep mat-chip-listbox {
+      mat-chip {
+        // Zurücksetzen aller Custom-Styles mit höchster Spezifität
+        background-color: transparent !important;
+        color: rgba(0, 0, 0, 0.87) !important;
+        border: 1px solid rgba(0, 0, 0, 0.12) !important;
+        
+        // Spezifische MDC-Klassen ansprechen
+        .mdc-evolution-chip,
+        .mat-mdc-chip,
+        .mdc-evolution-chip__text-label,
+        .mat-mdc-chip-action-label {
+          background-color: transparent !important;
+          color: rgba(0, 0, 0, 0.87) !important;
+        }
+
+        &[color="primary"] {
+          background-color: transparent !important;
+          color: #1976d2 !important;
+          border: 1px solid #1976d2 !important;
+          
+          .mdc-evolution-chip,
+          .mat-mdc-chip,
+          .mdc-evolution-chip__text-label,
+          .mat-mdc-chip-action-label {
+            background-color: transparent !important;
+            color: #1976d2 !important;
+          }
+
+          &:hover {
+            background-color: rgba(25, 118, 210, 0.08) !important;
+            transform: none !important;
+          }
+        }
+
+        &[color="accent"] {
+          background-color: transparent !important;
+          color: #e91e63 !important;
+          border: 1px solid #e91e63 !important;
+          
+          .mdc-evolution-chip,
+          .mat-mdc-chip,
+          .mdc-evolution-chip__text-label,
+          .mat-mdc-chip-action-label {
+            background-color: transparent !important;
+            color: #e91e63 !important;
+          }
+
+          &:hover {
+            background-color: rgba(233, 30, 99, 0.08) !important;
+            transform: none !important;
+          }
+        }
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.04) !important;
+          transform: none !important;
+        }
+      }
+    }
+  }
+}
+
+// ULTIMATIVE Light Mode Regel - Maximale Spezifität!
+body .shopping-list-container .shopping-mode-container ::ng-deep mat-chip-listbox mat-chip {
+  @media (prefers-color-scheme: light) {
+    // Alle Chip-Styles für Light Mode forcieren
+    background-color: transparent !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    
+    // Alle möglichen MDC-Unterklassen
+    * {
+      background-color: transparent !important;
+      color: inherit !important;
+    }
+    
+    .mdc-evolution-chip,
+    .mat-mdc-chip,
+    .mdc-evolution-chip__text-label,
+    .mat-mdc-chip-action-label,
+    .mat-mdc-chip-primary-focus-indicator {
+      background-color: transparent !important;
+      color: rgba(0, 0, 0, 0.87) !important;
+    }
+
+    &[color="primary"] {
+      color: #1976d2 !important;
+      border-color: #1976d2 !important;
+      
+      * {
+        color: #1976d2 !important;
+      }
+      
+      .mdc-evolution-chip,
+      .mat-mdc-chip,
+      .mdc-evolution-chip__text-label,
+      .mat-mdc-chip-action-label {
+        color: #1976d2 !important;
+      }
+    }
+
+    &[color="accent"] {
+      color: #e91e63 !important;
+      border-color: #e91e63 !important;
+      
+      * {
+        color: #e91e63 !important;
+      }
+      
+      .mdc-evolution-chip,
+      .mat-mdc-chip,
+      .mdc-evolution-chip__text-label,
+      .mat-mdc-chip-action-label {
+        color: #e91e63 !important;
+      }
+    }
+  }
+}
+
+// ULTIMATIVE Light Theme Klasse
+body .light-theme .shopping-list-container .shopping-mode-container ::ng-deep mat-chip-listbox mat-chip {
+  background-color: transparent !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  
+  * {
+    background-color: transparent !important;
+    color: inherit !important;
+  }
+  
+  .mdc-evolution-chip,
+  .mat-mdc-chip,
+  .mdc-evolution-chip__text-label,
+  .mat-mdc-chip-action-label,
+  .mat-mdc-chip-primary-focus-indicator {
+    background-color: transparent !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+
+  &[color="primary"] {
+    color: #1976d2 !important;
+    border-color: #1976d2 !important;
+    
+    * {
+      color: #1976d2 !important;
+    }
+    
+    .mdc-evolution-chip,
+    .mat-mdc-chip,
+    .mdc-evolution-chip__text-label,
+    .mat-mdc-chip-action-label {
+      color: #1976d2 !important;
+    }
+  }
+
+  &[color="accent"] {
+    color: #e91e63 !important;
+    border-color: #e91e63 !important;
+    
+    * {
+      color: #e91e63 !important;
+    }
+    
+    .mdc-evolution-chip,
+    .mat-mdc-chip,
+    .mdc-evolution-chip__text-label,
+    .mat-mdc-chip-action-label {
+      color: #e91e63 !important;
+    }
+  }
+} 

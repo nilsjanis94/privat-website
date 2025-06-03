@@ -1,0 +1,292 @@
+<div class="shopping-list-container">
+  
+  <!-- Header mit Statistiken -->
+  <div class="header-stats">
+    <mat-card class="stats-card" [ngClass]="(currentTheme$ | async) + '-theme'">
+      <mat-card-content>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <mat-icon>shopping_cart</mat-icon>
+            <div class="stat-content">
+              <span class="stat-number">{{ totalItems }}</span>
+              <span class="stat-label">Vorschläge</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <mat-icon>priority_high</mat-icon>
+            <div class="stat-content">
+              <span class="stat-number">{{ highPriorityCount }}</span>
+              <span class="stat-label">Hohe Priorität</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <mat-icon>euro</mat-icon>
+            <div class="stat-content">
+              <span class="stat-number">{{ estimatedCost | currency:'EUR':'symbol':'1.0-2' }}</span>
+              <span class="stat-label">Geschätzte Kosten</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Tab Navigation -->
+  <mat-tab-group class="shopping-tabs" mat-align-tabs="center">
+    
+    <!-- Smart Vorschläge Tab -->
+    <mat-tab label="🧠 Smart Vorschläge">
+      <div class="tab-content">
+        
+        <!-- Loading Spinner -->
+        <div *ngIf="loading" class="loading-container">
+          <mat-progress-spinner 
+            mode="indeterminate" 
+            diameter="60"
+            color="accent">
+          </mat-progress-spinner>
+          <p>Analysiere deine Verbrauchsmuster...</p>
+        </div>
+
+        <!-- Smart Suggestions List -->
+        <div *ngIf="!loading && smartSuggestions.length > 0" class="suggestions-container">
+          <div class="suggestions-header">
+            <h3>🎯 Intelligente Wiederkauf-Vorschläge</h3>
+            <p class="suggestions-subtitle">Basierend auf deinen letzten Verbrauchsdaten</p>
+          </div>
+
+          <div class="suggestions-grid">
+            <mat-card 
+              *ngFor="let item of smartSuggestions" 
+              class="suggestion-card"
+              [class.selected]="item.is_selected"
+              (click)="toggleItemSelection(item)">
+              
+              <mat-card-header>
+                <div mat-card-avatar class="item-avatar">
+                  <mat-icon [color]="getPriorityColor(item.priority_score)">
+                    {{ getPriorityIcon(item.priority_score) }}
+                  </mat-icon>
+                </div>
+                <mat-card-title>{{ item.name }}</mat-card-title>
+                <mat-card-subtitle>{{ item.category }} • Empfohlen: {{ item.quantity_needed }}x</mat-card-subtitle>
+                
+                <div class="card-actions">
+                  <mat-checkbox 
+                    [checked]="item.is_selected"
+                    (click)="$event.stopPropagation()"
+                    (change)="toggleItemSelection(item)">
+                  </mat-checkbox>
+                </div>
+              </mat-card-header>
+
+              <mat-card-content>
+                <div class="suggestion-details">
+                  <div class="detail-row">
+                    <mat-icon>schedule</mat-icon>
+                    <span>{{ item.suggestion_reason }}</span>
+                  </div>
+                  
+                  <div class="detail-row" *ngIf="item.average_consumption_quantity > 1">
+                    <mat-icon>bar_chart</mat-icon>
+                    <span>Ø Verbrauch: {{ item.average_consumption_quantity | number:'1.1-1' }}x pro Kauf</span>
+                  </div>
+                  
+                  <div class="detail-row" *ngIf="item.last_purchase_price > 0">
+                    <mat-icon>euro</mat-icon>
+                    <span>Letzter Preis: {{ item.last_purchase_price | currency:'EUR':'symbol':'1.0-2' }}</span>
+                  </div>
+                  
+                  <div class="detail-row" *ngIf="item.purchase_frequency > 1">
+                    <mat-icon>repeat</mat-icon>
+                    <span>{{ item.purchase_frequency }}x gekauft</span>
+                  </div>
+                </div>
+
+                <!-- Priority Score -->
+                <div class="priority-score">
+                  <mat-chip-listbox>
+                    <mat-chip [color]="getPriorityColor(item.priority_score)" selected>
+                      Priorität: {{ item.priority_score }}
+                    </mat-chip>
+                  </mat-chip-listbox>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+
+        <!-- No Suggestions State -->
+        <div *ngIf="!loading && smartSuggestions.length === 0" class="empty-state">
+          <mat-icon class="empty-icon">smart_toy</mat-icon>
+          <h3>Noch keine intelligenten Vorschläge</h3>
+          <p>Nutze das Inventar-System eine Weile, damit wir deine Verbrauchsmuster lernen können.</p>
+          <button mat-raised-button color="primary" routerLink="/inventory">
+            <mat-icon>inventory</mat-icon>
+            Zum Inventar
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Manuelle Items Tab -->
+    <mat-tab label="📝 Eigene Liste">
+      <div class="tab-content">
+        
+        <!-- Add Manual Item Form -->
+        <mat-card class="add-item-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>add_shopping_cart</mat-icon>
+              Artikel hinzufügen
+            </mat-card-title>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="add-item-form">
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="item-name-field">
+                  <mat-label>Artikel-Name *</mat-label>
+                  <input matInput 
+                         [(ngModel)]="newItemName" 
+                         placeholder="z.B. Milch, Brot, Shampoo"
+                         (keyup.enter)="addManualItem()">
+                  <mat-icon matSuffix>label</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="quantity-field">
+                  <mat-label>Anzahl</mat-label>
+                  <input matInput 
+                         type="number" 
+                         [(ngModel)]="newItemQuantity" 
+                         min="1" 
+                         max="99">
+                  <mat-icon matSuffix>inventory_2</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="category-field">
+                  <mat-label>Kategorie</mat-label>
+                  <input matInput 
+                         [(ngModel)]="newItemCategory" 
+                         placeholder="z.B. Lebensmittel, Drogerie">
+                  <mat-icon matSuffix>category</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Notizen (optional)</mat-label>
+                  <textarea matInput 
+                            [(ngModel)]="newItemNotes" 
+                            rows="2"
+                            placeholder="z.B. Bio, bestimmte Marke, Größe...">
+                  </textarea>
+                  <mat-icon matSuffix>note</mat-icon>
+                </mat-form-field>
+              </div>
+
+              <div class="form-actions">
+                <button mat-raised-button 
+                        color="primary" 
+                        (click)="addManualItem()"
+                        [disabled]="!newItemName.trim()">
+                  <mat-icon>add</mat-icon>
+                  Hinzufügen
+                </button>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Manual Items List -->
+        <div *ngIf="manualItems.length > 0" class="manual-items-container">
+          <h3>📋 Deine Einkaufsliste</h3>
+          
+          <div class="manual-items-list">
+            <mat-card *ngFor="let item of manualItems; let i = index" class="manual-item-card">
+              <mat-card-content>
+                <div class="manual-item-content">
+                  <div class="item-info">
+                    <div class="item-header">
+                      <h4>{{ item.name }}</h4>
+                      <mat-chip color="accent">{{ item.quantity }}x</mat-chip>
+                    </div>
+                    <div class="item-details">
+                      <span class="category">{{ item.category }}</span>
+                      <span *ngIf="item.notes" class="notes">{{ item.notes }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="item-actions">
+                    <button mat-icon-button 
+                            color="warn" 
+                            (click)="removeManualItem(i)"
+                            matTooltip="Entfernen">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+
+        <!-- Empty Manual Items State -->
+        <div *ngIf="manualItems.length === 0" class="empty-state">
+          <mat-icon class="empty-icon">edit_note</mat-icon>
+          <h3>Deine eigene Einkaufsliste ist leer</h3>
+          <p>Füge Artikel hinzu, die du gerne kaufen möchtest.</p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Einkaufsmodus Tab (Placeholder) -->
+    <mat-tab label="🛒 Einkaufen">
+      <div class="tab-content">
+        <div class="shopping-mode-container" [ngClass]="(currentTheme$ | async) + '-theme'">
+          <div class="shopping-summary">
+            <h3>🛒 Einkaufsmodus</h3>
+            <p>Hier siehst du alle ausgewählten Artikel:</p>
+            
+            <!-- Selected Items Summary -->
+            <div *ngIf="selectedItems.length > 0" class="selected-summary">
+              <h4>Smart Vorschläge ({{ selectedItems.length }})</h4>
+              <div class="selected-items">
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let item of selectedItems">
+                    {{ item.name }}
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+            </div>
+
+            <div *ngIf="manualItems.length > 0" class="manual-summary">
+              <h4>Eigene Liste ({{ manualItems.length }})</h4>
+              <div class="manual-items">
+                <mat-chip-listbox>
+                  <mat-chip *ngFor="let item of manualItems">
+                    {{ item.name }} ({{ item.quantity }}x)
+                  </mat-chip>
+                </mat-chip-listbox>
+              </div>
+            </div>
+            
+            <!-- Shopping Actions -->
+            <div class="shopping-actions">
+              <button mat-raised-button 
+                      color="primary" 
+                      size="large"
+                      (click)="startShopping()"
+                      [disabled]="selectedItems.length === 0 && manualItems.length === 0">
+                <mat-icon>shopping_cart</mat-icon>
+                Einkauf starten
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div> 

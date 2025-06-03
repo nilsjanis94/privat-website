@@ -130,6 +130,24 @@ def items_list_create(request):
     else:
         queryset = Item.objects.filter(owner=request.user).select_related('category', 'owner')
         
+        # Filter für verbrauchte/nicht verbrauchte Items
+        consumed = request.query_params.get('consumed', None)
+        if consumed is not None:
+            if consumed.lower() == 'true':
+                queryset = queryset.filter(consumed=True)
+            elif consumed.lower() == 'false':
+                queryset = queryset.filter(consumed=False)
+        
+        # Zeitraum-Filter für verbrauchte Items (für Shopping List)
+        days = request.query_params.get('days', None)
+        if days and consumed and consumed.lower() == 'true':
+            try:
+                days_int = int(days)
+                cutoff_date = timezone.now() - timedelta(days=days_int)
+                queryset = queryset.filter(consumed_at__gte=cutoff_date)
+            except (ValueError, TypeError):
+                pass  # Ignoriere ungültige days Parameter
+        
         # Suchfunktion
         search = request.query_params.get('search', None)
         if search:
@@ -143,6 +161,14 @@ def items_list_create(request):
         category = request.query_params.get('category', None)
         if category:
             queryset = queryset.filter(category_id=category)
+        
+        # Sortierung für bessere Shopping List Funktionalität
+        if consumed and consumed.lower() == 'true':
+            # Verbrauchte Items nach Verbrauchsdatum sortieren (neueste zuerst)
+            queryset = queryset.order_by('-consumed_at', '-updated_at')
+        else:
+            # Normale Items nach Update-Datum sortieren
+            queryset = queryset.order_by('-updated_at')
         
         serializer = ItemSerializer(queryset, many=True)
         return Response(serializer.data)

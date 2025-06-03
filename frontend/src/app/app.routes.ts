@@ -50,6 +50,12 @@ export const routes: Routes = [
     data: { animation: 'barcode-scanner' }
   },
   { 
+    path: 'shopping-list', 
+    loadComponent: () => import('./components/shopping-list/shopping-list.component').then(m => m.ShoppingListComponent),
+    canActivate: [authGuard],
+    data: { animation: 'shopping-list' }
+  },
+  { 
     path: 'notifications', 
     loadComponent: () => import('./components/notification-settings/notification-settings.component').then(m => m.NotificationSettingsComponent),
     canActivate: [authGuard],

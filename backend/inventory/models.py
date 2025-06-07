@@ -56,15 +56,16 @@ class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='items')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='items')
     quantity = models.PositiveIntegerField(default=1, help_text="Anzahl der Items")
+    initial_quantity = models.PositiveIntegerField(null=True, blank=True, help_text="Ursprüngliche Kaufmenge für Smart Suggestions")
     purchase_date = models.DateField(null=True, blank=True)
     purchase_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES, blank=True)
+    store = models.CharField(max_length=100, blank=True, null=True, help_text="Einkaufsgeschäft (z.B. REWE, dm, LIDL)")
     consumed = models.BooleanField(default=False)
     consumed_at = models.DateTimeField(null=True, blank=True)
     
     # Neue Felder für Verbrauchserinnerungen
     expiry_date = models.DateField(null=True, blank=True, help_text="Ablaufdatum für Lebensmittel etc.")
-    expected_lifetime_days = models.IntegerField(null=True, blank=True, help_text="Erwartete Lebensdauer in Tagen")
     reminder_enabled = models.BooleanField(default=False, help_text="Erinnerungen für dieses Item aktivieren")
     reminder_days_before = models.IntegerField(default=3, help_text="Tage vor Ablauf für Erinnerung")
     

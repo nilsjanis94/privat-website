@@ -263,10 +263,19 @@
           justify-content: center;
           width: 40px;
           height: 40px;
+          overflow: hidden;
 
           @media (max-width: 768px) {
             width: 36px;
             height: 36px;
+          }
+
+          .product-avatar-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 50%;
           }
 
           mat-icon {
@@ -1155,6 +1164,616 @@ body .light-theme .shopping-list-container .shopping-mode-container ::ng-deep ma
     .mdc-evolution-chip__text-label,
     .mat-mdc-chip-action-label {
       color: #e91e63 !important;
+    }
+  }
+}
+
+// Aktiver Einkaufsmodus Styles
+.active-shopping-container {
+  padding: 0;
+
+  .shopping-header {
+    margin-bottom: 2rem;
+
+    .shopping-progress-card {
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      background: linear-gradient(135deg, 
+        rgba(76, 175, 80, 0.9) 0%, 
+        rgba(139, 195, 74, 0.9) 100%);
+      color: white;
+
+      @media (prefers-color-scheme: dark) {
+        background: linear-gradient(135deg, 
+          rgba(76, 175, 80, 0.8) 0%, 
+          rgba(139, 195, 74, 0.8) 100%);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      &.dark-theme {
+        background: linear-gradient(135deg, 
+          rgba(76, 175, 80, 0.8) 0%, 
+          rgba(139, 195, 74, 0.8) 100%);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      .shopping-avatar {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+
+        mat-icon {
+          color: white;
+        }
+      }
+
+      .progress-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        .progress-bar {
+          flex: 1;
+          height: 8px;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 4px;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+          }
+        }
+
+        .progress-text {
+          font-weight: 600;
+          font-size: 1.1rem;
+          min-width: 50px;
+          text-align: right;
+        }
+      }
+
+      .cost-overview {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+
+        @media (max-width: 480px) {
+          grid-template-columns: 1fr;
+          gap: 0.5rem;
+        }
+
+        .cost-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem;
+          background: rgba(255, 255, 255, 0.15);
+          border-radius: 8px;
+          backdrop-filter: blur(5px);
+
+          .cost-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+          }
+
+          .cost-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+
+            &.actual {
+              color: #fff;
+              text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .shopping-items-container {
+    margin-bottom: 2rem;
+
+    h3 {
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+
+      @media (max-width: 768px) {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .shopping-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .shopping-item-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        &.purchased {
+          border-color: #4caf50;
+          background: rgba(76, 175, 80, 0.05);
+
+          @media (prefers-color-scheme: dark) {
+            background: rgba(76, 175, 80, 0.1);
+          }
+
+          .item-details h4 {
+            opacity: 0.7;
+          }
+        }
+
+        .shopping-item-content {
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+
+          @media (max-width: 768px) {
+            gap: 0.75rem;
+          }
+
+          .item-main {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+
+            .purchase-checkbox {
+              margin-top: 0.25rem;
+              flex-shrink: 0;
+            }
+
+            .item-details {
+              flex: 1;
+              min-width: 0;
+
+              h4 {
+                margin: 0 0 0.5rem 0;
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                word-break: break-word;
+
+                &.strikethrough {
+                  text-decoration: line-through;
+                }
+
+                @media (max-width: 768px) {
+                  font-size: 1.1rem;
+                }
+              }
+
+              .item-header {
+                .item-title-row {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  gap: 1rem;
+                  margin-bottom: 0.5rem;
+
+                  h4 {
+                    margin: 0;
+                    flex: 1;
+                  }
+
+                  .item-thumbnail {
+                    flex-shrink: 0;
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 3px;
+                    overflow: hidden;
+                    background: var(--surface-color);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-left: 0.5rem;
+
+                    @media (max-width: 768px) {
+                      width: 14px;
+                      height: 14px;
+                      border-radius: 2px;
+                    }
+
+                    @media (max-width: 480px) {
+                      width: 12px;
+                      height: 12px;
+                      border-radius: 2px;
+                    }
+
+                    .shopping-item-image {
+                      width: 100%;
+                      height: 100%;
+                      object-fit: cover;
+                      object-position: center;
+                    }
+                  }
+                }
+              }
+
+              .item-meta {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+                flex-wrap: wrap;
+
+                .category-chip,
+                .source-chip {
+                  font-size: 0.75rem;
+                  height: 24px;
+                  border-radius: 12px;
+                }
+
+                .source-chip {
+                  min-width: 40px;
+                }
+              }
+
+              .item-notes {
+                margin: 0;
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                font-style: italic;
+              }
+            }
+          }
+
+          .item-controls {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 0.75rem;
+            align-items: start;
+            margin-top: 0.5rem;
+
+            @media (max-width: 768px) {
+              grid-template-columns: 1fr 1fr;
+              gap: 0.5rem;
+            }
+
+            @media (max-width: 480px) {
+              grid-template-columns: 1fr;
+              gap: 0.5rem;
+            }
+
+            .quantity-control,
+            .price-control {
+              .quantity-field,
+              .price-field {
+                width: 100%;
+
+                // Kompaktere Form-Felder für Shopping-Modus
+                ::ng-deep .mat-mdc-form-field-wrapper {
+                  min-height: 48px !important;
+                }
+
+                ::ng-deep .mat-mdc-text-field-wrapper {
+                  border-radius: 6px;
+                  font-size: 0.9rem;
+                }
+
+                ::ng-deep .mat-mdc-form-field-label {
+                  font-size: 0.85rem !important;
+                }
+
+                .mat-mdc-form-field-subscript-wrapper {
+                  display: none;
+                }
+
+                input {
+                  text-align: center;
+                  font-weight: 500;
+                  font-size: 0.9rem !important;
+                  padding: 8px !important;
+
+                  &:disabled {
+                    opacity: 0.6;
+                  }
+
+                  // Bessere mobile Eingabe
+                  @media (max-width: 768px) {
+                    font-size: 16px !important;
+                  }
+                }
+
+                .mat-mdc-form-field-prefix,
+                .mat-mdc-form-field-suffix {
+                  color: var(--text-secondary);
+                  font-size: 0.8rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .shopping-actions-bottom {
+    position: sticky;
+    bottom: 0;
+    background: var(--background-primary);
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border-color);
+    margin-top: 2rem;
+    backdrop-filter: blur(10px);
+
+    @media (prefers-color-scheme: dark) {
+      background: rgba(var(--background-primary-rgb), 0.95);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      max-width: 400px;
+      margin: 0 auto;
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .cancel-btn,
+      .complete-btn {
+        flex: 1;
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+
+        mat-icon {
+          font-size: 1.2rem;
+          width: 1.2rem;
+          height: 1.2rem;
+        }
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .complete-btn {
+        background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+        
+        &:hover:not(:disabled) {
+          background: linear-gradient(135deg, #43a047 0%, #5cb85c 100%);
+        }
+      }
+    }
+  }
+}
+
+// Responsive Optimierungen für Shopping Mode
+@media (max-width: 768px) {
+  .active-shopping-container {
+    .shopping-header {
+      margin-bottom: 1.5rem;
+
+      .shopping-progress-card {
+        border-radius: 12px;
+        
+        .cost-overview {
+          gap: 0.5rem;
+          
+          .cost-item {
+            padding: 0.375rem;
+            
+            .cost-label,
+            .cost-value {
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
+    }
+
+    .shopping-items-container {
+      .shopping-items-list {
+        gap: 0.75rem;
+
+        .shopping-item-card {
+          border-radius: 8px;
+
+          .shopping-item-content {
+            .item-main {
+              gap: 0.75rem;
+            }
+
+            .item-controls {
+              gap: 0.75rem;
+            }
+          }
+        }
+      }
+    }
+
+    .shopping-actions-bottom {
+      padding: 1rem 0;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .active-shopping-container {
+    .shopping-header {
+      margin-bottom: 1rem;
+
+      .shopping-progress-card {
+        .progress-info {
+          gap: 0.75rem;
+
+          .progress-text {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+
+    .shopping-items-container {
+      .shopping-items-list {
+        gap: 0.5rem;
+
+        .shopping-item-card {
+          .shopping-item-content {
+            gap: 0.75rem;
+
+            .item-main {
+              gap: 0.5rem;
+
+              .item-details {
+                h4 {
+                  font-size: 1rem;
+                }
+
+                .item-meta {
+                  gap: 0.25rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// NEU: Store-gruppierte Einkaufsliste
+.shopping-stores-container {
+  .store-group {
+    margin-bottom: 2rem;
+
+    .store-header-card {
+      margin-bottom: 1rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, 
+        var(--primary-color) 0%, 
+        var(--accent-color) 100%);
+      color: white;
+
+      .store-avatar {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+
+      .store-progress {
+        margin-top: 0.5rem;
+
+        .progress-bar {
+          width: 100%;
+          height: 6px;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 3px;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+          }
+        }
+      }
+    }
+
+    .store-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-left: 1rem;
+      border-left: 2px solid var(--primary-color);
+      padding-left: 1rem;
+
+      @media (max-width: 768px) {
+        margin-left: 0;
+        border-left: none;
+        padding-left: 0;
+      }
+    }
+  }
+}
+
+// Store field im Form
+.form-row {
+  .store-field {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+// WICHTIGE Überschreibung für Shopping-Item-Bilder - Höchste Spezifität
+.active-shopping-container .shopping-items-container .shopping-item-card .item-thumbnail {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 3px !important;
+  margin-left: 0.5rem !important;
+  
+  @media (max-width: 768px) {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 2px !important;
+  }
+
+  @media (max-width: 480px) {
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 2px !important;
+  }
+
+  .shopping-item-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+}
+
+// WICHTIGE Überschreibung für Form-Felder im Shopping-Modus
+.active-shopping-container .item-controls .quantity-field,
+.active-shopping-container .item-controls .price-field {
+  ::ng-deep .mat-mdc-form-field-wrapper {
+    min-height: 48px !important;
+  }
+
+  ::ng-deep .mat-mdc-form-field-label {
+    font-size: 0.85rem !important;
+  }
+
+  input {
+    font-size: 0.9rem !important;
+    padding: 8px !important;
+    
+    @media (max-width: 768px) {
+      font-size: 16px !important;
     }
   }
 } 

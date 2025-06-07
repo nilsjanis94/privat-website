@@ -64,9 +64,16 @@
               
               <mat-card-header>
                 <div mat-card-avatar class="item-avatar">
-                  <mat-icon [color]="getPriorityColor(item.priority_score)">
-                    {{ getPriorityIcon(item.priority_score) }}
-                  </mat-icon>
+                  <img *ngIf="item.image_url; else iconAvatar" 
+                       [src]="item.image_url" 
+                       [alt]="item.name"
+                       class="product-avatar-image"
+                       loading="lazy">
+                  <ng-template #iconAvatar>
+                    <mat-icon [color]="getPriorityColor(item.priority_score)">
+                      {{ getPriorityIcon(item.priority_score) }}
+                    </mat-icon>
+                  </ng-template>
                 </div>
                 <mat-card-title>{{ item.name }}</mat-card-title>
                 <mat-card-subtitle>{{ item.category }} • Empfohlen: {{ item.quantity_needed }}x</mat-card-subtitle>
@@ -173,6 +180,20 @@
                          placeholder="z.B. Lebensmittel, Drogerie">
                   <mat-icon matSuffix>category</mat-icon>
                 </mat-form-field>
+                
+                <mat-form-field appearance="outline" class="store-field">
+                  <mat-label>Laden</mat-label>
+                  <input matInput 
+                         [(ngModel)]="newItemStore" 
+                         [matAutocomplete]="storeAuto"
+                         placeholder="z.B. REWE, dm, LIDL">
+                  <mat-icon matSuffix>store</mat-icon>
+                  <mat-autocomplete #storeAuto="matAutocomplete">
+                    <mat-option *ngFor="let store of commonStores" [value]="store">
+                      {{ store }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
               </div>
 
               <div class="form-row">
@@ -242,10 +263,12 @@
       </div>
     </mat-tab>
 
-    <!-- Einkaufsmodus Tab (Placeholder) -->
+    <!-- Einkaufsmodus Tab -->
     <mat-tab label="🛒 Einkaufen">
       <div class="tab-content">
-        <div class="shopping-mode-container" [ngClass]="(currentTheme$ | async) + '-theme'">
+        
+        <!-- Nicht-aktiver Einkaufsmodus: Übersicht der ausgewählten Artikel -->
+        <div *ngIf="!isShoppingActive" class="shopping-mode-container" [ngClass]="(currentTheme$ | async) + '-theme'">
           <div class="shopping-summary">
             <h3>🛒 Einkaufsmodus</h3>
             <p>Hier siehst du alle ausgewählten Artikel:</p>
@@ -282,6 +305,177 @@
                       [disabled]="selectedItems.length === 0 && manualItems.length === 0">
                 <mat-icon>shopping_cart</mat-icon>
                 Einkauf starten
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aktiver Einkaufsmodus: Interaktive Einkaufsliste -->
+        <div *ngIf="isShoppingActive" class="active-shopping-container">
+          
+          <!-- Shopping Header mit Progress -->
+          <div class="shopping-header">
+            <mat-card class="shopping-progress-card">
+              <mat-card-header>
+                <div mat-card-avatar class="shopping-avatar">
+                  <mat-icon color="primary">shopping_cart</mat-icon>
+                </div>
+                <mat-card-title>Aktiver Einkauf</mat-card-title>
+                <mat-card-subtitle>
+                  {{ getShoppingProgress().completed }} von {{ getShoppingProgress().total }} Artikel
+                </mat-card-subtitle>
+              </mat-card-header>
+              
+              <mat-card-content>
+                <!-- Progress Bar -->
+                <div class="progress-info">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="getShoppingProgress().percentage"></div>
+                  </div>
+                  <span class="progress-text">{{ getShoppingProgress().percentage }}%</span>
+                </div>
+                
+                <!-- Cost Overview -->
+                <div class="cost-overview">
+                  <div class="cost-item">
+                    <span class="cost-label">Geplant:</span>
+                    <span class="cost-value">{{ currentShoppingSession?.total_planned_cost | currency:'EUR':'symbol':'1.0-2' }}</span>
+                  </div>
+                  <div class="cost-item">
+                    <span class="cost-label">Tatsächlich:</span>
+                    <span class="cost-value actual">{{ currentShoppingSession?.total_actual_cost | currency:'EUR':'symbol':'1.0-2' }}</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <!-- Shopping Items List -->
+          <div class="shopping-items-container">
+            <h3>🏪 Einkauf nach Läden organisiert</h3>
+            
+            <!-- Gruppierung nach Läden -->
+            <div class="shopping-stores-container">
+              <div *ngFor="let store of getSortedStoreNames()" class="store-group">
+                <mat-card class="store-header-card">
+                  <mat-card-header>
+                    <div mat-card-avatar class="store-avatar">
+                      <mat-icon color="primary">store</mat-icon>
+                    </div>
+                    <mat-card-title>🏪 {{ store }}</mat-card-title>
+                    <mat-card-subtitle>
+                      {{ getStoreStats(store).purchased }} von {{ getStoreStats(store).total }} Artikel ({{ getStoreStats(store).percentage }}%)
+                    </mat-card-subtitle>
+                  </mat-card-header>
+                  
+                  <mat-card-content>
+                    <div class="store-progress">
+                      <div class="progress-bar">
+                        <div class="progress-fill" [style.width.%]="getStoreStats(store).percentage"></div>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+
+                <!-- Items für diesen Store -->
+                <div class="store-items-list">
+                  <mat-card 
+                    *ngFor="let item of getItemsByStore()[store]" 
+                    class="shopping-item-card"
+                    [class.purchased]="item.is_purchased">
+                    
+                    <mat-card-content>
+                      <div class="shopping-item-content">
+                        
+                        <!-- Checkbox und Item Info -->
+                        <div class="item-main">
+                          <mat-checkbox 
+                            [checked]="item.is_purchased"
+                            (change)="toggleItemPurchased(item)"
+                            class="purchase-checkbox">
+                          </mat-checkbox>
+                          
+                          <div class="item-details">
+                            <div class="item-header">
+                              <div class="item-title-row">
+                                <h4 [class.strikethrough]="item.is_purchased">{{ item.name }}</h4>
+                                <div *ngIf="getItemImageUrl(item)" class="item-thumbnail">
+                                  <img [src]="getItemImageUrl(item)" 
+                                       [alt]="item.name"
+                                       class="shopping-item-image"
+                                       loading="lazy">
+                                </div>
+                              </div>
+                              <div class="item-meta">
+                                <mat-chip class="category-chip">{{ item.category }}</mat-chip>
+                                <mat-chip class="source-chip" [color]="item.source === 'smart' ? 'primary' : 'accent'">
+                                  {{ item.source === 'smart' ? '🧠' : '📝' }}
+                                </mat-chip>
+                              </div>
+                            </div>
+                            <p *ngIf="item.notes" class="item-notes">{{ item.notes }}</p>
+                          </div>
+                        </div>
+
+                        <!-- Quantity und Price Controls -->
+                        <div class="item-controls">
+                          <div class="quantity-control">
+                            <mat-form-field appearance="outline" class="quantity-field">
+                              <mat-label>Anzahl</mat-label>
+                              <input matInput 
+                                     type="number" 
+                                     [(ngModel)]="item.purchased_quantity"
+                                     (ngModelChange)="updateItemQuantity(item, $event)"
+                                     min="0" 
+                                     max="99"
+                                     [disabled]="!item.is_purchased">
+                              <span matSuffix>/ {{ item.planned_quantity }}</span>
+                            </mat-form-field>
+                          </div>
+                          
+                          <div class="price-control">
+                            <mat-form-field appearance="outline" class="price-field">
+                              <mat-label>Preis</mat-label>
+                              <input matInput 
+                                     type="number" 
+                                     [(ngModel)]="item.actual_price"
+                                     (ngModelChange)="updateItemPrice(item, $event)"
+                                     min="0" 
+                                     step="0.01"
+                                     placeholder="0.00"
+                                     [disabled]="!item.is_purchased">
+                              <span matPrefix>€&nbsp;</span>
+                              <span matSuffix *ngIf="item.planned_price">({{ item.planned_price | currency:'EUR':'symbol':'1.0-2' }})</span>
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shopping Actions -->
+          <div class="shopping-actions-bottom">
+            <div class="action-buttons">
+              <button mat-raised-button 
+                      color="warn"
+                      (click)="cancelShoppingSession()"
+                      class="cancel-btn">
+                <mat-icon>cancel</mat-icon>
+                Abbrechen
+              </button>
+              
+              <button mat-raised-button 
+                      color="primary"
+                      (click)="completeShoppingSession()"
+                      [disabled]="getShoppingProgress().completed === 0 || loading"
+                      class="complete-btn">
+                <mat-icon>check_circle</mat-icon>
+                <span *ngIf="!loading">Einkauf abschließen</span>
+                <span *ngIf="loading">Verarbeite...</span>
               </button>
             </div>
           </div>

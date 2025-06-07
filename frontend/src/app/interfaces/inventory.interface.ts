@@ -15,14 +15,15 @@ export interface Item {
   owner: number;
   owner_name: string;
   quantity: number;
+  initial_quantity?: number;
   purchase_date?: string;
   purchase_price?: number;
   location: string;
   location_display?: string;
+  store?: string;
   consumed: boolean;
   consumed_at?: string;
   expiry_date?: string;
-  expected_lifetime_days?: number;
   reminder_enabled: boolean;
   reminder_days_before: number;
   barcode?: string;

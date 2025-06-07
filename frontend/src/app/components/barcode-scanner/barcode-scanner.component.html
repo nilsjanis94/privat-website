@@ -346,7 +346,7 @@
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Kategorie *</mat-label>
-              <mat-select formControlName="category">
+              <mat-select formControlName="category" (selectionChange)="onCategoryChange()">
                 <mat-option *ngFor="let category of categories" [value]="category.id">
                   {{ category.name }}
                 </mat-option>
@@ -409,6 +409,21 @@
               <mat-datepicker-toggle matIconSuffix [for]="purchasePicker"></mat-datepicker-toggle>
               <mat-datepicker #purchasePicker></mat-datepicker>
             </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Einkaufsort</mat-label>
+              <input matInput 
+                     formControlName="store"
+                     [matAutocomplete]="storeAuto"
+                     placeholder="z.B. REWE, dm, LIDL">
+              <mat-icon matSuffix>store</mat-icon>
+              <mat-autocomplete #storeAuto="matAutocomplete">
+                <mat-option *ngFor="let store of commonStores" [value]="store">
+                  {{ store }}
+                </mat-option>
+              </mat-autocomplete>
+              <mat-hint>Wo haben Sie das Produkt gekauft?</mat-hint>
+            </mat-form-field>
           </div>
 
           <!-- Standort & Verwaltung -->
@@ -437,17 +452,6 @@
               <mat-datepicker-toggle matIconSuffix [for]="expiryPicker"></mat-datepicker-toggle>
               <mat-datepicker #expiryPicker></mat-datepicker>
               <mat-hint>Optional für Lebensmittel oder zeitlich begrenzte Gegenstände</mat-hint>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Erwartete Lebensdauer (Tage)</mat-label>
-              <input matInput 
-                     type="number"
-                     formControlName="expected_lifetime_days"
-                     placeholder="z.B. 365"
-                     min="1">
-              <mat-icon matSuffix>schedule</mat-icon>
-              <mat-hint>Wie lange soll der Gegenstand voraussichtlich halten?</mat-hint>
             </mat-form-field>
           </div>
 

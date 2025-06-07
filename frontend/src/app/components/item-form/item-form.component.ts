@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { InventoryService } from '../../services/inventory.service';
 import { ToastrService } from 'ngx-toastr';
 import { ItemCondition, ItemLocation } from '../../interfaces/inventory.interface';
@@ -33,7 +34,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSlideToggleModule
   ],
   templateUrl: './item-form.component.html',
   styleUrls: ['./item-form.component.scss'],
@@ -64,8 +66,12 @@ export class ItemFormComponent {
         category: [data.item.category, Validators.required],
         quantity: [data.item.quantity || 1, [Validators.required, Validators.min(1)]],
         location: [data.item.location],
+        store: [data.item.store || ''],
         purchase_date: [data.item.purchase_date ? data.item.purchase_date.split('T')[0] : ''],
         purchase_price: [data.item.purchase_price ? data.item.purchase_price.toString() : ''],
+        expiry_date: [data.item.expiry_date ? data.item.expiry_date.split('T')[0] : ''],
+        reminder_enabled: [data.item.reminder_enabled || false],
+        reminder_days_before: [data.item.reminder_days_before || 7, [Validators.min(1)]],
         barcode: [data.item.barcode || ''],
         image_url: [data.item.image_url || '']
       });
@@ -76,8 +82,12 @@ export class ItemFormComponent {
         category: ['', Validators.required],
         quantity: [1, [Validators.required, Validators.min(1)]],
         location: [''],
+        store: [''],
         purchase_date: [''],
         purchase_price: [''],
+        expiry_date: [''],
+        reminder_enabled: [false],
+        reminder_days_before: [7, [Validators.min(1)]],
         barcode: [''],
         image_url: ['']
       });
@@ -158,12 +168,34 @@ export class ItemFormComponent {
         }
       }
       
+      // NEU: Expiry Date formatieren
+      if (formData.expiry_date) {
+        const date = new Date(formData.expiry_date);
+        if (!isNaN(date.getTime())) {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          formData.expiry_date = `${year}-${month}-${day}`;
+        } else {
+          formData.expiry_date = null;
+        }
+      }
+      
       // Leere Strings zu null konvertieren
       if (formData.purchase_price === '') {
         formData.purchase_price = null;
       }
       if (formData.purchase_date === '') {
         formData.purchase_date = null;
+      }
+      if (formData.expiry_date === '') {
+        formData.expiry_date = null;
+      }
+      if (formData.store === '') {
+        formData.store = null;
+      }
+      if (formData.location === '') {
+        formData.location = null;
       }
       
       console.log('Sending data:', formData); // Debug-Ausgabe

@@ -51,9 +51,9 @@ class ReminderAdmin(admin.ModelAdmin):
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('name', 'quantity', 'category', 'owner', 'purchase_price', 'expiry_date', 'barcode', 'created_at')
-    list_filter = ('category', 'created_at', 'owner', 'consumed', 'reminder_enabled')
-    search_fields = ('name', 'description', 'location', 'barcode')
+    list_display = ('name', 'quantity', 'category', 'owner', 'purchase_price', 'store', 'expiry_date', 'barcode', 'created_at')
+    list_filter = ('category', 'created_at', 'owner', 'consumed', 'reminder_enabled', 'store')
+    search_fields = ('name', 'description', 'location', 'store', 'barcode')
     ordering = ('-created_at',)
     
     fieldsets = (
@@ -61,13 +61,13 @@ class ItemAdmin(admin.ModelAdmin):
             'fields': ('name', 'description', 'category', 'owner', 'quantity')
         }),
         ('Kaufinformationen', {
-            'fields': ('purchase_date', 'purchase_price', 'barcode', 'image_url')
+            'fields': ('purchase_date', 'purchase_price', 'store', 'barcode', 'image_url')
         }),
         ('Details', {
             'fields': ('location',)
         }),
         ('Ablauf & Erinnerungen', {
-            'fields': ('expiry_date', 'expected_lifetime_days', 'reminder_enabled', 'reminder_days_before')
+            'fields': ('expiry_date', 'reminder_enabled', 'reminder_days_before')
         }),
         ('Status', {
             'fields': ('consumed', 'consumed_at')

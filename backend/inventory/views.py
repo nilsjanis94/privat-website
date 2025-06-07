@@ -121,7 +121,12 @@ def items_list_create(request):
                     }, status=status.HTTP_400_BAD_REQUEST)
             
             try:
-                item = serializer.save(owner=request.user)
+                # Setze initial_quantity auf quantity falls nicht bereits gesetzt
+                if serializer.validated_data.get('initial_quantity') is None:
+                    quantity = serializer.validated_data.get('quantity', 1)
+                    item = serializer.save(owner=request.user, initial_quantity=quantity)
+                else:
+                    item = serializer.save(owner=request.user)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

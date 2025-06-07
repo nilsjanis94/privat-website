@@ -59,6 +59,13 @@
             <mat-icon matSuffix>location_on</mat-icon>
           </mat-form-field>
         </div>
+        
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Einkaufsort (optional)</mat-label>
+          <input matInput formControlName="store" placeholder="z.B. REWE, dm, LIDL">
+          <mat-icon matSuffix>store</mat-icon>
+          <mat-hint>Wo haben Sie das Produkt gekauft?</mat-hint>
+        </mat-form-field>
 
         <small class="help-text" *ngIf="categories?.length === 0">
           Keine Kategorien vorhanden. Klicke auf + um eine zu erstellen.
@@ -95,6 +102,37 @@
             <input matInput type="number" formControlName="purchase_price" min="0" step="0.01" placeholder="0.00">
             <span matTextSuffix>€</span>
             <mat-hint>Gesamtpreis für alle {{ (itemForm.get('quantity')?.value || 1) }} Stück</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Ablauf & Erinnerungen -->
+      <div class="form-section">
+        <h3>Ablauf & Erinnerungen</h3>
+        
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Ablaufdatum (optional)</mat-label>
+          <input matInput [matDatepicker]="expiryPicker" formControlName="expiry_date">
+          <mat-datepicker-toggle matIconSuffix [for]="expiryPicker"></mat-datepicker-toggle>
+          <mat-datepicker #expiryPicker></mat-datepicker>
+          <mat-hint>Für Lebensmittel oder zeitlich begrenzte Gegenstände</mat-hint>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Erinnerungen aktiviert</mat-label>
+            <mat-select formControlName="reminder_enabled">
+              <mat-option [value]="true">Ja</mat-option>
+              <mat-option [value]="false">Nein</mat-option>
+            </mat-select>
+            <mat-icon matSuffix>notifications</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field" *ngIf="itemForm.get('reminder_enabled')?.value">
+            <mat-label>Erinnerung (Tage vorher)</mat-label>
+            <input matInput type="number" formControlName="reminder_days_before" min="1" max="365" placeholder="7">
+            <mat-icon matSuffix>schedule</mat-icon>
+            <mat-hint>Wie viele Tage vor Ablauf sollen Sie erinnert werden?</mat-hint>
           </mat-form-field>
         </div>
       </div>

@@ -13,6 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatOptionModule } from '@angular/material/core';
 import { Router } from '@angular/router';
 
 import { BarcodeService } from '../../services/barcode.service';
@@ -43,7 +45,9 @@ declare global {
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatAutocompleteModule,
+    MatOptionModule
   ],
   templateUrl: './barcode-scanner.component.html',
   styleUrl: './barcode-scanner.component.scss'
@@ -73,6 +77,28 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
   addItemForm: FormGroup;
   categories: Category[] = [];
   locations = Object.values(ItemLocation);
+  
+  // NEU: Store-Liste für Einkaufsgeschäfte (jetzt mit dediziertem Backend-Feld)
+  commonStores = [
+    'REWE',
+    'EDEKA', 
+    'LIDL',
+    'ALDI',
+    'dm',
+    'Rossmann',
+    'Kaufland',
+    'Real',
+    'PENNY',
+    'Netto',
+    'Müller',
+    'MediaMarkt',
+    'Saturn',
+    'Bauhaus',
+    'OBI',
+    'Apotheke',
+    'Bäckerei',
+    'Metzgerei'
+  ];
 
   private isCameraStarting = false;
   private supportsBarcodeDetector = false;
@@ -124,8 +150,8 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
       purchase_price: [0, [Validators.min(0)]],
       purchase_date: [new Date()],
       location: ['', Validators.required],
+      store: [''],
       expiry_date: [''],
-      expected_lifetime_days: [null, [Validators.min(1)]],
       reminder_enabled: [false],
       reminder_days_before: [7, [Validators.min(1)]],
       barcode: [''],
@@ -1158,9 +1184,7 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
     this.addItemForm.patchValue({ 
       barcode: this.barcode,
       name: '',
-      description: '',
-      category: '',
-      location: ''
+      description: ''
     });
   }
 
@@ -1172,7 +1196,7 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
     this.addItemForm.patchValue({
       name: this.productInfo.name || '',
       description: this.generateDescription(),
-      category: category?.name || '',
+      category: category?.id || '',
       barcode: this.barcode,
       image_url: this.productInfo.image_url || ''
     });
@@ -1220,13 +1244,23 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
     this.isSubmitting = true;
     const formData = this.addItemForm.value;
     
-    // Datum formatieren
-    if (formData.expiry_date) {
+    // Debug: Zeige gesendete Daten
+    console.log('🚀 [DEBUG] Sende Daten an Backend:', formData);
+    
+    // Datum formatieren - nur wenn Werte vorhanden sind
+    if (formData.expiry_date && formData.expiry_date !== '') {
       formData.expiry_date = this.formatDate(formData.expiry_date);
+    } else {
+      formData.expiry_date = null; // Explizit auf null setzen
     }
-    if (formData.purchase_date) {
+    
+    if (formData.purchase_date && formData.purchase_date !== '') {
       formData.purchase_date = this.formatDate(formData.purchase_date);
+    } else {
+      formData.purchase_date = null; // Explizit auf null setzen
     }
+
+    console.log('🚀 [DEBUG] Finaler Payload nach Formatierung:', formData);
 
     this.inventoryService.addItem(formData).subscribe({
       next: (response: any) => {
@@ -1238,9 +1272,20 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
         this.goToInventory();
       },
       error: (error: any) => {
-        console.error('Fehler beim Hinzufügen:', error);
-        this.snackBar.open('Fehler beim Hinzufügen des Artikels', 'Schließen', { 
-          duration: 5000,
+        console.error('❌ [DEBUG] Vollständiger Fehler beim Hinzufügen:', error);
+        console.error('❌ [DEBUG] Error Status:', error.status);
+        console.error('❌ [DEBUG] Error Message:', error.message);
+        console.error('❌ [DEBUG] Error Details:', error.error);
+        
+        let errorMessage = 'Fehler beim Hinzufügen des Artikels';
+        if (error.error && typeof error.error === 'object') {
+          const errorDetails = JSON.stringify(error.error, null, 2);
+          console.error('❌ [DEBUG] Backend-Validierungsfehler:', errorDetails);
+          errorMessage += ': ' + errorDetails;
+        }
+        
+        this.snackBar.open(errorMessage, 'Schließen', { 
+          duration: 8000,
           panelClass: ['error-snackbar']
         });
       },
@@ -1283,13 +1328,16 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
 
   getLocationDisplayName(location: string): string {
     const locationMap: { [key: string]: string } = {
-      [ItemLocation.KUECHE]: 'Küche',
-      [ItemLocation.SCHLAFZIMMER]: 'Schlafzimmer', 
-      [ItemLocation.WOHNZIMMER]: 'Wohnzimmer',
-      [ItemLocation.BAD]: 'Badezimmer',
-      [ItemLocation.BUERO]: 'Büro',
-      [ItemLocation.GARAGE]: 'Garage',
-      [ItemLocation.SONSTIGES]: 'Sonstiges'
+      'wohnzimmer': 'Wohnzimmer',
+      'schlafzimmer': 'Schlafzimmer',
+      'kueche': 'Küche',
+      'bad': 'Bad',
+      'buero': 'Büro',
+      'keller': 'Keller',
+      'dachboden': 'Dachboden',
+      'garage': 'Garage',
+      'balkon': 'Balkon',
+      'sonstiges': 'Sonstiges'
     };
     return locationMap[location] || location;
   }
@@ -1324,6 +1372,50 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy, AfterViewInit
     if (video && video.paused) {
       console.log('🖱️ Video clicked - attempting manual play');
       video.play().catch(console.error);
+    }
+  }
+
+  // Store-Vorschlag basierend auf Kategorie (jetzt mit dediziertem Backend-Feld)
+  getDefaultStoreForCategory(categoryName?: string): string {
+    if (!categoryName) return '';
+    
+    switch (categoryName.toLowerCase()) {
+      case 'lebensmittel':
+      case 'getränke':
+      case 'frisch':
+        return 'REWE';
+      case 'drogerie':
+      case 'kosmetik':
+      case 'pflege':
+        return 'dm';
+      case 'elektronik':
+      case 'technik':
+        return 'MediaMarkt';
+      case 'haushalt':
+      case 'reinigung':
+        return 'LIDL';
+      case 'medizin':
+      case 'gesundheit':
+        return 'Apotheke';
+      case 'baumarkt':
+      case 'garten':
+        return 'Bauhaus';
+      default:
+        return '';
+    }
+  }
+
+  // Kategorie-Änderung Handler um Store vorzuschlagen (jetzt mit dediziertem Backend-Feld)
+  onCategoryChange(): void {
+    const selectedCategoryId = this.addItemForm.get('category')?.value;
+    if (selectedCategoryId) {
+      const category = this.categories.find(c => c.id === selectedCategoryId);
+      if (category) {
+        const suggestedStore = this.getDefaultStoreForCategory(category.name);
+        if (suggestedStore && !this.addItemForm.get('store')?.value) {
+          this.addItemForm.patchValue({ store: suggestedStore });
+        }
+      }
     }
   }
 } 
